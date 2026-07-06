@@ -2,8 +2,6 @@
 title: On-Premise
 ---
 
-import { Callout, Card, Cards, Steps } from 'nextra/components'
-
 # On-Premise
 
 Deploy Xilos in your own data center or private cloud with full data sovereignty. On-Premise is air-gapped capable, has no external dependencies, and gives you complete control over the platform. This is the final phase of the [three-phase journey](/deployment/three-phase-journey).
@@ -22,13 +20,10 @@ With On-Premise, the Xilos platform runs entirely on infrastructure you control.
 | GPU for fine-tuned models | 1 × NVIDIA GPU (24 GB VRAM) | 2 × NVIDIA GPUs (40 GB VRAM each) |
 | Load balancer | Hardware or software | Hardware with HA |
 
-<Callout type="info">
-  GPU requirements vary based on the models you intend to host. Xilos provides sizing guidance based on your expected query volume and model selection.
-</Callout>
+> **Info:** GPU requirements vary based on the models you intend to host. Xilos provides sizing guidance based on your expected query volume and model selection.
 
 ## Installation
 
-<Steps>
   ### Obtain a License
   Contact Xilos to obtain an On-Premise license and deployment package. The license is tied to your organization and includes a defined number of seats and models.
 
@@ -46,7 +41,6 @@ With On-Premise, the Xilos platform runs entirely on infrastructure you control.
 
   ### Validate and Go Live
   Run smoke tests, verify routing and restrictions, and confirm audit logging. Xilos support assists with validation.
-</Steps>
 
 ## Licensing
 
@@ -55,9 +49,7 @@ With On-Premise, the Xilos platform runs entirely on infrastructure you control.
 - **Model hosting** — The license includes hosting of the internal SLM and a defined number of fine-tuned models.
 - **Air-gapped activation** — Offline activation is supported for air-gapped environments.
 
-<Callout type="warning">
-  On-Premise licenses must be renewed annually. Expired licenses result in read-only mode — existing configurations remain accessible but new queries are not processed. Contact Xilos for renewal.
-</Callout>
+> **Warning:** On-Premise licenses must be renewed annually. Expired licenses result in read-only mode — existing configurations remain accessible but new queries are not processed. Contact Xilos for renewal.
 
 ## Air-Gapped Operation
 
@@ -68,26 +60,14 @@ On-Premise supports fully air-gapped operation:
 - Software updates are delivered as offline packages.
 - The internal SLM and fine-tuned models run on local GPU hardware.
 
-<Callout type="info">
-  For air-gapped deployments, you must self-host all LLM models. OpenAI, Anthropic, and other cloud-based providers are not available. Use open-weight models like Llama or Mistral, or your own fine-tuned models.
-</Callout>
+> **Info:** For air-gapped deployments, you must self-host all LLM models. OpenAI, Anthropic, and other cloud-based providers are not available. Use open-weight models like Llama or Mistral, or your own fine-tuned models.
 
 ## When to Choose On-Premise
 
-<Cards>
-  <Card title="Full data sovereignty" href="/deployment">
-    All data must remain within your physical premises.
-  </Card>
-  <Card title="Air-gapped networks" href="/deployment">
-    No internet connectivity is available or permitted.
-  </Card>
-  <Card title="No external API dependencies" href="/deployment">
-    All models must be self-hosted with no cloud provider calls.
-  </Card>
-  <Card title="Maximum control" href="/deployment">
-    You need full control over hardware, network, and software stack.
-  </Card>
-</Cards>
+- **[Full data sovereignty](/deployment)** — All data must remain within your physical premises.
+- **[Air-gapped networks](/deployment)** — No internet connectivity is available or permitted.
+- **[No external API dependencies](/deployment)** — All models must be self-hosted with no cloud provider calls.
+- **[Maximum control](/deployment)** — You need full control over hardware, network, and software stack.
 
 ## Security
 

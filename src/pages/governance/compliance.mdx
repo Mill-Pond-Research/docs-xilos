@@ -2,25 +2,15 @@
 title: Compliance Frameworks
 ---
 
-import { Card, Cards, Callout, Tabs } from 'nextra/components'
-
 # Compliance Frameworks
 
 Xilos supports the compliance frameworks that matter most to enterprise AI deployments. Each framework maps to specific Xilos features that help you meet your regulatory and contractual obligations.
 
 ## Supported Frameworks
 
-<Cards>
-  <Card title="HIPAA" href="/governance/hipaa">
-    Healthcare data protection with BAA, PII detection, and audit logging.
-  </Card>
-  <Card title="GDPR" href="/governance/gdpr">
-    EU data residency, data subject rights, and PII detection.
-  </Card>
-  <Card title="SOC 2" href="/governance/soc2">
-    Security, availability, processing integrity, confidentiality, and privacy.
-  </Card>
-</Cards>
+- **[HIPAA](/governance/hipaa)** — Healthcare data protection with BAA, PII detection, and audit logging.
+- **[GDPR](/governance/gdpr)** — EU data residency, data subject rights, and PII detection.
+- **[SOC 2](/governance/soc2)** — Security, availability, processing integrity, confidentiality, and privacy.
 
 ## How Xilos Helps
 
@@ -65,9 +55,7 @@ Forward governance events to your SIEM platform via the [SIEM API](/api-referenc
 | RBAC | ✅ | ✅ | ✅ |
 | SIEM export | ✅ | ✅ | ✅ |
 
-<Callout type="info">
-  Xilos provides the tools and controls to support these frameworks, but compliance is a shared responsibility. Your organization is responsible for configuring policies, managing access, and conducting regular audits.
-</Callout>
+> **Info:** Xilos provides the tools and controls to support these frameworks, but compliance is a shared responsibility. Your organization is responsible for configuring policies, managing access, and conducting regular audits.
 
 ## Deployment Options and Compliance
 
@@ -81,24 +69,25 @@ For HIPAA compliance, a Business Associate Agreement (BAA) is available across a
 
 ## Getting Started
 
-<Tabs>
-  <Tabs.Tab title="HIPAA">
-    1. Contact Xilos to execute a BAA.
+### HIPAA
+
+1. Contact Xilos to execute a BAA.
     2. Configure [data residency](/governance/data-residency) to US region.
     3. Enable PII detection and create restriction rules for PHI.
     4. Set up [SIEM export](/api-reference/siem) for audit events.
     5. Review the [HIPAA guide](/governance/hipaa) for detailed steps.
-  </Tabs.Tab>
-  <Tabs.Tab title="GDPR">
-    1. Configure [data residency](/governance/data-residency) to EU region.
+
+### GDPR
+
+1. Configure [data residency](/governance/data-residency) to EU region.
     2. Enable PII detection and create restriction rules for personal data.
     3. Review the [GDPR guide](/governance/gdpr) for data subject rights.
     4. Set up data deletion procedures for right-to-erasure requests.
-  </Tabs.Tab>
-  <Tabs.Tab title="SOC 2">
-    1. Review the [SOC 2 guide](/governance/soc2) for trust service criteria.
+
+### SOC 2
+
+1. Review the [SOC 2 guide](/governance/soc2) for trust service criteria.
     2. Configure [RBAC](/governance/role-based-access) to scope access.
     3. Enable [audit trail](/governance/audit-trail) logging.
     4. Set up [SIEM export](/api-reference/siem) for continuous monitoring.
-  </Tabs.Tab>
-</Tabs>
+

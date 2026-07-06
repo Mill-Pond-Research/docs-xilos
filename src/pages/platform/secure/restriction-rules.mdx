@@ -2,8 +2,6 @@
 title: Restriction Rules
 ---
 
-import { Callout, Tabs } from 'nextra/components'
-
 # Restriction Rules
 
 Restriction rules are custom security policies that extend Xilos's built-in guardrails. Each rule evaluates incoming queries for specific threats, policy violations, or sensitive data patterns, then enforces an action — Block, Mask, or Flag. Rules are created in natural language through the Xilos dashboard. No code is required.
@@ -14,9 +12,7 @@ The foundation of effective rule creation begins with selecting the appropriate 
 
 ### AI Matching (Recommended)
 
-<Callout type="info">
-  Recommended for new users and for rules requiring natural language understanding.
-</Callout>
+> **Info:** Recommended for new users and for rules requiring natural language understanding.
 
 AI matching uses natural language processing to understand context and semantic meaning. It analyzes the intent behind queries rather than matching specific words.
 
@@ -119,35 +115,35 @@ The trigger phrase is the core intelligence of your rule. It must complete the s
 
 Action types determine what happens when a rule triggers.
 
-<Tabs>
-  <Tabs.Tab title="Block 🚫">
-    **Use case:** Prevent dangerous or prohibited queries from processing.
+### Block 🚫
+
+**Use case:** Prevent dangerous or prohibited queries from processing.
 
     **Impact:** Complete query termination. The LLM is never called.
 
     **Best for:** Security threats, policy violations, malware detection, credential leaks.
 
     **Consideration:** May impact user experience if overused.
-  </Tabs.Tab>
-  <Tabs.Tab title="Mask 🎭">
-    **Use case:** Allow query processing while hiding sensitive information.
+
+### Mask 🎭
+
+**Use case:** Allow query processing while hiding sensitive information.
 
     **Impact:** Redacts specific content, permits safe portions to proceed.
 
     **Best for:** PII protection, data privacy compliance.
 
     **Consideration:** Balances security with functionality.
-  </Tabs.Tab>
-  <Tabs.Tab title="Flag 🚩">
-    **Use case:** Allow query while generating alerts for monitoring.
+
+### Flag 🚩
+
+**Use case:** Allow query while generating alerts for monitoring.
 
     **Impact:** Creates audit trail without blocking functionality.
 
     **Best for:** Compliance monitoring, behavioral analysis, trend detection.
 
     **Consideration:** Requires active monitoring and response processes.
-  </Tabs.Tab>
-</Tabs>
 
 ## Sample Queries
 
@@ -161,45 +157,42 @@ Including three diverse sample queries is essential for rule validation and long
 - **Quality assurance** — Ensures comprehensive rule testing
 - **Team training** — Helps colleagues understand rule intent and scope
 
-<Callout type="warning">
-  Rules cannot be edited after saving. You can enable, disable, or delete rules, or create new rules with updated criteria. Thoroughly test before saving using the Rule Tester panel.
-</Callout>
+> **Warning:** Rules cannot be edited after saving. You can enable, disable, or delete rules, or create new rules with updated criteria. Thoroughly test before saving using the Rule Tester panel.
 
 ## Creating a Rule
 
-<Tabs>
-  <Tabs.Tab title="Step 1: Rule Type">
-    Choose **Use AI** or **Keywords** based on your matching requirements. AI matching is recommended for new users and for rules requiring semantic understanding. Keyword matching is recommended for exact-match and compliance scenarios.
-  </Tabs.Tab>
-  <Tabs.Tab title="Step 2: Rule Components">
-    Provide the four required components:
+### Step 1: Rule Type
+
+Choose **Use AI** or **Keywords** based on your matching requirements. AI matching is recommended for new users and for rules requiring semantic understanding. Keyword matching is recommended for exact-match and compliance scenarios.
+
+### Step 2: Rule Components
+
+Provide the four required components:
 
     1. **Rule Name** — Descriptive, follows your naming convention.
     2. **Severity Level** — High, Medium, or Low.
     3. **Trigger Phrase** — Completes the sentence "The rule is triggered if the query..."
     4. **System Action** — Block, Mask, or Flag.
-  </Tabs.Tab>
-  <Tabs.Tab title="Step 3: Sample Queries">
-    Provide exactly three sample queries that exemplify the types of user inputs this rule should match. These samples fine-tune the matching algorithm and serve as test cases.
-  </Tabs.Tab>
-  <Tabs.Tab title="Step 4: Test & Save">
-    Use the Rule Tester panel to validate your rule:
+
+### Step 3: Sample Queries
+
+Provide exactly three sample queries that exemplify the types of user inputs this rule should match. These samples fine-tune the matching algorithm and serve as test cases.
+
+### Step 4: Test & Save
+
+Use the Rule Tester panel to validate your rule:
 
     1. Enter a sample query in the test input.
     2. Review the matching results.
     3. Test multiple query variations, including edge cases and queries that should NOT trigger the rule.
     4. Adjust your trigger phrase if matching isn't working as expected.
     5. Save the rule when satisfied.
-  </Tabs.Tab>
-</Tabs>
 
 ## Rule Priority
 
 When multiple rules match a single query, Xilos evaluates them in priority order. The first rule that triggers a Block action terminates the query immediately. Mask and Flag actions are cumulative — a single query can be masked by one rule and flagged by another.
 
-<Callout type="info">
-  Block actions take precedence over Mask and Flag. If any matching rule specifies Block, the query is terminated regardless of other rules' actions.
-</Callout>
+> **Info:** Block actions take precedence over Mask and Flag. If any matching rule specifies Block, the query is terminated regardless of other rules' actions.
 
 ## Best Practices
 

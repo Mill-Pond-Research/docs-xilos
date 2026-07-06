@@ -2,15 +2,12 @@
 title: Fine-Tuning
 ---
 
-import { Callout, Card, Cards, Steps } from 'nextra/components'
-
 # Fine-Tuning
 
 Fine-tuning produces a custom model specialized for your use case using high-quality query-response pairs from your Xilos query log. The fine-tuned model can be imported back into Xilos as a routing target, giving you better quality at lower cost.
 
 ## The Fine-Tune Pipeline
 
-<Steps>
   ### Export Training Data
   Use the [Training Data API](/api-reference/training-data) to export query-response pairs from your query log. Apply quality filters — `min_faithfulness` and `min_relevance` set to 0.8 or higher — to ensure only high-quality responses are included.
 
@@ -25,7 +22,6 @@ Fine-tuning produces a custom model specialized for your use case using high-qua
 
   ### Evaluate
   Use [Eval Datasets](/api-reference/eval-datasets) to compare the fine-tuned model's performance against the base model. Measure routing accuracy, response quality, and cost.
-</Steps>
 
 ## Prerequisites
 
@@ -36,9 +32,7 @@ Before fine-tuning, ensure you have:
 - **A clear use case** — Fine-tuning works best when targeting a specific routing rule or query pattern (e.g., code generation, summarization, customer support).
 - **A chosen base model** — Review available models and select one appropriate for your use case.
 
-<Callout type="warning">
-  Fine-tuning on noisy or low-quality data can degrade model performance. Always apply quality filters and review a sample of your training data before creating a fine-tune job.
-</Callout>
+> **Warning:** Fine-tuning on noisy or low-quality data can degrade model performance. Always apply quality filters and review a sample of your training data before creating a fine-tune job.
 
 ## Choosing a Base Model
 
@@ -50,9 +44,7 @@ Before fine-tuning, ensure you have:
 | Customer support | Llama 3.1 8B | Open-weight, can be self-hosted on-premise |
 | General chat | GPT-4o mini | Balanced cost and quality |
 
-<Callout type="info">
-  If you plan to deploy to [On-Premise](/deployment/on-premise), choose an open-weight base model like Llama or Mistral so you can self-host the fine-tuned result.
-</Callout>
+> **Info:** If you plan to deploy to [On-Premise](/deployment/on-premise), choose an open-weight base model like Llama or Mistral so you can self-host the fine-tuned result.
 
 ## What to Expect
 
@@ -72,14 +64,9 @@ Once your fine-tuned model is imported:
 
 See the [Fine-Tune API reference](/api-reference/fine-tune) for endpoint details, and the [Fine-Tuning Guide](/guides/fine-tuning) for a step-by-step walkthrough.
 
-<Card title="Fine-Tune API" href="/api-reference/fine-tune">
   API reference for listing base models, creating jobs, and tracking status.
-</Card>
 
-<Card title="Training Data API" href="/api-reference/training-data">
   API reference for exporting and previewing training data.
-</Card>
 
-<Card title="Eval Datasets API" href="/api-reference/eval-datasets">
   API reference for evaluating routing accuracy and model performance.
-</Card>
+

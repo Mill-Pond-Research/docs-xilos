@@ -2,8 +2,6 @@
 title: Workflows API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Workflows API
 
 Workflows chain multiple LLM stages together, with an optional merge step that combines outputs into a single response. Use these endpoints to create and manage multi-model workflows.
@@ -43,9 +41,7 @@ Workflows chain multiple LLM stages together, with an optional merge step that c
 | `POST` | `/workflows` | Create a new workflow |
 | `PUT` | `/workflows/{id}` | Update an existing workflow |
 
-<Callout type="info">
-  Workflows do not have a DELETE endpoint. To remove a workflow, contact your account admin or use the dashboard.
-</Callout>
+> **Info:** Workflows do not have a DELETE endpoint. To remove a workflow, contact your account admin or use the dashboard.
 
 ---
 
@@ -171,7 +167,6 @@ Returns the updated workflow object.
 
 ## Designing Workflows
 
-<Steps>
   ### Define Your Stages
   Identify the distinct steps your workflow needs. Each stage runs on a single model with its own prompt.
 
@@ -183,4 +178,4 @@ Returns the updated workflow object.
 
   ### Test and Iterate
   Run sample queries through the workflow and review outputs in the dashboard. Adjust prompts and model selections as needed.
-</Steps>
+

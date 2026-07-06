@@ -2,8 +2,6 @@
 title: Semantic Caching
 ---
 
-import { Callout } from 'nextra/components'
-
 # Semantic Caching
 
 Cache LLM responses and reuse them for semantically similar queries — even if phrased differently. Semantic caching reduces cost and latency by 50-90% for repetitive query patterns.
@@ -34,9 +32,7 @@ Caching can be enabled per routing rule:
 3. Toggle **Cache Responses** on.
 4. Test with sample queries.
 
-<Callout type="info">
-  Caching is configured per-rule, not globally. This lets you cache stable queries (FAQs, policies) while leaving dynamic queries uncached.
-</Callout>
+> **Info:** Caching is configured per-rule, not globally. This lets you cache stable queries (FAQs, policies) while leaving dynamic queries uncached.
 
 ## When to Cache
 

@@ -2,8 +2,6 @@
 title: Set Up SIEM Export
 ---
 
-import { Callout, Tabs } from 'nextra/components'
-
 # Set Up SIEM Export
 
 Export governance events to Splunk, Datadog, or other SIEM platforms.
@@ -47,29 +45,29 @@ SIEM webhooks fire on the same events as regular webhooks, plus additional gover
 
 ## Step 2: Configure Your SIEM
 
-<Tabs>
-  <Tabs.Tab title="Splunk">
-    Configure an HTTP Event Collector (HEC):
+### Splunk
+
+Configure an HTTP Event Collector (HEC):
     1. In Splunk, go to Settings > Data Inputs > HTTP Event Collector.
     2. Create a new token.
     3. Set the endpoint URL as your SIEM webhook URL in Xilos.
     4. Use JSON format for easiest parsing.
-  </Tabs.Tab>
-  <Tabs.Tab title="Datadog">
-    Use Datadog's webhook integration:
+
+### Datadog
+
+Use Datadog's webhook integration:
     1. In Datadog, go to Integrations > Webhooks.
     2. Create a new webhook endpoint.
     3. Copy the URL and paste it into Xilos SIEM webhook config.
     4. Use JSON format.
-  </Tabs.Tab>
-  <Tabs.Tab title="Elastic">
-    Use Elastic's HTTP input:
+
+### Elastic
+
+Use Elastic's HTTP input:
     1. Configure an HTTP input in Logstash or Elastic Agent.
     2. Set the listening port and path.
     3. Point the Xilos SIEM webhook URL to your Elastic endpoint.
     4. Use JSON format.
-  </Tabs.Tab>
-</Tabs>
 
 ## Step 3: Verify Events
 
@@ -108,9 +106,7 @@ Use the forwarded events to create alerts:
 - **Prompt injection attempt** — Alert on any injection attempt
 - **Cost anomaly** — Alert when spending deviates from baseline
 
-<Callout type="info">
-  SIEM events include the user email, rule name, severity, and action — giving your security team full context for investigation.
-</Callout>
+> **Info:** SIEM events include the user email, rule name, severity, and action — giving your security team full context for investigation.
 
 ## Best Practices
 

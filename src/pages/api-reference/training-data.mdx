@@ -2,8 +2,6 @@
 title: Training Data API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Training Data API
 
 The query log captures every request and response processed by Xilos, along with quality scores and routing metadata. Use these endpoints to export that data as a filtered training dataset for fine-tuning.
@@ -35,9 +33,7 @@ Exports query-response pairs from the query log as a training dataset, filtered 
 | `routing_rule_id` | string | No | Only include queries that matched this routing rule. |
 | `limit` | integer | No | Maximum number of records to export. Default: `1000`. |
 
-<Callout type="info">
-  Setting `min_faithfulness` and `min_relevance` to `0.7` or higher is recommended for fine-tuning. This ensures your training data only includes high-quality responses.
-</Callout>
+> **Info:** Setting `min_faithfulness` and `min_relevance` to `0.7` or higher is recommended for fine-tuning. This ensures your training data only includes high-quality responses.
 
 ### cURL
 
@@ -114,7 +110,6 @@ curl "https://api.xilos.ai/api/v1/training-data/preview?min_faithfulness=0.8&min
 
 ## Building a Training Dataset
 
-<Steps>
   ### Preview the Data
   Use the preview endpoint with your desired filters to inspect sample records and verify quality.
 
@@ -126,4 +121,4 @@ curl "https://api.xilos.ai/api/v1/training-data/preview?min_faithfulness=0.8&min
 
   ### Create a Fine-Tune Job
   Use the exported data to [create a fine-tune job](/api-reference/fine-tune) and produce a custom model.
-</Steps>
+

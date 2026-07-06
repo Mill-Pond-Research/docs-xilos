@@ -2,40 +2,20 @@
 title: Orchestrate
 ---
 
-import { Card, Cards, Callout } from 'nextra/components'
-
 # Orchestrate
 
 Xilos orchestrates AI traffic with intelligent routing, semantic caching, multi-model workflows, context compression, and a context engine that compounds knowledge across every interaction.
 
 ## Orchestration Features
 
-<Cards>
-  <Card title="Routing Rules" href="/platform/orchestrate/routing-rules">
-    Route every query to the right model based on cost, latency, or capability. Define rules in natural language or with keywords.
-  </Card>
-  <Card title="Semantic Caching" href="/platform/orchestrate/semantic-caching">
-    Cache LLM responses and reuse them for semantically similar queries. Reduces cost and latency by 50-90%.
-  </Card>
-  <Card title="Multi-Model Workflows" href="/platform/orchestrate/workflows">
-    Chain LLMs sequentially, run them in parallel, and merge outputs. Build pipelines with the visual workflow builder.
-  </Card>
-  <Card title="Context Compression" href="/platform/orchestrate/context-compression">
-    Compress prompts before they reach the LLM. 50-90% token reduction with three strategies.
-  </Card>
-  <Card title="Context Engine" href="/platform/orchestrate/context-engine">
-    Every answered query becomes a searchable knowledge asset. Extracts atomic facts and enriches future queries.
-  </Card>
-  <Card title="Smart Routing" href="/architecture/smart-routing">
-    The internal SLM classifies query intent and selects the optimal LLM, tools, and context automatically.
-  </Card>
-  <Card title="Routines" href="/platform/orchestrate/routines">
-    Schedule agent queries on a recurring basis using cron expressions.
-  </Card>
-  <Card title="Webhooks" href="/platform/orchestrate/webhooks">
-    Receive event-driven notifications when queries complete, are blocked, cached, or compressed.
-  </Card>
-</Cards>
+- **[Routing Rules](/platform/orchestrate/routing-rules)** — Route every query to the right model based on cost, latency, or capability. Define rules in natural language or with keywords.
+- **[Semantic Caching](/platform/orchestrate/semantic-caching)** — Cache LLM responses and reuse them for semantically similar queries. Reduces cost and latency by 50-90%.
+- **[Multi-Model Workflows](/platform/orchestrate/workflows)** — Chain LLMs sequentially, run them in parallel, and merge outputs. Build pipelines with the visual workflow builder.
+- **[Context Compression](/platform/orchestrate/context-compression)** — Compress prompts before they reach the LLM. 50-90% token reduction with three strategies.
+- **[Context Engine](/platform/orchestrate/context-engine)** — Every answered query becomes a searchable knowledge asset. Extracts atomic facts and enriches future queries.
+- **[Smart Routing](/architecture/smart-routing)** — The internal SLM classifies query intent and selects the optimal LLM, tools, and context automatically.
+- **[Routines](/platform/orchestrate/routines)** — Schedule agent queries on a recurring basis using cron expressions.
+- **[Webhooks](/platform/orchestrate/webhooks)** — Receive event-driven notifications when queries complete, are blocked, cached, or compressed.
 
 ## The Orchestration Loop
 
@@ -52,6 +32,4 @@ Every query that passes through Xilos follows an orchestration loop:
 9. **Fire webhooks** — Event-driven notifications are sent to subscribed endpoints.
 10. **Schedule routine analysis** — Routines analyze patterns and generate suggestions on a schedule.
 
-<Callout type="info">
-  The orchestration loop is what makes Xilos "auto-magic" — the more queries flow through it, the smarter the routing, caching, and context enrichment become.
-</Callout>
+> **Info:** The orchestration loop is what makes Xilos "auto-magic" — the more queries flow through it, the smarter the routing, caching, and context enrichment become.

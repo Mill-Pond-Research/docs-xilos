@@ -2,8 +2,6 @@
 title: Context Compression
 ---
 
-import { Callout } from 'nextra/components'
-
 # Context Compression
 
 Compress prompts before they reach the LLM — summarize conversation history, extract relevant sentences, and stabilize prompt prefixes for better cache hits. Xilos achieves 50-90% token reduction with three complementary strategies.
@@ -44,9 +42,7 @@ Each routing rule can override the organization setting:
 - Disable for rules that need full-fidelity context
 - Set custom thresholds per rule
 
-<Callout type="info">
-  Compression only activates when the prompt exceeds the token threshold. Short prompts pass through uncompressed.
-</Callout>
+> **Info:** Compression only activates when the prompt exceeds the token threshold. Short prompts pass through uncompressed.
 
 ## Savings Tracking
 

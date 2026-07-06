@@ -2,8 +2,6 @@
 title: Rate Limits
 ---
 
-import { Callout } from 'nextra/components'
-
 # Rate Limits
 
 Rate limiting policies and headers for the Xilos API.
@@ -35,9 +33,7 @@ Virtual Keys can have custom rate limits set by the organization admin. When a V
 2. The `Retry-After` header indicates when to retry.
 3. The key is not deactivated — it simply waits for the window to reset.
 
-<Callout type="info">
-  Rate limits and budget limits are independent. A key can hit its rate limit without exceeding its budget, and vice versa.
-</Callout>
+> **Info:** Rate limits and budget limits are independent. A key can hit its rate limit without exceeding its budget, and vice versa.
 
 ## Handling 429 Responses
 

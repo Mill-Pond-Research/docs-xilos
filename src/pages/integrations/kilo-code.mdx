@@ -2,8 +2,6 @@
 title: Kilo Code
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Kilo Code
 
 [Kilo Code](https://kilocode.ai) is an AI coding assistant. Connect it to Xilos to route all coding queries through the Xilos gateway for governance, caching, and cost control. Xilos is OpenAI-compatible, so Kilo Code connects by setting the base URL and API key.
@@ -19,7 +17,6 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 
 Kilo Code supports custom OpenAI-compatible providers. Add Xilos as a provider in the Kilo Code settings and select it as the active model.
 
-<Steps>
   ### Open the Kilo Code settings
 
     In your editor, open the Kilo Code extension settings. Navigate to **Providers** or **API Configuration** (the exact label varies by version).
@@ -51,11 +48,8 @@ Kilo Code supports custom OpenAI-compatible providers. Add Xilos as a provider i
 
     In the Kilo Code chat panel, select the `Xilos` provider and the `xilos` model. All subsequent queries route through Xilos.
   
-</Steps>
 
-<Callout type="info">
-  When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
-</Callout>
+> **Info:** When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
 
 ## Verify the Connection
 

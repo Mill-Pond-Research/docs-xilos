@@ -2,8 +2,6 @@
 title: Private Cloud
 ---
 
-import { Callout, Card, Cards, Steps } from 'nextra/components'
-
 # Private Cloud
 
 Deploy Xilos in your own AWS, Azure, or GCP account for data isolation, network-level control, and compliance with data residency requirements. Xilos provides the deployment artifacts and guidance — your team operates the infrastructure.
@@ -23,7 +21,6 @@ With Private Cloud, the Xilos platform runs entirely within your cloud account. 
 
 ## Deployment Process
 
-<Steps>
   ### Contact Xilos
   Reach out to initiate a Private Cloud deployment. Xilos will provide deployment artifacts, a readiness checklist, and an assigned solutions architect.
 
@@ -41,7 +38,6 @@ With Private Cloud, the Xilos platform runs entirely within your cloud account. 
 
   ### Ongoing Operations
   Your team manages day-to-day operations. Xilos provides software updates, patches, and support on a agreed cadence.
-</Steps>
 
 ## Network Configuration
 
@@ -52,9 +48,7 @@ With Private Cloud, the Xilos platform runs entirely within your cloud account. 
 | Database | Private subnet, accessible only from the Xilos application. |
 | Internal SLM | If self-hosted, GPU instances must be reachable from the Xilos application via internal network. |
 
-<Callout type="warning">
-  The Xilos application must be able to reach your LLM provider endpoints. If your network restricts outbound traffic, add the provider domains to your allowlist.
-</Callout>
+> **Warning:** The Xilos application must be able to reach your LLM provider endpoints. If your network restricts outbound traffic, add the provider domains to your allowlist.
 
 ## Security and Compliance
 
@@ -65,20 +59,10 @@ With Private Cloud, the Xilos platform runs entirely within your cloud account. 
 
 ## When to Choose Private Cloud
 
-<Cards>
-  <Card title="Data must stay in your cloud" href="/deployment">
-    Your data residency or compliance requirements mandate data stays in your account.
-  </Card>
-  <Card title="Network-level control" href="/deployment">
-    You need custom network policies, VPC peering, or private connectivity.
-  </Card>
-  <Card title="Compliance with BAA" href="/governance/hipaa">
-    You need HIPAA compliance with a Business Associate Agreement.
-  </Card>
-  <Card title="GDPR EU data residency" href="/governance/gdpr">
-    You need EU data residency for GDPR compliance.
-  </Card>
-</Cards>
+- **[Data must stay in your cloud](/deployment)** — Your data residency or compliance requirements mandate data stays in your account.
+- **[Network-level control](/deployment)** — You need custom network policies, VPC peering, or private connectivity.
+- **[Compliance with BAA](/governance/hipaa)** — You need HIPAA compliance with a Business Associate Agreement.
+- **[GDPR EU data residency](/governance/gdpr)** — You need EU data residency for GDPR compliance.
 
 ## Migration
 

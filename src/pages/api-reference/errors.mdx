@@ -2,8 +2,6 @@
 title: Error Codes
 ---
 
-import { Callout } from 'nextra/components'
-
 # Error Codes
 
 Standard HTTP status codes and Xilos-specific error responses.
@@ -97,9 +95,7 @@ try {
 }
 ```
 
-<Callout type="info">
-  A 403 response means the query was blocked by a restriction rule — this is expected behavior, not a bug. Check your restriction rules if this happens unexpectedly.
-</Callout>
+> **Info:** A 403 response means the query was blocked by a restriction rule — this is expected behavior, not a bug. Check your restriction rules if this happens unexpectedly.
 
 ## Retry Strategy
 

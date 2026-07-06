@@ -2,8 +2,6 @@
 title: Architecture Overview
 ---
 
-import { Callout, Card, Cards } from 'nextra/components'
-
 # Architecture Overview
 
 Xilos is a middleware gateway that intercepts, analyzes, and processes every prompt before it reaches an LLM destination. This page provides a high-level overview of the system architecture.
@@ -33,35 +31,15 @@ Xilos is a middleware gateway that intercepts, analyzes, and processes every pro
 
 ## Key Components
 
-<Cards>
-  <Card title="Request Flow" href="/architecture/request-flow">
-    Trace a query from agent request through the full pipeline to response.
-  </Card>
-  <Card title="AI Kernel" href="/architecture/ai-kernel">
-    The core processing engine that orchestrates the full pipeline.
-  </Card>
-  <Card title="Smart Routing" href="/architecture/smart-routing">
-    How the SLM classifies intent and selects the optimal model.
-  </Card>
-  <Card title="Context Compression" href="/architecture/context-compression">
-    Three compression strategies for token reduction.
-  </Card>
-  <Card title="Context Engine" href="/architecture/context-engine">
-    Atomic fact extraction and semantic retrieval.
-  </Card>
-  <Card title="Multi-Tenancy" href="/architecture/multi-tenancy">
-    PostgreSQL RLS for organization isolation.
-  </Card>
-  <Card title="Security Model" href="/architecture/security-model">
-    Encryption, authentication, guardrails, and audit logging.
-  </Card>
-  <Card title="Data Flow" href="/architecture/data-flow">
-    Visual diagram of data flow through the platform.
-  </Card>
-</Cards>
+- **[Request Flow](/architecture/request-flow)** — Trace a query from agent request through the full pipeline to response.
+- **[AI Kernel](/architecture/ai-kernel)** — The core processing engine that orchestrates the full pipeline.
+- **[Smart Routing](/architecture/smart-routing)** — How the SLM classifies intent and selects the optimal model.
+- **[Context Compression](/architecture/context-compression)** — Three compression strategies for token reduction.
+- **[Context Engine](/architecture/context-engine)** — Atomic fact extraction and semantic retrieval.
+- **[Multi-Tenancy](/architecture/multi-tenancy)** — PostgreSQL RLS for organization isolation.
+- **[Security Model](/architecture/security-model)** — Encryption, authentication, guardrails, and audit logging.
+- **[Data Flow](/architecture/data-flow)** — Visual diagram of data flow through the platform.
 
 For the Managed SaaS deployment, Xilos runs on managed cloud infrastructure with automated backups and disaster recovery. All persistent data is stored in a PostgreSQL database with continuous backups.
 
-<Callout type="info">
-  **RTO:** 4 hours | **RPO:** 1 hour
-</Callout>
+> **Info:** **RTO:** 4 hours | **RPO:** 1 hour

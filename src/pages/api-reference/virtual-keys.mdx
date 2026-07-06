@@ -2,8 +2,6 @@
 title: Virtual Keys API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Virtual Keys API
 
 Virtual keys are sub-keys with budget limits and rate limits. Use them to scope access for individual users, teams, or integrations without exposing your master API key. Each virtual key's usage is tracked independently.
@@ -27,9 +25,7 @@ Virtual keys are sub-keys with budget limits and rate limits. Use them to scope 
 }
 ```
 
-<Callout type="warning">
-  The `key` field is only returned once — when the virtual key is created. Store it securely. You cannot retrieve it again.
-</Callout>
+> **Warning:** The `key` field is only returned once — when the virtual key is created. Store it securely. You cannot retrieve it again.
 
 ## Endpoints
 
@@ -188,7 +184,6 @@ curl https://api.xilos.ai/api/v1/virtual-keys/vkey_01HXYZ/usage \
 
 ## Managing Virtual Keys
 
-<Steps>
   ### Create Keys Per Consumer
   Give each team, user, or integration its own virtual key. This isolates budgets and makes usage attributable.
 
@@ -200,4 +195,4 @@ curl https://api.xilos.ai/api/v1/virtual-keys/vkey_01HXYZ/usage \
 
   ### Deactivate, Don't Delete
   If a key is compromised or no longer needed, set `is_active: false` first. Delete only after confirming no services depend on it.
-</Steps>
+

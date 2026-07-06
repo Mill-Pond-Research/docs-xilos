@@ -2,8 +2,6 @@
 title: Enable Context Compression
 ---
 
-import { Callout } from 'nextra/components'
-
 # Enable Context Compression
 
 Reduce token costs by 50-90% by compressing prompts before they reach the LLM.
@@ -22,9 +20,7 @@ Reduce token costs by 50-90% by compressing prompts before they reach the LLM.
 5. Set the **Compression Token Threshold** (default: 2000 — compression activates only when the prompt exceeds 2000 tokens).
 6. Click **Save**.
 
-<Callout type="info">
-  The token threshold prevents compression from activating on short queries. Only prompts exceeding the threshold are compressed.
-</Callout>
+> **Info:** The token threshold prevents compression from activating on short queries. Only prompts exceeding the threshold are compressed.
 
 ## Step 2: Enable Per-Rule Compression (Optional)
 

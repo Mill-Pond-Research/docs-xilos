@@ -2,8 +2,6 @@
 title: Skills
 ---
 
-import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
-
 # Skills
 
 Skills are reusable prompt templates for workflow stages. Define a system prompt once, attach it to any LLM Stage node, and share it across workflows. Skills keep prompts versioned, consistent, and easy to update.
@@ -17,15 +15,12 @@ A skill encapsulates:
 - **Default parameters** — Optional temperature, max tokens, and stop sequences.
 - **Tags** — Labels for organizing and searching skills.
 
-<Callout type="info">
-  Skills are the prompt-engineering equivalent of functions. Write once, reuse everywhere.
-</Callout>
+> **Info:** Skills are the prompt-engineering equivalent of functions. Write once, reuse everywhere.
 
 ## Creating a Skill
 
 ### From the Dashboard
 
-<Steps>
   ### Open Skills
 
     Navigate to **Orchestrate** → **Skills**.
@@ -46,12 +41,10 @@ A skill encapsulates:
 
     Add tags for discoverability and click **Save**. The skill is now available in the Workflow Builder.
   
-</Steps>
 
 ### From the API
 
-<Tabs>
-  <Tabs.Tab title="cURL">
+### cURL
 
 ```bash
 curl -X POST https://api.xilos.ai/v1/skills \
@@ -66,8 +59,7 @@ curl -X POST https://api.xilos.ai/v1/skills \
   }'
 ```
 
-  </Tabs.Tab>
-  <Tabs.Tab title="Python">
+### Python
 
 ```python
 import xilos
@@ -87,9 +79,6 @@ skill = client.skills.create(
 
 print(skill.id)
 ```
-
-  </Tabs.Tab>
-</Tabs>
 
 ## System Prompts
 
@@ -126,9 +115,7 @@ Draft:
 {{draft}}
 ```
 
-<Callout type="warning">
-  Variable names are case-sensitive. `{{User_Query}}` and `{{user_query}}` are different placeholders.
-</Callout>
+> **Warning:** Variable names are case-sensitive. `{{User_Query}}` and `{{user_query}}` are different placeholders.
 
 ## Importing Skills
 
@@ -154,9 +141,7 @@ curl -X POST https://api.xilos.ai/v1/skills/import \
   -d @refine-answer.json
 ```
 
-<Callout type="info">
-  Imported skills are independent copies. Updates to the marketplace original do not propagate to imported skills. Re-import to pick up changes.
-</Callout>
+> **Info:** Imported skills are independent copies. Updates to the marketplace original do not propagate to imported skills. Re-import to pick up changes.
 
 ## Using Skills in Workflows
 
@@ -185,9 +170,7 @@ The Refine stage automatically receives the Draft stage's output in the `{{draft
 
 Skills are versioned. Every save creates a new version. Existing workflows reference the skill by ID and automatically use the latest version unless pinned. Pin a version in the workflow node settings to lock a specific version for reproducibility.
 
-<Callout type="warning">
-  Editing a skill that is used in active workflows will change the behavior of those workflows on the next execution. Pin a version if you need stability.
-</Callout>
+> **Warning:** Editing a skill that is used in active workflows will change the behavior of those workflows on the next execution. Pin a version if you need stability.
 
 ## Best Practices
 

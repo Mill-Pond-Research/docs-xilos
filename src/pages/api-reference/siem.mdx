@@ -2,8 +2,6 @@
 title: SIEM Export API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # SIEM Export API
 
 SIEM webhooks deliver governance and security events to your Security Information and Event Management (SIEM) platform. Choose from CEF, Syslog, or JSON formats to match your SIEM's ingestion requirements.
@@ -170,7 +168,6 @@ curl -X DELETE https://api.xilos.ai/api/v1/siem/siem_01HXYZ \
 
 ## Setting Up SIEM Integration
 
-<Steps>
   ### Choose a Format
   Select the format that matches your SIEM platform. Use `cef` for Splunk or ArcSight, `syslog` for standard log collectors, and `json` for custom pipelines.
 
@@ -182,8 +179,5 @@ curl -X DELETE https://api.xilos.ai/api/v1/siem/siem_01HXYZ \
 
   ### Verify Delivery
   Trigger a test event (e.g., a flagged query) and confirm it appears in your SIEM. Check the audit trail in the dashboard for delivery status.
-</Steps>
 
-<Callout type="info">
-  For more on audit logging and governance events, see [Audit Trail](/governance/audit-trail) and [SIEM Integration](/governance/audit-trail#siem-export).
-</Callout>
+> **Info:** For more on audit logging and governance events, see [Audit Trail](/governance/audit-trail) and [SIEM Integration](/governance/audit-trail#siem-export).

@@ -2,8 +2,6 @@
 title: Hermes Agent
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Hermes Agent
 
 [Hermes Agent](https://hermes-agent.nousresearch.com) is an open-source AI agent runtime by Nous Research. Connect Hermes to Xilos by setting the provider base URL and API key in your Hermes profile configuration. Once connected, every LLM call flows through the Xilos gateway for routing, guardrails, caching, and cost control.
@@ -19,7 +17,6 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 
 Hermes reads provider settings from `~/.hermes/config.yaml` (or the profile-specific YAML under `~/.hermes/profiles/<name>/`). You set the base URL, API key, and model, then export the key as an environment variable so Hermes doctor and tool checks recognize it.
 
-<Steps>
   ### Set the model provider and base URL
 
     ```bash
@@ -37,12 +34,10 @@ Hermes reads provider settings from `~/.hermes/config.yaml` (or the profile-spec
     ```
     Add this line to your shell profile (`~/.bashrc` or `~/.zshrc`) so it persists across sessions.
 
-    <Callout type="warning">
-      You must also write the key to the Hermes `.env` file. Some tool checks read from `.env`, not `config.yaml`. Run the command below to copy the key into the active profile's environment file:
-      ```bash
-      echo "XILOS_API_KEY=$XILOS_API_KEY" >> $(hermes config env-path)
-      ```
-    </Callout>
+    > **Warning:** You must also write the key to the Hermes `.env` file. Some tool checks read from `.env`, not `config.yaml`. Run the command below to copy the key into the active profile's environment file:
+>       ```bash
+>       echo "XILOS_API_KEY=$XILOS_API_KEY" >> $(hermes config env-path)
+>       ```
   
 
   ### Verify the configuration
@@ -60,11 +55,8 @@ Hermes reads provider settings from `~/.hermes/config.yaml` (or the profile-spec
     ```
     Any command that triggers an LLM call now routes through Xilos.
   
-</Steps>
 
-<Callout type="info">
-  When `model.default` is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query. To bypass routing and target a specific model, set `model.default` to a concrete model name (for example, `claude-sonnet-4`).
-</Callout>
+> **Info:** When `model.default` is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query. To bypass routing and target a specific model, set `model.default` to a concrete model name (for example, `claude-sonnet-4`).
 
 ## Verify the Connection
 
@@ -88,9 +80,7 @@ hermes chat -q "Hello, Xilos!"
 | Requests ignore routing rules | `model.default` is set to a concrete model name. | Set `model.default` to `xilos` so the Xilos routing engine selects the model. |
 | Auxiliary tasks (vision, compression) fail | Hermes cannot find a backend for auxiliary models. | Set `OPENROUTER_API_KEY` or configure each auxiliary task's provider explicitly with `hermes config set auxiliary.<task>.provider`. |
 
-<Callout type="warning">
-  `security.redact_secrets` (enabled by default) redacts strings that look like API keys from tool output. If Hermes is working with your own tokens and the redaction interferes, disable it with `hermes config set security.redact_secrets false`, then start a new session. The setting is read once at startup and cannot be toggled mid-session.
-</Callout>
+> **Warning:** `security.redact_secrets` (enabled by default) redacts strings that look like API keys from tool output. If Hermes is working with your own tokens and the redaction interferes, disable it with `hermes config set security.redact_secrets false`, then start a new session. The setting is read once at startup and cannot be toggled mid-session.
 
 ## Next Steps
 

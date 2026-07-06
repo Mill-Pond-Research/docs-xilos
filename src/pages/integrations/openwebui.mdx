@@ -2,8 +2,6 @@
 title: OpenWebUI
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # OpenWebUI
 
 [OpenWebUI](https://docs.openwebui.com/) is a self-hosted chat interface for LLMs. Add Xilos as a custom OpenAI-compatible connection to get a full chat interface with Xilos governance, routing, caching, and cost control.
@@ -19,7 +17,6 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 
 OpenWebUI discovers models from the OpenAI-compatible `/models` endpoint. Add Xilos as a connection and OpenWebUI fetches the available models automatically.
 
-<Steps>
   ### Open OpenWebUI settings
 
     Log in to your OpenWebUI instance as an administrator. Navigate to **Settings → Connections** in the admin panel.
@@ -44,15 +41,10 @@ OpenWebUI discovers models from the OpenAI-compatible `/models` endpoint. Add Xi
 
     In the chat interface, open the model picker and select `xilos`. Messages now flow through the Xilos gateway.
 
-    <Callout type="info">
-      When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, select it from the model picker if it appears, or configure a routing rule that routes to it.
-    </Callout>
+    > **Info:** When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, select it from the model picker if it appears, or configure a routing rule that routes to it.
   
-</Steps>
 
-<Callout type="warning">
-  Ensure the URL ends with `/api/v1` and not `/api/v1/`. A trailing slash can cause OpenWebUI to construct invalid endpoint paths (for example, `//chat/completions`), which results in 404 errors.
-</Callout>
+> **Warning:** Ensure the URL ends with `/api/v1` and not `/api/v1/`. A trailing slash can cause OpenWebUI to construct invalid endpoint paths (for example, `//chat/completions`), which results in 404 errors.
 
 ## Verify the Connection
 
@@ -73,9 +65,7 @@ OpenWebUI discovers models from the OpenAI-compatible `/models` endpoint. Add Xi
 | 429 Rate limit exceeded | You exceeded your organization or Virtual Key rate limit. | Reduce request frequency or create a Virtual Key with a higher limit. |
 | Routing rules do not apply | The selected model is a concrete model instead of `xilos`. | Select the `xilos` model in the chat interface so the Xilos routing engine processes each query. |
 
-<Callout type="info">
-  If you manage multiple OpenWebUI instances, create a separate [Virtual Key](/guides/virtual-keys) for each instance. This lets you track usage and enforce independent budget limits per instance.
-</Callout>
+> **Info:** If you manage multiple OpenWebUI instances, create a separate [Virtual Key](/guides/virtual-keys) for each instance. This lets you track usage and enforce independent budget limits per instance.
 
 ## Next Steps
 

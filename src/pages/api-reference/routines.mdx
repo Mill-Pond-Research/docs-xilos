@@ -2,8 +2,6 @@
 title: Routines API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Routines API
 
 Routines are scheduled, recurring queries that run on a cron schedule. Use them to generate periodic reports, run automated checks, or trigger agent workflows on a fixed cadence. Each routine is associated with a routing rule that determines how its query is processed.
@@ -71,9 +69,7 @@ POST /api/v1/routines
 | `routing_rule_id` | string | No | Routing rule to apply. If omitted, the default routing rule is used. |
 | `is_active` | boolean | No | Whether the routine is active. Default: `true`. |
 
-<Callout type="info">
-  Cron expressions use standard 5-field format: `minute hour day-of-month month day-of-week`. Times are in UTC.
-</Callout>
+> **Info:** Cron expressions use standard 5-field format: `minute hour day-of-month month day-of-week`. Times are in UTC.
 
 ### cURL
 
@@ -181,13 +177,10 @@ curl -X POST https://api.xilos.ai/api/v1/routines/rtn_01HXYZ/run \
 }
 ```
 
-<Callout type="info">
-  Manual runs do not affect the scheduled cadence. The routine will still execute at its next scheduled time.
-</Callout>
+> **Info:** Manual runs do not affect the scheduled cadence. The routine will still execute at its next scheduled time.
 
 ## Working With Routines
 
-<Steps>
   ### Define the Query
   Write the query string you want to run on a schedule. Keep it self-contained — routines do not maintain conversation context between runs.
 
@@ -199,4 +192,4 @@ curl -X POST https://api.xilos.ai/api/v1/routines/rtn_01HXYZ/run \
 
   ### Test Manually
   Use the manual trigger endpoint to verify the routine works before relying on the schedule.
-</Steps>
+

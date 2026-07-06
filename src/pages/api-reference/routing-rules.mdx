@@ -2,8 +2,6 @@
 title: Routing Rules API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Routing Rules API
 
 Routing rules determine which LLM handles each incoming query. Each rule maps a trigger phrase to a model, with optional caching and sample queries for evaluation. Use these endpoints to create, list, update, and delete routing rules.
@@ -187,13 +185,10 @@ curl -X DELETE https://api.xilos.ai/api/v1/routing-rules/rule_01HXYZ \
 }
 ```
 
-<Callout type="warning">
-  Deleting a routing rule is permanent. Any queries that previously matched this rule will fall back to the default routing behavior.
-</Callout>
+> **Warning:** Deleting a routing rule is permanent. Any queries that previously matched this rule will fall back to the default routing behavior.
 
 ## Working With Routing Rules
 
-<Steps>
   ### Create a Rule
   Define a trigger phrase and the model that should handle matching queries.
 
@@ -205,4 +200,4 @@ curl -X DELETE https://api.xilos.ai/api/v1/routing-rules/rule_01HXYZ \
 
   ### Monitor and Adjust
   Review query logs in the dashboard and update rules as your traffic patterns evolve.
-</Steps>
+

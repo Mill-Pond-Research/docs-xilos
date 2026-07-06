@@ -2,8 +2,6 @@
 title: Eval Datasets API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Eval Datasets API
 
 Eval datasets are collections of test cases used to evaluate routing accuracy, response quality, and model performance. Create a dataset, add test cases, then run it against your routing rules to measure accuracy.
@@ -156,13 +154,10 @@ curl -X POST https://api.xilos.ai/api/v1/eval-datasets/eval_01HXYZ/run \
 }
 ```
 
-<Callout type="info">
-  Eval runs are synchronous for small datasets. For datasets with more than 100 test cases, the response returns a `pending` status — poll the dataset endpoint to check for results.
-</Callout>
+> **Info:** Eval runs are synchronous for small datasets. For datasets with more than 100 test cases, the response returns a `pending` status — poll the dataset endpoint to check for results.
 
 ## Using Eval Datasets
 
-<Steps>
   ### Create Test Cases
   Write queries that represent your real traffic. Assign the expected routing rule for each.
 
@@ -174,4 +169,4 @@ curl -X POST https://api.xilos.ai/api/v1/eval-datasets/eval_01HXYZ/run \
 
   ### Re-run After Changes
   After updating routing rules, re-run the dataset to verify improvements. Track accuracy over time as your rules evolve.
-</Steps>
+

@@ -2,8 +2,6 @@
 title: Smart Routing Engine
 ---
 
-import { Callout } from 'nextra/components'
-
 # Smart Routing Engine
 
 Smart Routing uses an internal Small Language Model (SLM) to classify query intent and automatically select the optimal LLM for each query.
@@ -24,9 +22,7 @@ When Smart Routing is enabled, the SLM analyzes each query and considers:
 3. The model with the best capability-to-cost ratio for that intent is selected
 4. If no clear match, the organization's default model is used
 
-<Callout type="info">
-  Smart Routing is transparent — users and agents always send queries to the same endpoint. The routing decision is visible in the Query Log.
-</Callout>
+> **Info:** Smart Routing is transparent — users and agents always send queries to the same endpoint. The routing decision is visible in the Query Log.
 
 ## Enabling Smart Routing
 

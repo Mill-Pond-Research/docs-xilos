@@ -2,8 +2,6 @@
 title: OpenClaw
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # OpenClaw
 
 [OpenClaw](https://github.com/NousResearch/openclaw) is an open-source agent framework. Route OpenClaw traffic through Xilos to apply routing rules, restriction rules, guardrails, and caching to every agent call.
@@ -19,7 +17,6 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 
 OpenClaw uses the OpenAI-compatible provider as its default backend. Set two environment variables and update the model name in your OpenClaw configuration file.
 
-<Steps>
   ### Set environment variables
 
     OpenClaw respects the standard `OPENAI_API_KEY` and `OPENAI_BASE_URL` variables. Set them to your Xilos API key and the Xilos base URL.
@@ -50,11 +47,8 @@ OpenClaw uses the OpenAI-compatible provider as its default backend. Set two env
     ```
     All LLM calls now route through Xilos.
   
-</Steps>
 
-<Callout type="info">
-  When the model name is `xilos`, Xilos applies your routing rules to select the best LLM for each query. To target a specific model, set `model.name` to a concrete model identifier (for example, `claude-sonnet-4`).
-</Callout>
+> **Info:** When the model name is `xilos`, Xilos applies your routing rules to select the best LLM for each query. To target a specific model, set `model.name` to a concrete model identifier (for example, `claude-sonnet-4`).
 
 ## Verify the Connection
 

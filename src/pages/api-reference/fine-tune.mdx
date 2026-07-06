@@ -2,8 +2,6 @@
 title: Fine-Tune API
 ---
 
-import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
-
 # Fine-Tune API
 
 Create fine-tuned models using training data exported from your Xilos query log. Fine-tuning produces a custom model that can be imported back into Xilos as a routing target, giving you a model specialized for your use case.
@@ -107,9 +105,7 @@ curl -X POST https://api.xilos.ai/api/v1/fine-tune/create \
 }
 ```
 
-<Callout type="info">
-  Fine-tune job statuses: `queued` → `running` → `succeeded` or `failed`. Poll the [jobs endpoint](#list-fine-tune-jobs) to track progress.
-</Callout>
+> **Info:** Fine-tune job statuses: `queued` → `running` → `succeeded` or `failed`. Poll the [jobs endpoint](#list-fine-tune-jobs) to track progress.
 
 ---
 
@@ -146,7 +142,6 @@ curl https://api.xilos.ai/api/v1/fine-tune/jobs \
 
 ## Fine-Tune Pipeline
 
-<Steps>
   ### Export Training Data
   Use the [Training Data API](/api-reference/training-data) to export high-quality query-response pairs from your query log.
 
@@ -161,8 +156,5 @@ curl https://api.xilos.ai/api/v1/fine-tune/jobs \
 
   ### Evaluate
   Use [Eval Datasets](/api-reference/eval-datasets) to compare the fine-tuned model's performance against the base model.
-</Steps>
 
-<Callout type="warning">
-  Fine-tuning requires a sufficient volume of high-quality training data. We recommend at least 500 records with faithfulness and relevance scores of 0.8 or higher. See the [Fine-Tuning Guide](/deployment/fine-tuning) for detailed guidance.
-</Callout>
+> **Warning:** Fine-tuning requires a sufficient volume of high-quality training data. We recommend at least 500 records with faithfulness and relevance scores of 0.8 or higher. See the [Fine-Tuning Guide](/deployment/fine-tuning) for detailed guidance.

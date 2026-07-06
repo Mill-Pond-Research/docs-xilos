@@ -2,8 +2,6 @@
 title: Suggestions API
 ---
 
-import { Callout, Tabs, Card, Cards } from 'nextra/components'
-
 # Suggestions API
 
 The Suggestions endpoint returns AI-powered recommendations for improving your Xilos configuration. Xilos analyzes your query log, routing rules, cost patterns, and usage data to surface actionable insights.
@@ -80,20 +78,10 @@ curl https://api.xilos.ai/api/v1/suggestions \
 
 ## Suggestion Types
 
-<Cards>
-  <Card title="fine_tune_target" href="/api-reference/fine-tune">
-    Recommends fine-tuning a model for a specific routing rule. Includes the record count, estimated cost savings, and suggested base model.
-  </Card>
-  <Card title="cost_optimization" href="/api-reference/routing-rules">
-    Identifies queries that could use a cheaper model without sacrificing quality. Includes estimated monthly savings.
-  </Card>
-  <Card title="routing_gap" href="/api-reference/routing-rules">
-    Highlights queries that aren't matching any routing rule. Includes sample queries to help you create new rules.
-  </Card>
-  <Card title="tool_suggestion">
-    Recommends enabling tools (like web search) for query patterns that would benefit from them.
-  </Card>
-</Cards>
+- **[fine_tune_target](/api-reference/fine-tune)** — Recommends fine-tuning a model for a specific routing rule. Includes the record count, estimated cost savings, and suggested base model.
+- **[cost_optimization](/api-reference/routing-rules)** — Identifies queries that could use a cheaper model without sacrificing quality. Includes estimated monthly savings.
+- **[routing_gap](/api-reference/routing-rules)** — Highlights queries that aren't matching any routing rule. Includes sample queries to help you create new rules.
+- **tool_suggestion** — Recommends enabling tools (like web search) for query patterns that would benefit from them.
 
 ## Suggestion Object
 
@@ -105,6 +93,4 @@ curl https://api.xilos.ai/api/v1/suggestions \
 | `priority` | string | `high`, `medium`, or `low`. |
 | `metadata` | object | Type-specific data (see examples above). |
 
-<Callout type="info">
-  Suggestions are regenerated periodically based on your latest query data. Check back regularly for new recommendations as your usage patterns evolve.
-</Callout>
+> **Info:** Suggestions are regenerated periodically based on your latest query data. Check back regularly for new recommendations as your usage patterns evolve.

@@ -2,8 +2,6 @@
 title: Restriction Rules API
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Restriction Rules API
 
 Restriction rules are security policies that block, mask, or flag queries before they reach an LLM. Use these endpoints to manage rules that protect against unauthorized content, sensitive data exposure, and compliance violations.
@@ -84,11 +82,9 @@ POST /api/v1/restriction-rules
 | `severity` | string | No | Severity level: `high`, `medium`, or `low`. Default: `medium`. |
 | `rule_type` | string | Yes | Rule engine: `ai` (semantic matching) or `keyword` (exact match). |
 
-<Callout type="info">
-  - **`block`** — The query is rejected and never reaches the LLM.
-  - **`mask`** — Sensitive content in the query is redacted before forwarding to the LLM.
-  - **`flag`** — The query proceeds but is flagged in the audit log for review.
-</Callout>
+> **Info:** - **`block`** — The query is rejected and never reaches the LLM.
+>   - **`mask`** — Sensitive content in the query is redacted before forwarding to the LLM.
+>   - **`flag`** — The query proceeds but is flagged in the audit log for review.
 
 ### cURL
 
@@ -173,7 +169,6 @@ curl -X DELETE https://api.xilos.ai/api/v1/restriction-rules/rest_01HXYZ \
 
 ## Choosing a Rule Type
 
-<Steps>
   ### Keyword Rules
   Use `rule_type: "keyword"` for exact phrase matching. Fast and deterministic — ideal for compliance blocks on specific terms like "social security number" or "credit card number."
 
@@ -182,4 +177,4 @@ curl -X DELETE https://api.xilos.ai/api/v1/restriction-rules/rest_01HXYZ \
 
   ### Combine Both
   Layer keyword rules for hard blocks and AI rules for nuanced flagging. Review flagged queries in the audit trail to refine your policies.
-</Steps>
+

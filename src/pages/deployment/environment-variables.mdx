@@ -2,15 +2,11 @@
 title: Environment Variables
 ---
 
-import { Callout } from 'nextra/components'
-
 # Environment Variables
 
 When connecting to Xilos or self-hosting the platform, you may need to configure the following environment variables. This reference covers the variables users and integrators typically need.
 
-<Callout type="info">
-  This page covers user-facing environment variables only. Internal backend configuration variables are not documented here. For self-hosted deployments, Xilos provides a full configuration reference as part of the deployment package.
-</Callout>
+> **Info:** This page covers user-facing environment variables only. Internal backend configuration variables are not documented here. For self-hosted deployments, Xilos provides a full configuration reference as part of the deployment package.
 
 ## Connecting to Xilos
 
@@ -53,9 +49,7 @@ When self-hosting or when Xilos needs to call LLM providers on your behalf, conf
 | `AZURE_OPENAI_API_KEY` | Azure OpenAI API key. | Azure OpenAI deployments |
 | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL. | Azure OpenAI deployments |
 
-<Callout type="warning">
-  Never commit API keys to version control. Use a secrets manager or environment variable injection in your deployment pipeline.
-</Callout>
+> **Warning:** Never commit API keys to version control. Use a secrets manager or environment variable injection in your deployment pipeline.
 
 ## Self-Hosted Deployments
 

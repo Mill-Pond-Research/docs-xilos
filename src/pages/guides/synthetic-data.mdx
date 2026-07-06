@@ -2,8 +2,6 @@
 title: Generate Synthetic Data
 ---
 
-import { Callout } from 'nextra/components'
-
 # Generate Synthetic Data
 
 Use the SLM to generate edge-case test variants from existing queries.
@@ -62,9 +60,7 @@ After adding variants to your dataset:
 3. The test run includes both your manual test cases and the generated variants.
 4. Review results — adversarial variants should be blocked or flagged, paraphrases should route correctly.
 
-<Callout type="info">
-  Adversarial variants are particularly useful for testing your restriction rules and prompt injection defenses. If an adversarial variant routes successfully, your guardrails may need tightening.
-</Callout>
+> **Info:** Adversarial variants are particularly useful for testing your restriction rules and prompt injection defenses. If an adversarial variant routes successfully, your guardrails may need tightening.
 
 ## Best Practices
 

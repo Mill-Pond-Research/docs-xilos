@@ -2,15 +2,11 @@
 title: Audit Logs
 ---
 
-import { Callout, Tabs } from 'nextra/components'
-
 # Audit Logs
 
 Audit logs are the immutable record of every security decision Xilos makes. Each query that passes through the platform generates an audit entry capturing the governance actions applied, restriction rules triggered, guardrail results, and the final disposition — allow, block, mask, or flag. Audit logs support compliance reporting, security analysis, and SIEM integration.
 
-<Callout type="info">
-  Audit logs are immutable. Once written, entries cannot be modified or deleted. This guarantees a tamper-evident record for compliance and forensic analysis.
-</Callout>
+> **Info:** Audit logs are immutable. Once written, entries cannot be modified or deleted. This guarantees a tamper-evident record for compliance and forensic analysis.
 
 ## Audit Log Fields
 
@@ -70,33 +66,31 @@ Combine multiple filters with spaces (implicit AND):
 action:flag user:user@example.com date:2024-01-15
 ```
 
-<Callout type="info">
-  All search queries are themselves audited. Searching the audit log does not modify or redact existing entries.
-</Callout>
+> **Info:** All search queries are themselves audited. Searching the audit log does not modify or redact existing entries.
 
 ## Export for SIEM
 
 Xilos supports continuous export of audit logs to external Security Information and Event Management (SIEM) systems. SIEM export enables long-term retention, cross-platform correlation, and centralized compliance reporting.
 
-<Tabs>
-  <Tabs.Tab title="Webhook Export">
-    Xilos streams audit events to an HTTP endpoint in real time. Configure the webhook URL in **Secure → Audit Logs → SIEM Export**.
+### Webhook Export
+
+Xilos streams audit events to an HTTP endpoint in real time. Configure the webhook URL in **Secure → Audit Logs → SIEM Export**.
 
     **Payload format:** Each audit entry is sent as a JSON object in the request body. Events are batched and sent every 5 seconds, or when 100 events accumulate, whichever comes first.
 
     **Headers:** Requests include an `X-Xilos-Signature` header containing an HMAC-SHA256 signature of the payload, verified using your tenant's shared secret.
-  </Tabs.Tab>
-  <Tabs.Tab title="Syslog Export">
-    Xilos forwards audit events to a syslog server using RFC 5424 format. Configure the syslog endpoint (host, port, protocol) in **Secure → Audit Logs → SIEM Export**.
+
+### Syslog Export
+
+Xilos forwards audit events to a syslog server using RFC 5424 format. Configure the syslog endpoint (host, port, protocol) in **Secure → Audit Logs → SIEM Export**.
 
     **Supported protocols:** UDP, TCP, and TLS-encrypted TCP.
-  </Tabs.Tab>
-  <Tabs.Tab title="CSV Export">
-    For ad-hoc analysis, export audit log entries as a CSV file from the audit log viewer. Select a date range, apply filters, and download the results.
+
+### CSV Export
+
+For ad-hoc analysis, export audit log entries as a CSV file from the audit log viewer. Select a date range, apply filters, and download the results.
 
     **Limit:** Exports are capped at 100,000 entries per file. For larger exports, use webhook or syslog streaming.
-  </Tabs.Tab>
-</Tabs>
 
 ### SIEM Integration Verification
 
@@ -117,9 +111,7 @@ Audit log retention is configurable per tenant. The retention policy determines 
 | SIEM export | Disabled | On / Off | When enabled, entries are streamed to your SIEM before deletion |
 | Immutable storage | Enabled | On / Off | Prevents modification of entries after creation |
 
-<Callout type="warning">
-  Reducing the retention period permanently deletes older entries. If you need longer retention for compliance, configure SIEM export before reducing the retention period.
-</Callout>
+> **Warning:** Reducing the retention period permanently deletes older entries. If you need longer retention for compliance, configure SIEM export before reducing the retention period.
 
 ### Compliance Retention Guidelines
 
@@ -153,9 +145,7 @@ Audit logs support compliance reporting for common security frameworks. Generate
 4. Select **Generate Report** and choose the report type.
 5. Download the report as PDF or CSV.
 
-<Callout type="info">
-  Compliance reports inherit the immutability of the underlying audit log data. Report contents reflect the exact audit entries recorded during the selected period.
-</Callout>
+> **Info:** Compliance reports inherit the immutability of the underlying audit log data. Report contents reflect the exact audit entries recorded during the selected period.
 
 ## Related
 

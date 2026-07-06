@@ -2,8 +2,6 @@
 title: Fine-Tune a Model
 ---
 
-import { Callout } from 'nextra/components'
-
 # Fine-Tune a Model
 
 Use Xilos orchestration data to fine-tune an open-source model and import it back into Xilos.
@@ -77,9 +75,7 @@ Available base models typically include:
 | Phi-4 Mini | Together AI | 16k | Compact, efficient |
 | Mistral-7B | Fireworks | 32k | Balanced performance |
 
-<Callout type="info">
-  Choose a base model that matches the complexity of your queries. A 70B model will give better quality but cost more to fine-tune and run. A 1B model is cheaper but may not match the quality of a premium API model.
-</Callout>
+> **Info:** Choose a base model that matches the complexity of your queries. A 70B model will give better quality but cost more to fine-tune and run. A 1B model is cheaper but may not match the quality of a premium API model.
 
 ## Step 4: Create a Fine-Tune Job
 
@@ -120,9 +116,7 @@ Once the fine-tune job is completed:
 3. Monitor cost savings in **Cost Controls** — the fine-tuned model runs on your own infrastructure at a fraction of the API cost.
 4. Check quality scores in the Query Log to ensure the fine-tuned model maintains acceptable quality.
 
-<Callout type="info">
-  The fine-tuned model captures your organization's specific query patterns, terminology, and desired response style. It often outperforms generic premium models on domain-specific queries while costing significantly less.
-</Callout>
+> **Info:** The fine-tuned model captures your organization's specific query patterns, terminology, and desired response style. It often outperforms generic premium models on domain-specific queries while costing significantly less.
 
 ## Cost Savings
 

@@ -2,8 +2,6 @@
 title: Data Residency
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
-
 # Data Residency
 
 Data residency controls where your Xilos data is stored. Configure the region in Model Config to meet regional data protection requirements, such as GDPR's requirement for EU data residency or HIPAA's preference for US-based storage.
@@ -19,7 +17,6 @@ Data residency controls where your Xilos data is stored. Configure the region in
 
 ## Configuring Data Residency
 
-<Steps>
   ### Open Model Config
   Navigate to **Settings → Model Config** in the Xilos dashboard.
 
@@ -31,11 +28,8 @@ Data residency controls where your Xilos data is stored. Configure the region in
 
   ### Save Configuration
   Save your changes. The region applies to all new queries immediately. Existing data remains in its original region.
-</Steps>
 
-<Callout type="warning">
-  Changing the region does not migrate existing data. New queries are stored in the new region, but historical data remains in the original region. Contact Xilos if you need to migrate historical data.
-</Callout>
+> **Warning:** Changing the region does not migrate existing data. New queries are stored in the new region, but historical data remains in the original region. Contact Xilos if you need to migrate historical data.
 
 ## Enforcement
 
@@ -45,9 +39,7 @@ When enforcement is enabled, Xilos checks every routing decision against the con
 - **Self-hosted models** (On-Premise) — All models are local, so enforcement is inherently satisfied.
 - **Hybrid setups** — If you use a mix of cloud and self-hosted models, only models in the configured region are available.
 
-<Callout type="info">
-  Enforcement ensures that no query is processed by a model outside your configured region, even if a routing rule points to a non-compliant model. This is a safety net — your routing rules should already target compliant models.
-</Callout>
+> **Info:** Enforcement ensures that no query is processed by a model outside your configured region, even if a routing rule points to a non-compliant model. This is a safety net — your routing rules should already target compliant models.
 
 ## GDPR and EU Residency
 
@@ -71,6 +63,4 @@ For HIPAA compliance, configure the US region:
 
 For [On-Premise](/deployment/on-premise) deployments, all data resides in your data center. The region is set to `on-prem`, and enforcement is inherently satisfied — no data leaves your premises.
 
-<Callout type="info">
-  On-Premise deployments provide the strongest data residency guarantee: complete data sovereignty with no external dependencies. See the [Three-Phase Journey](/deployment/three-phase-journey) for guidance on when to move to On-Premise.
-</Callout>
+> **Info:** On-Premise deployments provide the strongest data residency guarantee: complete data sovereignty with no external dependencies. See the [Three-Phase Journey](/deployment/three-phase-journey) for guidance on when to move to On-Premise.

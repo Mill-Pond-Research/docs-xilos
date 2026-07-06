@@ -2,8 +2,6 @@
 title: Platform Overview
 ---
 
-import { Card, Cards, Callout, Steps } from 'nextra/components'
-
 # Platform Overview
 
 Xilos is an AI infrastructure platform that sits between your users and the Large Language Models (LLMs) they call. Every prompt, every response, and every token flows through Xilos, where it is observed, secured, and orchestrated before a single inference call is made.
@@ -12,23 +10,14 @@ The platform is built on three pillars — **Observe**, **Secure**, and **Orches
 
 ## The Three Pillars
 
-<Cards>
-  <Card title="Observe" href="/platform/observe">
-    Gain total visibility into AI traffic. Dashboards, query logs, cost controls, and metrics surface every query, every treatment, and every dollar in real time.
-  </Card>
-  <Card title="Secure" href="/platform/secure">
-    Enforce policy before the model is called. Guardrails detect PII, block prompt injection, and apply restriction rules that block, mask, or flag queries by intent.
-  </Card>
-  <Card title="Orchestrate" href="/platform/orchestrate">
-    Route each query to the right model, compress prompts to cut cost, cache semantically equivalent responses, and compound knowledge across every interaction.
-  </Card>
-</Cards>
+- **[Observe](/platform/observe)** — Gain total visibility into AI traffic. Dashboards, query logs, cost controls, and metrics surface every query, every treatment, and every dollar in real time.
+- **[Secure](/platform/secure)** — Enforce policy before the model is called. Guardrails detect PII, block prompt injection, and apply restriction rules that block, mask, or flag queries by intent.
+- **[Orchestrate](/platform/orchestrate)** — Route each query to the right model, compress prompts to cut cost, cache semantically equivalent responses, and compound knowledge across every interaction.
 
 ## Request Flow
 
 Every query that enters Xilos follows the same path. The pillars apply sequentially, and each stage can act on or transform the request before it reaches the model.
 
-<Steps>
   ### Ingest
 
     A user submits a query through a connected application, API, or agent. Xilos receives the request and attaches a trace identifier that follows it end to end.
@@ -49,11 +38,8 @@ Every query that enters Xilos follows the same path. The pillars apply sequentia
 
     The response, governance actions, compression statistics, and cost breakdown are written to the Query Log and rendered on the Dashboard in real time.
   
-</Steps>
 
-<Callout type="info">
-  Stages 2 and 3 can transform the request. A masked query, for example, reaches the model with sensitive fields already redacted — the model never sees the original PII.
-</Callout>
+> **Info:** Stages 2 and 3 can transform the request. A masked query, for example, reaches the model with sensitive fields already redacted — the model never sees the original PII.
 
 ## Multi-Tenancy
 
@@ -86,9 +72,7 @@ Xilos can be deployed in three configurations:
 | **Self-Hosted** | Xilos runs in your own cloud or on-premises environment. Private models stay inside your network. | Regulated industries and organizations with data residency requirements. |
 | **Hybrid** | Xilos Cloud manages the control plane; private models run in your environment. | Teams that want managed convenience alongside private model control. |
 
-<Callout type="info">
-  All deployment options expose the same API surface. Applications built against Xilos work identically across Cloud, Self-Hosted, and Hybrid configurations.
-</Callout>
+> **Info:** All deployment options expose the same API surface. Applications built against Xilos work identically across Cloud, Self-Hosted, and Hybrid configurations.
 
 ## Next Steps
 

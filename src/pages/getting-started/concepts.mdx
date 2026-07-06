@@ -2,8 +2,6 @@
 title: Core Concepts
 ---
 
-import { Callout, Card, Cards } from 'nextra/components'
-
 # Core Concepts
 
 Xilos is an AI infrastructure platform built on three pillars: **Observe**, **Secure**, and **Orchestrate**. Every query that passes through the Xilos gateway is logged, inspected against security policies, and routed to the optimal model. This page explains the building blocks that make that possible.
@@ -29,9 +27,7 @@ Routing rules support two matching approaches:
 | **Natural Language (AI)** | Intent-based routing, complex categorization | Uses AI to understand meaning and intent, not exact words. Matches queries phrased differently. |
 | **Keyword-Based** | Exact term detection, compliance terms | Performs a direct string search for specific words or phrases. Predictable, deterministic matching. |
 
-<Callout type="info">
-  A rule triggered by the natural-language phrase "billing inquiries" will match "How much does this cost?", "I have a question about my invoice", and "What are your pricing plans?" — even though none of them contain the word "billing."
-</Callout>
+> **Info:** A rule triggered by the natural-language phrase "billing inquiries" will match "How much does this cost?", "I have a question about my invoice", and "What are your pricing plans?" — even though none of them contain the word "billing."
 
 ### Rule Components
 
@@ -53,9 +49,7 @@ Every routing rule includes:
 | Cost optimization | Balance model capability with query complexity. |
 | Specialized tasks | Match model strengths to query type (coding, analysis, etc.). |
 
-<Callout type="warning">
-  Routing rules cannot be edited after saving. You can enable, disable, or delete a rule, or create a new rule with updated criteria. Always test your rule with the Rule Tester before saving.
-</Callout>
+> **Warning:** Routing rules cannot be edited after saving. You can enable, disable, or delete a rule, or create a new rule with updated criteria. Always test your rule with the Rule Tester before saving.
 
 Learn more in the [Create a Routing Rule](/guides/create-routing-rule) guide.
 
@@ -83,9 +77,7 @@ Every restriction rule includes:
 - **System Action** — Block, Mask, or Flag.
 - **Sample Queries** — Three diverse examples that validate rule accuracy and document intent.
 
-<Callout type="info">
-  Start with **Flag** (audit-only) for new sensitive-data rules. After a tuning period, switch to **Mask** or **Block** once you are confident the rule produces minimal false positives.
-</Callout>
+> **Info:** Start with **Flag** (audit-only) for new sensitive-data rules. After a tuning period, switch to **Mask** or **Block** once you are confident the rule produces minimal false positives.
 
 ### Foundational Security Rules
 
@@ -138,9 +130,7 @@ Semantic Caching stores LLM responses and reuses them for semantically similar q
 - Policy and procedure questions.
 - Common troubleshooting steps.
 
-<Callout type="warning">
-  Do not enable caching for queries requiring real-time data, personalized responses, or rapidly changing information. Caching is also not recommended for creative or generative tasks that require unique outputs.
-</Callout>
+> **Warning:** Do not enable caching for queries requiring real-time data, personalized responses, or rapidly changing information. Caching is also not recommended for creative or generative tasks that require unique outputs.
 
 ---
 
@@ -162,9 +152,7 @@ Guardrails cover three critical areas:
 2. **Data safeguarding** — Controls the flow of PII, financial data, and confidential information.
 3. **Model integrity** — Defends against prompt injection and malicious code attempts.
 
-<Callout type="info">
-  Guardrails apply automatically to every request sent through the Xilos gateway, including the OpenAI-compatible endpoint. No application code changes are required.
-</Callout>
+> **Info:** Guardrails apply automatically to every request sent through the Xilos gateway, including the OpenAI-compatible endpoint. No application code changes are required.
 
 ---
 

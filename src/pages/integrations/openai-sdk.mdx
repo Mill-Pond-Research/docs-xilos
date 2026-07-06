@@ -2,8 +2,6 @@
 title: OpenAI SDK
 ---
 
-import { Callout, Tabs } from 'nextra/components'
-
 # OpenAI SDK
 
 The official OpenAI SDKs for Python and JavaScript work with Xilos out of the box. Only the `base_url` and `api_key` change — no other code modifications are required. Xilos accepts the full OpenAI Chat Completions API surface, including streaming and tool calls.
@@ -17,26 +15,25 @@ The official OpenAI SDKs for Python and JavaScript work with Xilos out of the bo
 
 ## Install the SDK
 
-<Tabs>
-  <Tabs.Tab title="Python">
-    ```bash
+### Python
+
+```bash
     pip install openai
     ```
-  </Tabs.Tab>
-  <Tabs.Tab title="JavaScript">
-    ```bash
+
+### JavaScript
+
+```bash
     npm install openai
     ```
-  </Tabs.Tab>
-</Tabs>
 
 ## Configuration
 
 Create an OpenAI client with the Xilos base URL and your Xilos API key.
 
-<Tabs>
-  <Tabs.Tab title="Python">
-    ```python
+### Python
+
+```python
     from openai import OpenAI
 
     client = OpenAI(
@@ -44,9 +41,10 @@ Create an OpenAI client with the Xilos base URL and your Xilos API key.
         base_url="https://api.xilos.ai/api/v1"
     )
     ```
-  </Tabs.Tab>
-  <Tabs.Tab title="JavaScript">
-    ```javascript
+
+### JavaScript
+
+```javascript
     import OpenAI from "openai";
 
     const client = new OpenAI({
@@ -54,9 +52,10 @@ Create an OpenAI client with the Xilos base URL and your Xilos API key.
       baseURL: "https://api.xilos.ai/api/v1",
     });
     ```
-  </Tabs.Tab>
-  <Tabs.Tab title="cURL">
-    ```bash
+
+### cURL
+
+```bash
     curl https://api.xilos.ai/api/v1/chat/completions \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer your-xilos-api-key" \
@@ -65,20 +64,16 @@ Create an OpenAI client with the Xilos base URL and your Xilos API key.
         "messages": [{"role": "user", "content": "Hello, Xilos!"}]
       }'
     ```
-  </Tabs.Tab>
-</Tabs>
 
-<Callout type="info">
-  When `model` is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
-</Callout>
+> **Info:** When `model` is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
 
 ## Basic Usage
 
 Send a chat completion request through the Xilos gateway:
 
-<Tabs>
-  <Tabs.Tab title="Python">
-    ```python
+### Python
+
+```python
     response = client.chat.completions.create(
         model="xilos",
         messages=[
@@ -89,9 +84,10 @@ Send a chat completion request through the Xilos gateway:
 
     print(response.choices[0].message.content)
     ```
-  </Tabs.Tab>
-  <Tabs.Tab title="JavaScript">
-    ```javascript
+
+### JavaScript
+
+```javascript
     const response = await client.chat.completions.create({
       model: "xilos",
       messages: [
@@ -102,16 +98,14 @@ Send a chat completion request through the Xilos gateway:
 
     console.log(response.choices[0].message.content);
     ```
-  </Tabs.Tab>
-</Tabs>
 
 ## Streaming
 
 Set `stream: true` to receive a stream of server-sent events (SSE). This is useful for chat interfaces and real-time applications where you want to display tokens as they arrive.
 
-<Tabs>
-  <Tabs.Tab title="Python">
-    ```python
+### Python
+
+```python
     stream = client.chat.completions.create(
         model="xilos",
         messages=[{"role": "user", "content": "Tell me a story."}],
@@ -122,9 +116,10 @@ Set `stream: true` to receive a stream of server-sent events (SSE). This is usef
         if chunk.choices[0].delta.content:
             print(chunk.choices[0].delta.content, end="")
     ```
-  </Tabs.Tab>
-  <Tabs.Tab title="JavaScript">
-    ```javascript
+
+### JavaScript
+
+```javascript
     const stream = await client.chat.completions.create({
       model: "xilos",
       messages: [{ role: "user", content: "Tell me a story." }],
@@ -136,16 +131,14 @@ Set `stream: true` to receive a stream of server-sent events (SSE). This is usef
       if (content) process.stdout.write(content);
     }
     ```
-  </Tabs.Tab>
-</Tabs>
 
 ## Tool Calls
 
 Xilos supports OpenAI-compatible function calling. Define tools, let the model decide when to call them, and return results for the model to act on.
 
-<Tabs>
-  <Tabs.Tab title="Python">
-    ```python
+### Python
+
+```python
     tools = [
         {
             "type": "function",
@@ -173,9 +166,10 @@ Xilos supports OpenAI-compatible function calling. Define tools, let the model d
     print(tool_call.function.name)   # "get_weather"
     print(tool_call.function.arguments)  # '{"city": "Paris"}'
     ```
-  </Tabs.Tab>
-  <Tabs.Tab title="JavaScript">
-    ```javascript
+
+### JavaScript
+
+```javascript
     const tools = [
       {
         type: "function",
@@ -203,8 +197,6 @@ Xilos supports OpenAI-compatible function calling. Define tools, let the model d
     console.log(toolCall.function.name);       // "get_weather"
     console.log(toolCall.function.arguments);  // '{"city": "Paris"}'
     ```
-  </Tabs.Tab>
-</Tabs>
 
 ## Verify the Connection
 

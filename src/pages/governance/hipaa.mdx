@@ -2,15 +2,11 @@
 title: HIPAA Compliance
 ---
 
-import { Callout, Card, Cards, Steps } from 'nextra/components'
-
 # HIPAA Compliance
 
 Xilos supports HIPAA compliance for organizations handling Protected Health Information (PHI). With a Business Associate Agreement (BAA), PII detection, audit logging, and data residency controls, Xilos helps you use AI while maintaining HIPAA compliance.
 
-<Callout type="warning">
-  Xilos is a Business Associate under HIPAA when processing PHI. A BAA must be executed between your organization (the Covered Entity) and Xilos before processing any PHI. Contact Xilos to execute a BAA.
-</Callout>
+> **Warning:** Xilos is a Business Associate under HIPAA when processing PHI. A BAA must be executed between your organization (the Covered Entity) and Xilos before processing any PHI. Contact Xilos to execute a BAA.
 
 ## How Xilos Supports HIPAA
 
@@ -61,7 +57,6 @@ Configure [data residency](/governance/data-residency) to the US region to ensur
 
 ## Setting Up HIPAA Compliance
 
-<Steps>
   ### Execute a BAA
   Contact Xilos to execute a Business Associate Agreement. This is required before processing any PHI.
 
@@ -87,7 +82,6 @@ Configure [data residency](/governance/data-residency) to the US region to ensur
 
   ### Conduct Regular Audits
   Periodically review audit logs, restriction rule effectiveness, and access controls.
-</Steps>
 
 ## Roles and Access
 
@@ -97,15 +91,12 @@ Use [role-based access control](/governance/role-based-access) to limit who can 
 - **Org Admin** — Configuration access (rules, keys) but cannot manage the BAA.
 - **User** — API access only. Cannot view audit logs or configuration.
 
-<Callout type="info">
-  Limit the number of SuperAdmin and Org Admin roles. Most users should have the User role with a [virtual key](/api-reference/virtual-keys) scoped to their needs.
-</Callout>
+> **Info:** Limit the number of SuperAdmin and Org Admin roles. Most users should have the User role with a [virtual key](/api-reference/virtual-keys) scoped to their needs.
 
 ## Related
 
-<Cards>
-  <Card title="Data Residency" href="/governance/data-residency">Configure US-only data storage.</Card>
-  <Card title="Audit Trail" href="/governance/audit-trail">Search and export audit logs.</Card>
-  <Card title="Restriction Rules API" href="/api-reference/restriction-rules">Block or mask PHI in queries.</Card>
-  <Card title="SIEM Export API" href="/api-reference/siem">Forward events to your SIEM.</Card>
-</Cards>
+- **[Data Residency](/governance/data-residency)** — Configure US-only data storage.
+- **[Audit Trail](/governance/audit-trail)** — Search and export audit logs.
+- **[Restriction Rules API](/api-reference/restriction-rules)** — Block or mask PHI in queries.
+- **[SIEM Export API](/api-reference/siem)** — Forward events to your SIEM.
+

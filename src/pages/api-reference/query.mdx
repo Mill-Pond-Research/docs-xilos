@@ -2,8 +2,6 @@
 title: Query Endpoint
 ---
 
-import { Callout } from 'nextra/components'
-
 # Query Endpoint
 
 ```
@@ -73,9 +71,7 @@ curl -X POST https://api.xilos.ai/api/v1/query/ \
 }
 ```
 
-<Callout type="info">
-  The Query endpoint returns richer metadata than the Chat Completions endpoint — including governance actions, quality scores, compression stats, and cache information. Use this endpoint when you need full observability.
-</Callout>
+> **Info:** The Query endpoint returns richer metadata than the Chat Completions endpoint — including governance actions, quality scores, compression stats, and cache information. Use this endpoint when you need full observability.
 
 ## Conversation Threading
 
