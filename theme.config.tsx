@@ -2,6 +2,11 @@ import React from "react";
 import { DocsThemeConfig } from "nextra-theme-docs";
 
 const config: DocsThemeConfig = {
+  useNextSeoProps() {
+    return {
+      titleTemplate: "%s – Xilos Docs",
+    };
+  },
   logo: (
     <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       <img src="/xilos-logo-blue.svg" alt="Xilos" style={{ height: "28px", width: "auto" }} className="xilos-logo-light" />
