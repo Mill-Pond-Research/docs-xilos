@@ -5,6 +5,13 @@
    Gray text: #6B7280 / #4B5563
 */
 
+/* Logo — show blue version in light mode, white in dark mode */
+.xilos-logo-dark { display: none !important; }
+.xilos-logo-light { display: inline-block !important; }
+
+.dark .xilos-logo-dark { display: inline-block !important; }
+.dark .xilos-logo-light { display: none !important; }
+
 :root {
   --xilos-blue: #0066FF;
   --xilos-dark: #111827;

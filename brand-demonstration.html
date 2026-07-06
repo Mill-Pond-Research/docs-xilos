@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xilos Brand Update — Demonstration</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px; }
+  h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; color: #0066FF; }
+  h2 { font-size: 1.25rem; font-weight: 600; margin: 32px 0 16px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .subtitle { color: #64748b; margin-bottom: 32px; font-size: 0.9rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 32px; }
+  .card-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 16px; }
+  .logo-box { background: #fff; border-radius: 8px; padding: 24px; display: flex; align-items: center; justify-content: center; min-height: 80px; margin-bottom: 12px; }
+  .logo-box.dark { background: #0f172a; }
+  .logo-box.beige { background: #f5f0e8; }
+  .caption { font-size: 0.8rem; color: #64748b; }
+  .wrong { border-color: #ef4444; }
+  .wrong .card-label { color: #ef4444; }
+  .right { border-color: #22c55e; }
+  .right .card-label { color: #22c55e; }
+  .img-fit { max-width: 100%; max-height: 60px; }
+  .steps { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-top: 32px; }
+  .steps h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #0066FF; }
+  .steps ol { padding-left: 20px; }
+  .steps li { margin-bottom: 8px; font-size: 0.9rem; color: #cbd5e1; }
+  .swatch-row { display: flex; gap: 12px; margin-top: 12px; }
+  .swatch { width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 600; }
+  .swatch.blue { background: #1f4e79; color: #fff; }
+  .swatch.accent { background: #0066FF; color: #fff; }
+  .swatch.white { background: #f1f4f8; color: #1e293b; border: 1px solid #ccc; }
+  .swatch.beige { background: #f5f0e8; color: #1e293b; }
+</style>
+</head>
+<body>
+
+<h1>Xilos Brand Update — Demonstration</h1>
+<p class="subtitle">Showing current (incorrect) logos vs the real MPR/Xilos brand assets. This page demonstrates what will change across xilos-personal and docs-xilos.</p>
+
+<h2>Current Logos (Incorrect)</h2>
+<div class="grid">
+  <div class="card wrong">
+    <div class="card-label">❌ Current — Xilos-Personal UI (Logo.svg)</div>
+    <div class="logo-box">
+      <img src="/home/pshimshock/Pictures/MPR/product-logos/xilos-logo-name-1000px.png" style="display:none">
+      <svg width="120" height="40" viewBox="0 0 88 40" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <path d="M0 0V40H88V0H0ZM82.551 34.5213H5.44896V5.47868H82.551V34.5196V34.5213Z" fill="#475966"/>
+          <path d="M65.1675 25.3884V30.8671H78.9184V17.1704H70.6165V14.4311H78.9184V8.9524H65.1675V22.6491H73.4694V25.3884H65.1675Z" fill="#475966"/>
+          <path d="M31.4917 8.9524H26.0427V30.8689H31.4917V8.9524Z" fill="#475966"/>
+          <path d="M48.8206 8.9524V30.8689H63.3512V8.9524H48.8206ZM57.9022 25.3902H54.2696V14.4328H57.9022V25.3902Z" fill="#475966"/>
+          <path d="M34.2162 8.9524V30.8671H47.0043V25.3884H39.6651V8.9524H34.2162Z" fill="#475966"/>
+          <path d="M14.7611 30.8671L16.6549 25.5919L18.5469 30.8671H24.2264L19.4938 19.9098L24.2264 8.9524H18.5469L16.6549 14.2276L14.7611 8.9524H9.0816L13.8142 19.9098L9.0816 30.8671H14.7611Z" fill="#475966"/>
+        </g>
+      </svg>
+    </div>
+    <p class="caption">Generic "XILO" text logo in gray (#475966). Not the Xilos brand. Used in the sidebar collapsed state and landing page.</p>
+  </div>
+  <div class="card wrong">
+    <div class="card-label">❌ Current — Docs-Xilos (theme.config.tsx)</div>
+    <div class="logo-box">
+      <svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+        <rect width="28" height="28" x="0" y="6" rx="7" fill="#0066FF"/>
+        <path d="M9 15L16 22L9 29M23 15L16 22L23 29" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text x="36" y="28" font-family="Arial" font-size="16" font-weight="700" fill="#111827">Xilos</text>
+        <text x="82" y="28" font-family="Arial" font-size="11" font-weight="500" fill="#6B7280">Docs</text>
+      </svg>
+    </div>
+    <p class="caption">Fake "X" chevron icon in a blue box. Not the real Xilos logo. Used in the docs navbar and favicon.</p>
+  </div>
+</div>
+
+<h2>Real Xilos Brand Logos (Correct)</h2>
+<div class="grid">
+  <div class="card right">
+    <div class="card-label">✅ Real — Xilos Logo Name (Blue) — xilos-logo-name-blue.svg</div>
+    <div class="logo-box">
+      <img src="/home/pshimshock/Pictures/MPR/product-logos/xilos-logo-name-blue@3x.png" class="img-fit">
+    </div>
+    <p class="caption">Official Xilos logo with brand symbol + "Xilos" wordmark. Color: #1f4e79 (MPR navy blue). Font: Sora-Bold.</p>
+  </div>
+  <div class="card right">
+    <div class="card-label">✅ Real — Xilos Logo Name (White) — xilos-logo-name-white.svg</div>
+    <div class="logo-box dark">
+      <img src="/home/pshimshock/Pictures/MPR/product-logos/xilos-logo-name-white@3x.png" class="img-fit">
+    </div>
+    <p class="caption">White version for dark backgrounds. Color: #f1f4f8. Same symbol + wordmark.</p>
+  </div>
+</div>
+<div class="grid">
+  <div class="card right">
+    <div class="card-label">✅ Real — Xilos Logo Name (Black) — xilos-logo-name-black.svg</div>
+    <div class="logo-box">
+      <img src="/home/pshimshock/Pictures/MPR/product-logos/xilos-logo-name-black@3x.png" class="img-fit">
+    </div>
+    <p class="caption">Black version for light backgrounds. Default fill (black).</p>
+  </div>
+  <div class="card right">
+    <div class="card-label">✅ Real — Xilos Logo (Large PNG) — xilos-logo-name-3200px.png</div>
+    <div class="logo-box beige">
+      <img src="/home/pshimshock/Pictures/MPR/product-logos/xilos-logo-name-3200px.png" class="img-fit">
+    </div>
+    <p class="caption">High-res PNG for print/presentations. Shows the full brand lockup.</p>
+  </div>
+</div>
+
+<h2>Real MPR Company Logos</h2>
+<div class="grid">
+  <div class="card right">
+    <div class="card-label">✅ MPR Logo (Color, Square) — MillPondReseach-Logo-Square-4000-Color.png</div>
+    <div class="logo-box">
+      <img src="/home/pshimshock/Pictures/MPR/company-logos/MillPondReseach-Logo-Square-4000-Color.png" class="img-fit" style="max-height:80px">
+    </div>
+    <p class="caption">MPR company logo for footer/about sections.</p>
+  </div>
+  <div class="card right">
+    <div class="card-label">✅ MPR Wordmark (Beige) — MillPondResearch-Wordmark-2000-beige.png</div>
+    <div class="logo-box beige">
+      <img src="/home/pshimshock/Pictures/MPR/company-logos/MillPondResearch-Wordmark-2000-beige.png" class="img-fit">
+    </div>
+    <p class="caption">MPR wordmark for light backgrounds.</p>
+  </div>
+</div>
+
+<h2>Brand Color Palette</h2>
+<div class="card">
+  <div class="card-label">Colors used across xilos.ai, millpondresearch.com, and docs.xilos.ai</div>
+  <div class="swatch-row">
+    <div class="swatch blue">MPR Navy<br>#1f4e79</div>
+    <div class="swatch accent">Accent<br>#0066FF</div>
+    <div class="swatch white">Off-White<br>#f1f4f8</div>
+    <div class="swatch beige">Beige<br>#f5f0e8</div>
+  </div>
+  <p class="caption" style="margin-top:12px">The Xilos logo uses MPR navy (#1f4e79). The accent blue (#0066FF) is used for buttons, links, and interactive elements. Off-white (#f1f4f8) for dark backgrounds. Beige (#f5f0e8) for premium/light sections.</p>
+</div>
+
+<h2>Implementation Plan</h2>
+<div class="steps">
+  <h3>Xilos-Personal (UI)</h3>
+  <ol>
+    <li><b>src/assets/Logo.svg</b> — Replace with xilos-logo-name-blue.svg (or black for light navbars)</li>
+    <li><b>src/assets/Logo-2.svg</b> — Replace with xilos-name-white.svg (collapsed sidebar icon — the symbol only, no wordmark)</li>
+    <li><b>public/favicon.ico</b> — Replace with the Xilos symbol as favicon</li>
+    <li><b>Landing page</b> — Logo component already uses Logo.svg, so updating the file updates everywhere</li>
+    <li><b>Layout sidebar</b> — LogoCollapsed uses Logo-2.svg, so updating the file updates the collapsed state</li>
+  </ol>
+</div>
+
+<div class="steps">
+  <h3>Docs-Xilos</h3>
+  <ol>
+    <li><b>public/favicon.svg</b> — Replace with the Xilos symbol (extract from the full logo)</li>
+    <li><b>theme.config.tsx</b> — Replace the inline SVG logo with the real Xilos logo (blue for light mode, white for dark mode)</li>
+    <li><b>Footer</b> — Add MPR company link/logo</li>
+    <li><b>Welcome page</b> — Already references MPR and xilos.ai (no logo changes needed in content)</li>
+  </ol>
+</div>
+
+<div class="steps">
+  <h3>Future Rebranding Considerations</h3>
+  <ol>
+    <li>All logos are centralized in <b>src/assets/</b> (UI) and <b>public/</b> (docs) — a single file swap rebrands the entire site</li>
+    <li>The Logo component in <b>components/assets/index.tsx</b> accepts a <code>color</code> prop — this controls the SVG filter, not the file itself</li>
+    <li>The Xilos brand SVGs have 3 color variants (blue, black, white) — swap the import to change the site-wide logo color</li>
+    <li>Keep the original brand asset files in <b>~/Pictures/MPR/product-logos/</b> as the source of truth</li>
+    <li>If renaming the product, update: Logo.svg, Logo-2.svg, favicon, theme.config.tsx, and the &lt;title&gt; in index.html</li>
+  </ol>
+</div>
+
+</body>
+</html>

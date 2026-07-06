@@ -4,13 +4,8 @@ import { DocsThemeConfig } from "nextra-theme-docs";
 const config: DocsThemeConfig = {
   logo: (
     <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="32" height="32" rx="7" fill="#0066FF"/>
-        <path d="M9 9L16 16L9 23M23 9L16 16L23 23" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span style={{ fontWeight: 700, fontSize: "1.125rem", color: "#111827" }}>
-        Xilos
-      </span>
+      <img src="/xilos-logo-blue.svg" alt="Xilos" style={{ height: "28px", width: "auto" }} className="xilos-logo-light" />
+      <img src="/xilos-logo-white.svg" alt="Xilos" style={{ height: "28px", width: "auto", display: "none" }} className="xilos-logo-dark" />
       <span style={{ fontSize: "0.75rem", color: "#6B7280", fontWeight: 500, marginLeft: "2px" }}>
         Docs
       </span>
