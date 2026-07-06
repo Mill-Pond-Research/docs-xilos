@@ -33,7 +33,6 @@ const config: DocsThemeConfig = {
     ),
   },
   sidebar: {
-    defaultOpen: true,
     toggleButton: true,
   },
   search: {
