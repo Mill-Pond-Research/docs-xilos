@@ -1,0 +1,16 @@
+{
+  "index": "Guides Overview",
+  "prompt-playground": "Using the Prompt Playground",
+  "create-routing-rule": "Create a Routing Rule",
+  "create-restriction-rule": "Create a Restriction Rule",
+  "build-workflow": "Build a Multi-Model Workflow",
+  "enable-compression": "Enable Context Compression",
+  "export-training-data": "Export Training Data",
+  "fine-tune-model": "Fine-Tune a Model",
+  "setup-webhooks": "Set Up Webhooks",
+  "setup-routines": "Set Up Routines",
+  "setup-siem": "Set Up SIEM Export",
+  "virtual-keys": "Manage Virtual Keys",
+  "eval-datasets": "Create Eval Datasets",
+  "synthetic-data": "Generate Synthetic Data"
+}

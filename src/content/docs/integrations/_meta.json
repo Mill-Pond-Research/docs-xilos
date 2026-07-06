@@ -1,0 +1,12 @@
+{
+  "index": "Integrations Overview",
+  "hermes": "Hermes Agent",
+  "openclaw": "OpenClaw",
+  "claude-code": "Claude Code",
+  "openai-sdk": "OpenAI SDK",
+  "langchain": "LangChain",
+  "copilot": "GitHub Copilot",
+  "kilo-code": "Kilo Code",
+  "openwebui": "OpenWebUI",
+  "custom-app": "Custom Application"
+}

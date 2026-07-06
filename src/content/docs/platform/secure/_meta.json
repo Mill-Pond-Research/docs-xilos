@@ -1,0 +1,8 @@
+{
+  "index": "Security Overview",
+  "guardrails": "Guardrails",
+  "restriction-rules": "Restriction Rules",
+  "pii-detection": "PII Detection",
+  "prompt-injection": "Prompt Injection Defense",
+  "audit-logs": "Audit Logs"
+}

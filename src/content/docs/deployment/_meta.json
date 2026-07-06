@@ -1,0 +1,9 @@
+{
+  "index": "Deployment Overview",
+  "managed-saas": "Managed SaaS",
+  "private-cloud": "Private Cloud (VPC)",
+  "on-premise": "On-Premise",
+  "three-phase-journey": "Three-Phase Ownership Journey",
+  "fine-tuning": "Fine-Tuning Pipeline",
+  "environment-variables": "Environment Variables"
+}

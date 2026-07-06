@@ -1,0 +1,20 @@
+{
+  "index": "API Overview",
+  "authentication": "Authentication",
+  "chat-completions": "Chat Completions",
+  "query": "Query Endpoint",
+  "routing-rules": "Routing Rules API",
+  "restriction-rules": "Restriction Rules API",
+  "workflows": "Workflows API",
+  "eval-datasets": "Eval Datasets API",
+  "training-data": "Training Data Export API",
+  "fine-tune": "Fine-Tune API",
+  "suggestions": "Suggestions API",
+  "routines": "Routines API",
+  "webhooks": "Webhooks API",
+  "siem": "SIEM Export API",
+  "virtual-keys": "Virtual Keys API",
+  "prompts": "Prompts API",
+  "errors": "Error Codes",
+  "rate-limits": "Rate Limits"
+}
