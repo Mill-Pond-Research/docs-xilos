@@ -2,18 +2,207 @@
 title: Routing Rules API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Routing Rules API
 
-CRUD endpoints for managing routing rules that determine which LLM handles each query.
+Routing rules determine which LLM handles each incoming query. Each rule maps a trigger phrase to a model, with optional caching and sample queries for evaluation. Use these endpoints to create, list, update, and delete routing rules.
 
-## Sections
+## Rule Object
 
-- List Rules
-- Create Rule
-- Update Rule
-- Delete Rule
-- Rule Object
+```json
+{
+  "id": "rule_01HXYZ",
+  "name": "Code generation",
+  "trigger_phrase": "write code",
+  "llm_id": "gpt-4o",
+  "cache_enabled": true,
+  "sample_queries": [
+    "Write a Python function to reverse a string",
+    "Create a React component for a login form"
+  ],
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/routing-rules` | List all routing rules |
+| `POST` | `/routing-rules` | Create a new routing rule |
+| `PUT` | `/routing-rules/{id}` | Update an existing rule |
+| `DELETE` | `/routing-rules/{id}` | Delete a routing rule |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Routing Rules
+
+```
+GET /api/v1/routing-rules
+```
+
+Returns all routing rules for your organization.
+
+### Response
+
+```json
+[
+  {
+    "id": "rule_01HXYZ",
+    "name": "Code generation",
+    "trigger_phrase": "write code",
+    "llm_id": "gpt-4o",
+    "cache_enabled": true,
+    "sample_queries": [
+      "Write a Python function to reverse a string"
+    ],
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z"
+  }
+]
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/routing-rules \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+---
+
+## Create Routing Rule
+
+```
+POST /api/v1/routing-rules
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the rule. |
+| `trigger_phrase` | string | Yes | Phrase that activates this rule when matched in the query. |
+| `llm_id` | string | Yes | Model ID to route matching queries to (e.g., `gpt-4o`). |
+| `cache_enabled` | boolean | No | Whether responses for this rule are cached. Default: `false`. |
+| `sample_queries` | array | No | List of example queries for evaluation and testing. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/routing-rules \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Code generation",
+    "trigger_phrase": "write code",
+    "llm_id": "gpt-4o",
+    "cache_enabled": true,
+    "sample_queries": [
+      "Write a Python function to reverse a string",
+      "Create a React component for a login form"
+    ]
+  }'
+```
+
+### Response
+
+```json
+{
+  "id": "rule_01HXYZ",
+  "name": "Code generation",
+  "trigger_phrase": "write code",
+  "llm_id": "gpt-4o",
+  "cache_enabled": true,
+  "sample_queries": [
+    "Write a Python function to reverse a string",
+    "Create a React component for a login form"
+  ],
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+---
+
+## Update Routing Rule
+
+```
+PUT /api/v1/routing-rules/{id}
+```
+
+Updates an existing routing rule. All fields are optional — only provided fields are updated.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `trigger_phrase` | string | No | Updated trigger phrase. |
+| `llm_id` | string | No | Updated model ID. |
+| `cache_enabled` | boolean | No | Toggle caching. |
+| `sample_queries` | array | No | Updated sample queries. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/routing-rules/rule_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "llm_id": "claude-3-5-sonnet",
+    "cache_enabled": false
+  }'
+```
+
+### Response
+
+Returns the updated rule object with the same fields as the [Rule Object](#rule-object).
+
+---
+
+## Delete Routing Rule
+
+```
+DELETE /api/v1/routing-rules/{id}
+```
+
+Deletes a routing rule. This action cannot be undone.
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/routing-rules/rule_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "rule_01HXYZ",
+  "deleted": true
+}
+```
+
+<Callout type="warning">
+  Deleting a routing rule is permanent. Any queries that previously matched this rule will fall back to the default routing behavior.
+</Callout>
+
+## Working With Routing Rules
+
+<Steps>
+  ### Create a Rule
+  Define a trigger phrase and the model that should handle matching queries.
+
+  ### Add Sample Queries
+  Include representative sample queries so you can evaluate routing accuracy in [Eval Datasets](/api-reference/eval-datasets).
+
+  ### Enable Caching
+  Turn on `cache_enabled` for queries with predictable, repeatable responses to reduce cost and latency.
+
+  ### Monitor and Adjust
+  Review query logs in the dashboard and update rules as your traffic patterns evolve.
+</Steps>

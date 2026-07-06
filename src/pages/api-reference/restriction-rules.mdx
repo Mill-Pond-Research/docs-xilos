@@ -2,18 +2,184 @@
 title: Restriction Rules API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Restriction Rules API
 
-CRUD endpoints for managing restriction rules that block, mask, or warn on specific query patterns.
+Restriction rules are security policies that block, mask, or flag queries before they reach an LLM. Use these endpoints to manage rules that protect against unauthorized content, sensitive data exposure, and compliance violations.
 
-## Sections
+## Rule Object
 
-- List Rules
-- Create Rule
-- Update Rule
-- Delete Rule
-- Rule Object
+```json
+{
+  "id": "rest_01HXYZ",
+  "name": "Block SSN disclosure",
+  "trigger_phrase": "social security number",
+  "action": "block",
+  "severity": "high",
+  "rule_type": "keyword",
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/restriction-rules` | List all restriction rules |
+| `POST` | `/restriction-rules` | Create a new restriction rule |
+| `PUT` | `/restriction-rules/{id}` | Update an existing rule |
+| `DELETE` | `/restriction-rules/{id}` | Delete a restriction rule |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Restriction Rules
+
+```
+GET /api/v1/restriction-rules
+```
+
+Returns all restriction rules for your organization.
+
+### Response
+
+```json
+[
+  {
+    "id": "rest_01HXYZ",
+    "name": "Block SSN disclosure",
+    "trigger_phrase": "social security number",
+    "action": "block",
+    "severity": "high",
+    "rule_type": "keyword",
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z"
+  }
+]
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/restriction-rules \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+---
+
+## Create Restriction Rule
+
+```
+POST /api/v1/restriction-rules
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the rule. |
+| `trigger_phrase` | string | Yes | Phrase or pattern that activates the rule. |
+| `action` | string | Yes | Action to take: `block`, `mask`, or `flag`. |
+| `severity` | string | No | Severity level: `high`, `medium`, or `low`. Default: `medium`. |
+| `rule_type` | string | Yes | Rule engine: `ai` (semantic matching) or `keyword` (exact match). |
+
+<Callout type="info">
+  - **`block`** — The query is rejected and never reaches the LLM.
+  - **`mask`** — Sensitive content in the query is redacted before forwarding to the LLM.
+  - **`flag`** — The query proceeds but is flagged in the audit log for review.
+</Callout>
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/restriction-rules \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Block SSN disclosure",
+    "trigger_phrase": "social security number",
+    "action": "block",
+    "severity": "high",
+    "rule_type": "keyword"
+  }'
+```
+
+### Response
+
+Returns the created [Rule Object](#rule-object).
+
+---
+
+## Update Restriction Rule
+
+```
+PUT /api/v1/restriction-rules/{id}
+```
+
+Updates an existing restriction rule. All fields are optional — only provided fields are updated.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `trigger_phrase` | string | No | Updated trigger phrase. |
+| `action` | string | No | Updated action. |
+| `severity` | string | No | Updated severity. |
+| `rule_type` | string | No | Updated rule type. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/restriction-rules/rest_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "action": "mask",
+    "severity": "medium"
+  }'
+```
+
+### Response
+
+Returns the updated rule object.
+
+---
+
+## Delete Restriction Rule
+
+```
+DELETE /api/v1/restriction-rules/{id}
+```
+
+Deletes a restriction rule. This action cannot be undone.
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/restriction-rules/rest_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "rest_01HXYZ",
+  "deleted": true
+}
+```
+
+## Choosing a Rule Type
+
+<Steps>
+  ### Keyword Rules
+  Use `rule_type: "keyword"` for exact phrase matching. Fast and deterministic — ideal for compliance blocks on specific terms like "social security number" or "credit card number."
+
+  ### AI Rules
+  Use `rule_type: "ai"` for semantic matching. The AI engine evaluates intent, so paraphrased or indirect attempts to trigger the restriction are still caught. Ideal for nuanced policy enforcement.
+
+  ### Combine Both
+  Layer keyword rules for hard blocks and AI rules for nuanced flagging. Review flagged queries in the audit trail to refine your policies.
+</Steps>

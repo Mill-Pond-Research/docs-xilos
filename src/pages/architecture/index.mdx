@@ -31,15 +31,6 @@ Xilos is a middleware gateway that intercepts, analyzes, and processes every pro
                     └──────────────────────────────────┘
 ```
 
-## Technology Stack
-
-- **Frontend:** React, TypeScript, MUI (Material UI)
-- **Backend:** FastAPI, Python, SQLModel, SQLAlchemy 2.0+
-- **Database:** PostgreSQL (Neon for SaaS, RDS for VPC/On-Prem)
-- **Embeddings:** all-MiniLM-L6-v2 (local, CPU-based)
-- **SLM (Smart Routing):** Internal Small Language Model with 16k token context window
-- **Deployment:** Vercel (frontend), Railway (backend), Neon (database)
-
 ## Key Components
 
 <Cards>
@@ -69,18 +60,8 @@ Xilos is a middleware gateway that intercepts, analyzes, and processes every pro
   </Card>
 </Cards>
 
-## Infrastructure
-
-For the Managed SaaS deployment:
-
-- **Frontend:** CloudFront + S3 (or Vercel)
-- **Backend:** Application Load Balancer + ECS Fargate (or Railway)
-- **Database:** RDS Serverless PostgreSQL (or Neon)
-- **Internal SLLM:** Internal ALB + Auto Scaling Group with EC2 GPU instances
-
-The core principle is that all persistent data resides within the PostgreSQL database. All other components are stateless and can be rebuilt from Infrastructure as Code (Terraform and Atmos).
+For the Managed SaaS deployment, Xilos runs on managed cloud infrastructure with automated backups and disaster recovery. All persistent data is stored in a PostgreSQL database with continuous backups.
 
 <Callout type="info">
-  **RTO:** 4 hours (RDS Point-in-Time Recovery + IaC redeployment)
-  **RPO:** 1 hour (continuous RDS backups)
+  **RTO:** 4 hours | **RPO:** 1 hour
 </Callout>

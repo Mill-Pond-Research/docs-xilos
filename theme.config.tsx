@@ -8,7 +8,7 @@ const config: DocsThemeConfig = {
     </span>
   ),
   project: {
-    link: "https://github.com/Mill-Pond-Research/Xilos-Personal",
+    link: "",
   },
   chat: {
     link: "https://www.xilos.ai",

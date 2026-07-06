@@ -12,7 +12,7 @@ Cache LLM responses and reuse them for semantically similar queries — even if 
 
 Unlike traditional exact-match caching, Xilos uses semantic similarity to determine cache hits:
 
-1. When a query arrives, Xilos generates an embedding of the query using the local embedding model (all-MiniLM-L6-v2).
+1. When a query arrives, Xilos generates an embedding of the query using a local embedding model.
 2. Xilos searches the semantic cache for similar queries using cosine similarity.
 3. If a cached response has a similarity score above the threshold, it is returned immediately — no LLM call is made.
 4. If no cache hit, the query proceeds through the normal pipeline and the response is cached for future use.
