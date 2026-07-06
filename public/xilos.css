@@ -1,0 +1,154 @@
+/* Xilos Docs — Custom Styles
+   Matches the design system of xilos.ai and millpondresearch.com
+   Primary accent: #0066FF
+   Dark text: #111827
+   Gray text: #6B7280 / #4B5563
+*/
+
+:root {
+  --xilos-blue: #0066FF;
+  --xilos-dark: #111827;
+  --xilos-gray: #6B7280;
+  --xilos-gray-light: #9CA3AF;
+}
+
+/* Remove Nextra branding from search */
+.nextra-search input::placeholder {
+  color: var(--xilos-gray);
+}
+
+/* Navbar styling — match xilos.ai header */
+.nextra-navbar {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .nextra-navbar {
+  background-color: rgba(17, 24, 39, 0.85) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Banner — match xilos.ai accent */
+.nextra-banner {
+  background-color: var(--xilos-blue) !important;
+  color: #fff !important;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* Sidebar — clean, minimal */
+.nextra-sidebar {
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .nextra-sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Sidebar items — match xilos.ai nav style */
+.nextra-sidebar nav a {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.nextra-sidebar nav a:hover {
+  color: var(--xilos-blue);
+}
+
+/* Active sidebar item */
+.nextra-sidebar nav a.active {
+  color: var(--xilos-blue);
+  font-weight: 600;
+}
+
+/* Headings — match xilos.ai typography */
+article h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+article h2 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 2.5rem;
+}
+
+article h3 {
+  font-weight: 600;
+}
+
+/* Links — use xilos blue */
+article a {
+  color: var(--xilos-blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+article a:hover {
+  text-decoration: underline;
+}
+
+/* Code blocks — match xilos.ai dark code style */
+article pre {
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+/* Tables — clean borderless style */
+article table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+article table th {
+  font-weight: 600;
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+article table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark article table th {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark article table td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Footer — match xilos.ai footer style */
+.nextra-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 1.5rem 2rem;
+}
+
+.dark .nextra-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Cards — match xilos.ai card style */
+.nextra-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nextra-card:hover {
+  border-color: var(--xilos-blue);
+  box-shadow: 0 0 0 1px var(--xilos-blue);
+}
+
+.dark .nextra-card {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Callout — subtle, xilos.ai-style */
+.nextra-callout {
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}

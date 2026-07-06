@@ -61,6 +61,7 @@ const config: DocsThemeConfig = {
       <meta property="og:image" content="https://docs.xilos.ai/og-image.png" />
       <meta name="twitter:card" content="summary_large_image" />
       <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      <link rel="stylesheet" href="/xilos.css" />
     </>
   ),
   darkMode: true,
