@@ -2,16 +2,109 @@
 title: Suggestions API
 ---
 
+import { Callout, Tabs, Card, Cards } from 'nextra/components'
+
 # Suggestions API
 
-Get AI-powered suggestions for cost optimization, fine-tune targets, routing gaps, and tool attachments.
+The Suggestions endpoint returns AI-powered recommendations for improving your Xilos configuration. Xilos analyzes your query log, routing rules, cost patterns, and usage data to surface actionable insights.
 
-## Sections
+## Endpoint
 
-- Get Suggestions
-- Suggestion Types
-- Estimated Savings
+```
+GET /api/v1/suggestions
+```
 
----
+Returns a list of suggestions tailored to your current configuration and usage patterns.
 
-*This page is a stub. Content will be added soon.*
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/suggestions \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "suggestions": [
+    {
+      "type": "fine_tune_target",
+      "title": "Fine-tune a model for code generation queries",
+      "description": "You have 2,400 high-quality code generation responses. Fine-tuning gpt-4o-mini could reduce cost by 60% while maintaining quality.",
+      "priority": "high",
+      "metadata": {
+        "routing_rule_id": "rule_01HXYZ",
+        "record_count": 2400,
+        "estimated_cost_savings": "60%",
+        "suggested_base_model": "gpt-4o-mini"
+      }
+    },
+    {
+      "type": "cost_optimization",
+      "title": "Route summarization queries to a smaller model",
+      "description": "45% of your gpt-4o traffic is summarization. These queries perform equally well on gpt-4o-mini at 1/5 the cost.",
+      "priority": "medium",
+      "metadata": {
+        "current_model": "gpt-4o",
+        "suggested_model": "gpt-4o-mini",
+        "estimated_monthly_savings": "$340"
+      }
+    },
+    {
+      "type": "routing_gap",
+      "title": "12% of queries are not matching any routing rule",
+      "description": "These unmatched queries fall through to the default model. Adding routing rules for common unmatched patterns could improve routing accuracy.",
+      "priority": "medium",
+      "metadata": {
+        "unmatched_percentage": 12,
+        "sample_queries": [
+          "Summarize this article",
+          "Extract key points from the meeting notes"
+        ]
+      }
+    },
+    {
+      "type": "tool_suggestion",
+      "title": "Enable web search for factual queries",
+      "description": "30% of your queries ask about current events. Enabling web search tool access would improve response accuracy.",
+      "priority": "low",
+      "metadata": {
+        "query_percentage": 30,
+        "suggested_tool": "web_search"
+      }
+    }
+  ]
+}
+```
+
+## Suggestion Types
+
+<Cards>
+  <Card title="fine_tune_target" href="/api-reference/fine-tune">
+    Recommends fine-tuning a model for a specific routing rule. Includes the record count, estimated cost savings, and suggested base model.
+  </Card>
+  <Card title="cost_optimization" href="/api-reference/routing-rules">
+    Identifies queries that could use a cheaper model without sacrificing quality. Includes estimated monthly savings.
+  </Card>
+  <Card title="routing_gap" href="/api-reference/routing-rules">
+    Highlights queries that aren't matching any routing rule. Includes sample queries to help you create new rules.
+  </Card>
+  <Card title="tool_suggestion">
+    Recommends enabling tools (like web search) for query patterns that would benefit from them.
+  </Card>
+</Cards>
+
+## Suggestion Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | string | Suggestion type: `fine_tune_target`, `cost_optimization`, `routing_gap`, or `tool_suggestion`. |
+| `title` | string | Short summary of the suggestion. |
+| `description` | string | Detailed explanation with context and rationale. |
+| `priority` | string | `high`, `medium`, or `low`. |
+| `metadata` | object | Type-specific data (see examples above). |
+
+<Callout type="info">
+  Suggestions are regenerated periodically based on your latest query data. Check back regularly for new recommendations as your usage patterns evolve.
+</Callout>

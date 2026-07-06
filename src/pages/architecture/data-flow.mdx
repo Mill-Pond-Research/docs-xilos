@@ -1,19 +1,49 @@
 ---
-title: Data Flow Diagram
+title: Data Flow
 ---
 
-# Data Flow Diagram
+# Data Flow
 
-Visual diagram showing how data flows through the Xilos platform from input to output.
+How data moves through the Xilos platform from input to output.
 
-## Sections
+## Input
 
-- Input Data
-- Processing Stages
-- Storage
-- Output Data
-- External Integrations
+Data enters Xilos when:
 
----
+- An AI agent sends a chat completion or query request via the API
+- A routine triggers a scheduled query
+- A workflow stage processes its input
 
-*This page is a stub. Content will be added soon.*
+## Processing
+
+Each query flows through the processing pipeline:
+
+```
+Input → Authenticate → Guardrails → Restrictions → Cache Check
+    → Route → Compress → LLM Call → Quality Score → Fact Extract
+    → Log → Webhooks → Output
+```
+
+## Storage
+
+Data is stored in:
+
+- **Query Log** — Full query history with routing decisions, governance actions, and responses
+- **Semantic Cache** — Cached responses for similar future queries
+- **Context Engine** — Extracted atomic facts for enriching future queries
+- **Audit Trail** — Immutable record of all governance and security events
+
+## Output
+
+Data leaves Xilos when:
+
+- A response is returned to the requesting agent
+- A webhook fires to notify an external system
+- A SIEM export forwards governance events
+- A report is generated and exported
+- Training data is exported for fine-tuning
+
+<Callout type="info">
+  All data storage is scoped to the organization. No data is shared between organizations.
+</Callout>
+

@@ -2,16 +2,36 @@
 title: Guides Overview
 ---
 
-# Guides Overview
+import { Card, Cards } from 'nextra/components'
+
+# Guides
 
 Step-by-step guides for using Xilos features — from creating routing rules to fine-tuning models.
 
-## Sections
+## Platform Guides
 
-- Platform Guides
-- Integration Guides
-- Deployment Guides
+<Cards>
+  <Card title="Using the Prompt Playground" href="/guides/prompt-playground">Test prompts against different models with adjustable parameters.</Card>
+  <Card title="Create a Routing Rule" href="/guides/create-routing-rule">Route queries to specific models based on intent or keywords.</Card>
+  <Card title="Create a Restriction Rule" href="/guides/create-restriction-rule">Block, mask, or warn on queries matching specific patterns.</Card>
+  <Card title="Build a Multi-Model Workflow" href="/guides/build-workflow">Create multi-stage LLM pipelines with the Visual Workflow Builder.</Card>
+  <Card title="Enable Context Compression" href="/guides/enable-compression">Reduce token costs by 50-90% with three compression strategies.</Card>
+</Cards>
 
----
+## Integration Guides
 
-*This page is a stub. Content will be added soon.*
+<Cards>
+  <Card title="Set Up Webhooks" href="/guides/setup-webhooks">Receive event-driven notifications for query events.</Card>
+  <Card title="Set Up Routines" href="/guides/setup-routines">Schedule recurring agent queries with cron expressions.</Card>
+  <Card title="Set Up SIEM Export" href="/guides/setup-siem">Forward governance events to Splunk, Datadog, or other SIEM platforms.</Card>
+  <Card title="Manage Virtual Keys" href="/guides/virtual-keys">Create per-user API keys with budget and rate limits.</Card>
+</Cards>
+
+## Data and Fine-Tuning Guides
+
+<Cards>
+  <Card title="Create Eval Datasets" href="/guides/eval-datasets">Create test datasets and run regression tests against routing rules.</Card>
+  <Card title="Generate Synthetic Data" href="/guides/synthetic-data">Use the SLM to generate edge-case test variants.</Card>
+  <Card title="Export Training Data" href="/guides/export-training-data">Export the query log as a filtered training dataset.</Card>
+  <Card title="Fine-Tune a Model" href="/guides/fine-tune-model">Fine-tune an open-source model using Xilos orchestration data.</Card>
+</Cards>

@@ -2,19 +2,68 @@
 title: Role-Based Access Control
 ---
 
+import { Callout } from 'nextra/components'
+
 # Role-Based Access Control
 
-Xilos supports role-based access control with organization, department, and user-level permissions.
+Xilos supports role-based access control with three primary roles.
 
-## Sections
+## Roles
 
-- Roles
-- Permissions Matrix
-- Organization Admin
-- Department Admin
-- User
-- SuperAdmin
+### SuperAdmin
 
----
+The SuperAdmin role has full access to the organization's Xilos environment:
 
-*This page is a stub. Content will be added soon.*
+- Manage organization settings and model configuration
+- Create and manage virtual keys
+- View all dashboards, query logs, and cost controls
+- Create and manage routing rules, restriction rules, and workflows
+- Configure SIEM export, webhooks, and routines
+- Manage users and departments
+- Access billing and plan management
+
+### Organization Admin
+
+The Org Admin role manages day-to-day operations:
+
+- Create and manage routing and restriction rules
+- View dashboards and query logs
+- Manage workflows, skills, and tools
+- Configure webhooks and routines
+- Cannot manage billing or model configuration
+
+### User
+
+The User role has read-only access:
+
+- View dashboards (own activity)
+- View query log (own queries)
+- Cannot create or modify rules
+- Cannot access settings or billing
+
+<Callout type="info">
+  Virtual Keys provide an additional layer of access control — each key can have its own budget and rate limits, independent of the user's role.
+</Callout>
+
+## Assigning Roles
+
+Roles are assigned when creating or editing a user:
+
+1. Navigate to **Settings** > **Administration**.
+2. Click **Add User** or edit an existing user.
+3. Select the role from the dropdown.
+4. Save.
+
+## API Access by Role
+
+| Action | SuperAdmin | Org Admin | User |
+|--------|-----------|-----------|------|
+| View dashboards | ✅ | ✅ | ✅ (own) |
+| Create routing rules | ✅ | ✅ | ❌ |
+| Create restriction rules | ✅ | ✅ | ❌ |
+| Manage virtual keys | ✅ | ❌ | ❌ |
+| Model configuration | ✅ | ❌ | ❌ |
+| View audit logs | ✅ | ✅ | ❌ |
+| SIEM configuration | ✅ | ✅ | ❌ |
+| Billing | ✅ | ❌ | ❌ |
+

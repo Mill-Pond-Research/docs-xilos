@@ -1,18 +1,129 @@
 ---
-title: Three-Phase Ownership Journey
+title: Three-Phase Journey
 ---
 
-# Three-Phase Ownership Journey
+import { Callout, Card, Cards, Steps } from 'nextra/components'
 
-Xilos guides organizations through a three-phase journey: connect existing services, fine-tune using orchestration data, and deploy on premises.
+# The Three-Phase Ownership Journey
 
-## Sections
+Xilos guides organizations through a three-phase journey toward full AI ownership. Each phase builds on the previous one, letting you start fast and progressively take on more control as your requirements evolve. You can stop at any phase — there's no obligation to progress.
 
-- Phase 1: Deploy & Connect
-- Phase 2: Fine-Tune & Optimize
-- Phase 3: Deploy On-Premises
-- Throughout: Rule & Workflow Optimization
+## Overview
 
----
+| Phase | Deployment | Data Location | Who Manages Infra | Time to Value |
+|-------|-----------|---------------|-------------------|---------------|
+| Phase 1: Connect | Managed SaaS | Xilos cloud | Xilos | Minutes |
+| Phase 2: Fine-Tune | Private Cloud | Your cloud | You | Days |
+| Phase 3: On-Prem | On-Premise | Your data center | You | Weeks |
 
-*This page is a stub. Content will be added soon.*
+<Cards>
+  <Card title="Phase 1: Connect" href="#phase-1-connect">
+    Start with Managed SaaS. Connect your agents and validate value.
+  </Card>
+  <Card title="Phase 2: Fine-Tune" href="#phase-2-fine-tune">
+    Move to Private Cloud. Fine-tune models and take control of data.
+  </Card>
+  <Card title="Phase 3: On-Prem" href="#phase-3-on-prem">
+    Deploy On-Premise. Full data sovereignty and air-gapped operation.
+  </Card>
+</Cards>
+
+## Phase 1: Connect
+
+**Deployment:** [Managed SaaS](/deployment/managed-saas)
+
+Phase 1 is about getting started quickly and validating that Xilos works for your use case. Xilos hosts everything — you connect your agents, configure routing rules, and start processing queries.
+
+### What You Do
+
+- Connect your existing OpenAI-compatible agents to the Xilos API.
+- Create routing rules to direct queries to the right models.
+- Set up restriction rules for security and compliance.
+- Monitor usage, cost, and quality in the dashboard.
+
+### What You Get
+
+- A working AI gateway in minutes.
+- Full routing, restriction, and governance features.
+- Access to all supported LLM providers.
+- No infrastructure to manage.
+
+### When to Move to Phase 2
+
+- Your compliance requirements mandate data stays in your cloud account.
+- You want to fine-tune models using your own query data.
+- You need network-level control over the platform.
+
+<Callout type="info">
+  Many organizations stay in Phase 1 indefinitely. There's no requirement to progress — Phase 1 is a complete, production-ready deployment.
+</Callout>
+
+## Phase 2: Fine-Tune
+
+**Deployment:** [Private Cloud](/deployment/private-cloud)
+
+Phase 2 is about taking control of your data and models. Xilos runs in your cloud account, and you use the query log to fine-tune models that are specialized for your use case.
+
+### What You Do
+
+- Deploy Xilos in your AWS, Azure, or GCP account.
+- Export training data from the query log using quality filters.
+- [Fine-tune models](/deployment/fine-tuning) on your high-quality query-response pairs.
+- Import the fine-tuned models and route queries to them.
+- Maintain full control over data residency and network configuration.
+
+### What You Get
+
+- Data stays in your cloud account.
+- Fine-tuned models that reduce cost and improve quality for your specific use case.
+- Network-level control over the platform.
+- Compliance with HIPAA (with BAA), GDPR, and SOC 2.
+
+### When to Move to Phase 3
+
+- You need full data sovereignty — data must not leave your premises.
+- You require air-gapped operation with no internet connectivity.
+- You want to self-host all models with no external API dependencies.
+
+## Phase 3: On-Prem
+
+**Deployment:** [On-Premise](/deployment/on-premise)
+
+Phase 3 is about full ownership. Xilos runs in your data center, on your hardware, with no external dependencies. This is the endpoint of the journey — complete control and data sovereignty.
+
+### What You Do
+
+- Deploy Xilos on your own hardware in your data center.
+- Self-host the internal SLM and all LLM models (open-weight or fine-tuned).
+- Operate the platform with your team.
+- Manage licensing, updates, and compliance.
+
+### What You Get
+
+- Complete data sovereignty — no data leaves your premises.
+- Air-gapped operation with no external API calls.
+- Full control over hardware, network, and software stack.
+- No vendor lock-in for infrastructure.
+
+## Migration Between Phases
+
+<Steps>
+  ### Export Configuration
+  Your routing rules, restriction rules, workflows, and prompts are exported from your current deployment.
+
+  ### Deploy the New Environment
+  Stand up the target deployment (Private Cloud or On-Premise) using the deployment artifacts.
+
+  ### Import Configuration
+  Import your exported configuration into the new deployment.
+
+  ### Redirect Agents
+  Update your agents' API base URL to point to the new deployment.
+
+  ### Verify and Decommission
+  Validate that the new deployment is working correctly, then decommission the old one.
+</Steps>
+
+<Callout type="info">
+  Xilos provides migration support at each phase transition, including configuration export/import, deployment assistance, and validation. Contact Xilos to plan your migration.
+</Callout>

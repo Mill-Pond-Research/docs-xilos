@@ -1,19 +1,36 @@
 ---
-title: Multi-Tenancy & RLS
+title: Multi-Tenancy
 ---
 
-# Multi-Tenancy & RLS
+import { Callout } from 'nextra/components'
 
-How Xilos isolates organizations using PostgreSQL Row-Level Security (RLS) with connection pool management.
+# Multi-Tenancy
 
-## Sections
+Xilos supports multi-tenant isolation, ensuring each organization's data is completely separate from all others.
 
-- RLS Architecture
-- Pool Checkout Problem
-- Context Setting
-- SuperAdmin Access
-- On-Prem Isolation
+## Organization Isolation
 
----
+- Each organization has its own set of routing rules, restriction rules, workflows, and query history
+- Users in one organization cannot access data from another organization
+- Data isolation is enforced at the database level, not just at the application level
+- All queries are automatically scoped to the authenticated user's organization
 
-*This page is a stub. Content will be added soon.*
+## What This Means for Users
+
+- Your query history, routing rules, and security policies are private to your organization
+- No data leaks between organizations, even on shared infrastructure
+- Each organization can have its own model configuration, compliance settings, and data residency rules
+- SuperAdmins manage their own organization's settings independently
+
+<Callout type="info">
+  For Private Cloud and On-Premise deployments, isolation is further enhanced by running on dedicated infrastructure.
+</Callout>
+
+## Departments
+
+Within an organization, users can be grouped into departments for:
+
+- Department-level cost tracking in Cost Controls
+- Department-level query filtering in the Query Log
+- Department-level budget limits via Virtual Keys
+

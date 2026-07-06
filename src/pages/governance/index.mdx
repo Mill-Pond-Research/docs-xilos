@@ -2,18 +2,63 @@
 title: Governance Overview
 ---
 
+import { Card, Cards, Callout } from 'nextra/components'
+
 # Governance Overview
 
-Xilos provides enterprise-grade governance including compliance frameworks, data residency, audit trails, and role-based access control.
+Xilos provides enterprise-grade governance features that give you control over compliance, data residency, auditability, and access. These features ensure that AI usage in your organization is secure, compliant, and accountable.
 
-## Sections
+## Governance Pillars
 
-- Compliance Frameworks
-- Data Residency
-- Audit Trail
-- RBAC
-- SIEM Integration
+<Cards>
+  <Card title="Compliance Frameworks" href="/governance/compliance">
+    Xilos supports HIPAA, GDPR, and SOC 2 compliance with built-in controls.
+  </Card>
+  <Card title="Data Residency" href="/governance/data-residency">
+    Control where your data is stored — US, EU, APAC, or on-premise.
+  </Card>
+  <Card title="Audit Trail" href="/governance/audit-trail">
+    Every query, routing decision, and configuration change is logged and searchable.
+  </Card>
+  <Card title="Role-Based Access" href="/governance/role-based-access">
+    Three roles — SuperAdmin, Org Admin, and User — with scoped permissions.
+  </Card>
+  <Card title="SIEM Integration" href="/api-reference/siem">
+    Forward governance events to your SIEM platform in CEF, Syslog, or JSON format.
+  </Card>
+  <Card title="Restriction Rules" href="/api-reference/restriction-rules">
+    Block, mask, or flag queries that violate your security policies.
+  </Card>
+</Cards>
 
----
+## How Governance Works
 
-*This page is a stub. Content will be added soon.*
+Every request processed by Xilos passes through the governance pipeline:
+
+1. **Authentication** — The request is authenticated via Bearer token or virtual key.
+2. **Restriction check** — Restriction rules evaluate the query for blocked, masked, or flagged content.
+3. **Routing decision** — The routing rule selection is logged with the query.
+4. **Processing** — The query is processed and the response is generated.
+5. **Quality scoring** — Faithfulness and relevance scores are computed and logged.
+6. **Audit logging** — The full request-response cycle is written to the audit trail.
+
+All of these steps are automatic and require no additional configuration beyond setting up your restriction rules and routing rules.
+
+## What This Means for You
+
+- **Compliance teams** get a complete audit trail of every AI interaction, exportable to SIEM.
+- **Security teams** can enforce policies with restriction rules and monitor for violations.
+- **Data officers** can configure data residency to meet regional requirements.
+- **Administrators** can scope access with role-based access control and virtual keys.
+- **Auditors** can search the audit trail and export evidence for compliance reviews.
+
+<Callout type="info">
+  Governance features are available across all deployment options. On-Premise deployments give you the additional benefit of full data sovereignty — no data leaves your premises.
+</Callout>
+
+## Next Steps
+
+- Review supported [compliance frameworks](/governance/compliance)
+- Configure [data residency](/governance/data-residency) for your regions
+- Set up [SIEM export](/governance/audit-trail) for your security team
+- Define [roles and permissions](/governance/role-based-access) for your team

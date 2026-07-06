@@ -4,16 +4,53 @@ title: SOC 2 Compliance
 
 # SOC 2 Compliance
 
-How Xilos aligns with SOC 2 Trust Service Criteria.
+Xilos aligns with SOC 2 (System and Organization Controls 2) Trust Service Criteria.
 
-## Sections
+## Trust Service Categories
 
-- Security
-- Availability
-- Processing Integrity
-- Confidentiality
-- Privacy
+### Security
 
----
+Xilos protects against unauthorized access through:
 
-*This page is a stub. Content will be added soon.*
+- Bearer token authentication for all API access
+- Role-based access control (SuperAdmin, Org Admin, User)
+- Virtual keys with budget and rate limits
+- Encrypted data storage
+
+### Availability
+
+- Managed SaaS deployment includes automated backups and disaster recovery
+- Recovery Time Objective (RTO): 4 hours
+- Recovery Point Objective (RPO): 1 hour
+- Stateless architecture enables rapid recovery
+
+### Processing Integrity
+
+- Every query is logged with the full processing pipeline: routing decision, governance actions, model selection, and response
+- Quality scores (faithfulness, answer relevance, context relevance) are computed for each response
+- Audit trail captures all governance actions with timestamps
+
+### Confidentiality
+
+- PII detection and masking before queries reach the LLM
+- Data residency enforcement to control where data is processed
+- Organization-level data isolation
+- Restriction rules to block sensitive data from processing
+
+### Privacy
+
+- Audit trail tracks all data access and processing
+- User data can be deleted on request
+- SIEM export enables external compliance monitoring
+- Data residency controls prevent unauthorized data movement
+
+## Audit Support
+
+Xilos provides the following for SOC 2 audits:
+
+- Audit logs with immutable timestamps
+- SIEM export for continuous monitoring
+- Role-based access control documentation
+- Data residency configuration records
+- Query processing pipeline documentation
+

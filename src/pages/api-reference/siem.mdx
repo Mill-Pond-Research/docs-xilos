@@ -2,17 +2,188 @@
 title: SIEM Export API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # SIEM Export API
 
-Create and manage SIEM webhook integrations for exporting governance events to security platforms.
+SIEM webhooks deliver governance and security events to your Security Information and Event Management (SIEM) platform. Choose from CEF, Syslog, or JSON formats to match your SIEM's ingestion requirements.
 
-## Sections
+## SIEM Webhook Object
 
-- List SIEM Webhooks
-- Create SIEM Webhook
-- Formats: CEF, Syslog, JSON
-- Event Types
+```json
+{
+  "id": "siem_01HXYZ",
+  "name": "Splunk ingestion",
+  "url": "https://splunk.company.com:8088/services/collector",
+  "format": "cef",
+  "event_types": ["restriction.triggered", "audit.query", "auth.failed"],
+  "is_active": true,
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/siem` | List all SIEM webhooks |
+| `POST` | `/siem` | Create a new SIEM webhook |
+| `PUT` | `/siem/{id}` | Update an existing SIEM webhook |
+| `DELETE` | `/siem/{id}` | Delete a SIEM webhook |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List SIEM Webhooks
+
+```
+GET /api/v1/siem
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/siem \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+Returns an array of [SIEM Webhook Objects](#siem-webhook-object).
+
+---
+
+## Create SIEM Webhook
+
+```
+POST /api/v1/siem
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the SIEM webhook. |
+| `url` | string | Yes | HTTPS URL of your SIEM ingestion endpoint. |
+| `format` | string | Yes | Output format: `cef`, `syslog`, or `json`. |
+| `event_types` | array | Yes | List of governance event types to forward. |
+| `is_active` | boolean | No | Whether the webhook is active. Default: `true`. |
+
+### Format Options
+
+| Format | Description |
+|--------|-------------|
+| `cef` | Common Event Format — used by Splunk, ArcSight, and similar SIEMs. |
+| `syslog` | Standard syslog messages, suitable for rsyslog or syslog-ng collectors. |
+| `json` | Structured JSON payloads for custom ingestion pipelines. |
+
+### Available Event Types
+
+| Event Type | Description |
+|------------|-------------|
+| `restriction.triggered` | A restriction rule blocked, masked, or flagged a query. |
+| `audit.query` | A query was processed through the governance pipeline. |
+| `audit.routing` | A routing decision was made. |
+| `auth.failed` | An authentication attempt failed. |
+| `config.changed` | A configuration change was made (rules, webhooks, keys). |
+| `key.exceeded_budget` | A virtual key exceeded its budget limit. |
+| `key.exceeded_rate_limit` | A virtual key exceeded its rate limit. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/siem \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Splunk ingestion",
+    "url": "https://splunk.company.com:8088/services/collector",
+    "format": "cef",
+    "event_types": ["restriction.triggered", "audit.query", "auth.failed"],
+    "is_active": true
+  }'
+```
+
+### Response
+
+Returns the created [SIEM Webhook Object](#siem-webhook-object).
+
+---
+
+## Update SIEM Webhook
+
+```
+PUT /api/v1/siem/{id}
+```
+
+Updates an existing SIEM webhook. All fields are optional.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `url` | string | No | Updated URL. |
+| `format` | string | No | Updated format. |
+| `event_types` | array | No | Updated event types. |
+| `is_active` | boolean | No | Toggle active state. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/siem/siem_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "format": "json",
+    "event_types": ["restriction.triggered", "audit.query", "config.changed"]
+  }'
+```
+
+### Response
+
+Returns the updated SIEM webhook object.
+
+---
+
+## Delete SIEM Webhook
+
+```
+DELETE /api/v1/siem/{id}
+```
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/siem/siem_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "siem_01HXYZ",
+  "deleted": true
+}
+```
+
+## Setting Up SIEM Integration
+
+<Steps>
+  ### Choose a Format
+  Select the format that matches your SIEM platform. Use `cef` for Splunk or ArcSight, `syslog` for standard log collectors, and `json` for custom pipelines.
+
+  ### Select Event Types
+  Subscribe to the governance events your security team needs. Start with `restriction.triggered` and `audit.query`, then expand as needed.
+
+  ### Configure Your SIEM
+  Point your SIEM's HTTP collector at the webhook URL. Ensure it can accept POST requests with the chosen format.
+
+  ### Verify Delivery
+  Trigger a test event (e.g., a flagged query) and confirm it appears in your SIEM. Check the audit trail in the dashboard for delivery status.
+</Steps>
+
+<Callout type="info">
+  For more on audit logging and governance events, see [Audit Trail](/governance/audit-trail) and [SIEM Integration](/governance/audit-trail#siem-export).
+</Callout>

@@ -2,18 +2,60 @@
 title: GDPR Compliance
 ---
 
+import { Callout } from 'nextra/components'
+
 # GDPR Compliance
 
-How Xilos helps organizations meet GDPR requirements for AI workloads.
+Xilos helps organizations meet General Data Protection Regulation (GDPR) requirements for AI workloads.
 
-## Sections
+## Data Subject Rights
 
-- Data Subject Rights
-- Data Residency (EU)
-- PII Detection
-- Audit & Deletion
-- Configuration
+Xilos supports GDPR data subject rights through:
 
----
+- **Right to access** — Query logs and audit trails provide a complete record of what data was processed
+- **Right to rectification** — Users can update their information through the user management system
+- **Right to erasure** — Organization admins can delete user data and associated query history
+- **Right to restrict processing** — Restriction rules can be configured to block processing of specific data types
 
-*This page is a stub. Content will be added soon.*
+## EU Data Residency
+
+Configure Xilos to process and store data within the EU:
+
+1. Navigate to **SuperAdmin** > **Model Config**.
+2. Set **Data Region** to `eu`.
+3. Toggle **Data Residency Enforced** on.
+
+When enforced, Xilos only routes queries to LLM providers with EU-region endpoints. This ensures prompt data and responses remain within the EU.
+
+<Callout type="info">
+  Data residency enforcement prevents queries from being routed to providers that cannot guarantee EU-region processing.
+</Callout>
+
+## PII Detection
+
+Xilos automatically detects and masks Personally Identifiable Information (PII) in queries before they reach the LLM. This includes:
+
+- Names, email addresses, phone numbers
+- Social security numbers, passport numbers
+- Credit card numbers, bank account numbers
+- IP addresses, physical addresses
+
+See [PII Detection](/platform/secure/pii-detection) for the full list and configuration.
+
+## Audit and Deletion
+
+- All query processing is logged in the audit trail with full context
+- Admins can export audit data for compliance reporting
+- User data can be deleted on request while preserving anonymized aggregate metrics
+- SIEM export forwards governance events to your compliance platform
+
+## Configuration
+
+| Setting | Location | Description |
+|---------|----------|-------------|
+| Data Region | Model Config | Set to `eu` for EU residency |
+| Residency Enforced | Model Config | Block non-EU providers |
+| PII Detection | Guardrails | Enable PII masking |
+| Restriction Rules | Restriction Rules | Block sensitive data types |
+| SIEM Export | SIEM | Forward events to compliance platform |
+

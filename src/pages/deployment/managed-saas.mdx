@@ -2,18 +2,89 @@
 title: Managed SaaS
 ---
 
+import { Callout, Card, Cards, Steps } from 'nextra/components'
+
 # Managed SaaS
 
-The fastest way to get started. Xilos hosts and manages everything — you just connect your agents.
+The fastest way to get started with Xilos. Xilos hosts and manages the entire platform — you connect your agents and configure routing, restrictions, and governance through the dashboard. No infrastructure to provision, no servers to maintain.
 
-## Sections
+## What's Included
 
-- What's Included
-- Security & Compliance
-- SLA
-- Limitations
-- Getting Started
+With Managed SaaS, Xilos handles:
 
----
+- **Hosting and infrastructure** — The full Xilos platform runs in Xilos-managed cloud accounts.
+- **Updates and upgrades** — New features and security patches are deployed automatically with zero downtime.
+- **Database management** — Backups, replication, and point-in-time recovery are included.
+- **Model integrations** — Connections to OpenAI, Anthropic, Google, and other LLM providers are maintained by Xilos.
+- **Internal SLM** — The Smart Routing model is hosted and managed by Xilos.
+- **Monitoring and alerting** — Platform health is monitored 24/7 with automated incident response.
+- **Dashboard access** — Full access to the web UI for configuration, monitoring, and analytics.
 
-*This page is a stub. Content will be added soon.*
+## Security and Compliance
+
+- **Encryption in transit** — All API traffic is encrypted via TLS 1.2+.
+- **Encryption at rest** — All stored data is encrypted with AES-256.
+- **Authentication** — Bearer token authentication with optional virtual keys for per-team access control.
+- **Audit logging** — Every query, routing decision, and configuration change is logged.
+- **SIEM export** — Forward governance events to your SIEM via CEF, Syslog, or JSON.
+- **Data residency** — Choose US or EU regions for data storage. See [Data Residency](/governance/data-residency).
+
+<Callout type="info">
+  Managed SaaS supports HIPAA and GDPR compliance. For HIPAA, a Business Associate Agreement (BAA) is available. See [HIPAA](/governance/hipaa) for details.
+</Callout>
+
+## SLA
+
+| Metric | Target |
+|--------|--------|
+| Uptime | 99.9% monthly |
+| API response time (p95) | < 500ms overhead |
+| Incident response | < 4 hours |
+| RTO | 4 hours |
+| RPO | 1 hour |
+
+<Callout type="info">
+  The 99.9% uptime SLA excludes scheduled maintenance, which is announced at least 72 hours in advance and performed during off-peak hours.
+</Callout>
+
+## Getting Started
+
+<Steps>
+  ### Request Access
+  Contact Xilos to provision your organization. You'll receive your API key and dashboard URL.
+
+  ### Connect Your Agents
+  Point your existing OpenAI-compatible agents at the Xilos API base URL. See [Quickstart](/getting-started/quickstart) for integration examples.
+
+  ### Configure Routing Rules
+  Create [routing rules](/api-reference/routing-rules) to direct queries to the appropriate models based on intent.
+
+  ### Set Up Restrictions
+  Add [restriction rules](/api-reference/restriction-rules) to block, mask, or flag sensitive queries.
+
+  ### Monitor and Optimize
+  Use the dashboard to monitor usage, review [suggestions](/api-reference/suggestions), and optimize cost and performance.
+</Steps>
+
+## When to Choose Managed SaaS
+
+<Cards>
+  <Card title="Fast time-to-value" href="/deployment/three-phase-journey">
+    Get started in minutes with no infrastructure setup.
+  </Card>
+  <Card title="Minimal IT overhead" href="/deployment">
+    No servers to manage, patch, or scale.
+  </Card>
+  <Card title="Automatic updates" href="/deployment">
+    New features and security patches are deployed for you.
+  </Card>
+</Cards>
+
+## Limitations
+
+- Data resides in Xilos-managed cloud infrastructure (US or EU regions).
+- Custom model hosting requires [Private Cloud](/deployment/private-cloud) or [On-Premise](/deployment/on-premise) deployment.
+- Air-gapped environments are not supported — use [On-Premise](/deployment/on-premise) instead.
+- For full data sovereignty requirements, consider [Private Cloud](/deployment/private-cloud) or [On-Premise](/deployment/on-premise).
+
+When your needs evolve, you can migrate to Private Cloud or On-Premise as part of the [three-phase journey](/deployment/three-phase-journey).

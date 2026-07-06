@@ -4,17 +4,45 @@ title: Security Model
 
 # Security Model
 
-Xilos security architecture: encryption, authentication, RLS, guardrails, and audit logging.
+Xilos is designed with security as a foundational principle. All processing happens before queries reach LLM providers, giving organizations complete control over their AI traffic.
 
-## Sections
+## Authentication
 
-- Encryption at Rest
-- Authentication
-- RLS
-- Guardrails
-- SIEM Integration
-- Data Residency
+- All API requests require a Bearer token
+- Virtual Keys provide per-user or per-team access with budget and rate limits
+- Keys can be deactivated instantly without affecting other users
 
----
+## Guardrails
 
-*This page is a stub. Content will be added soon.*
+All queries pass through local guardrails before model routing:
+
+- **PII Detection** — Identifies and masks sensitive data (SSNs, credit cards, emails, etc.)
+- **Jailbreak Detection** — Identifies prompt injection and manipulation attempts
+- **Content Moderation** — Filters harmful or inappropriate content
+- All guardrails run locally — no query content is sent to external services for analysis
+
+## Restriction Rules
+
+Organizations create restriction rules to enforce security policies:
+
+- **Block** — Prevent queries matching specific patterns from processing
+- **Mask** — Redact sensitive information while allowing the query to proceed
+- **Flag** — Allow the query but create an audit trail for review
+
+## Data Residency
+
+- Configure data residency to ensure prompts and responses stay in the selected region (US, EU, APAC, or On-Premise)
+- When enforced, only providers with matching region endpoints are used
+
+## Audit Logging
+
+- Every query is logged with full processing context
+- Audit trail captures all governance actions, restriction triggers, and security events
+- SIEM export forwards events to external security platforms
+
+## Encryption
+
+- Data is encrypted at rest in the database
+- All API communication uses HTTPS/TLS
+- API keys are hashed in storage
+

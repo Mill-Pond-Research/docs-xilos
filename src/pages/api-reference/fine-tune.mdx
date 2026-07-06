@@ -2,17 +2,167 @@
 title: Fine-Tune API
 ---
 
+import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
+
 # Fine-Tune API
 
-Create and manage fine-tune jobs that use Xilos orchestration data to train open-source models.
+Create fine-tuned models using training data exported from your Xilos query log. Fine-tuning produces a custom model that can be imported back into Xilos as a routing target, giving you a model specialized for your use case.
 
-## Sections
+## Endpoints
 
-- Available Base Models
-- Create Job
-- List Jobs
-- Job Status
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/fine-tune/models` | List available base models for fine-tuning |
+| `POST` | `/fine-tune/create` | Create a new fine-tune job |
+| `GET` | `/fine-tune/jobs` | List all fine-tune jobs |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Base Models
+
+```
+GET /api/v1/fine-tune/models
+```
+
+Returns the base models available for fine-tuning.
+
+### Response
+
+```json
+[
+  {
+    "id": "gpt-4o",
+    "provider": "openai",
+    "display_name": "GPT-4o",
+    "context_window": 128000,
+    "supports_finetune": true
+  },
+  {
+    "id": "gpt-4o-mini",
+    "provider": "openai",
+    "display_name": "GPT-4o mini",
+    "context_window": 128000,
+    "supports_finetune": true
+  },
+  {
+    "id": "llama-3-1-8b",
+    "provider": "meta",
+    "display_name": "Llama 3.1 8B",
+    "context_window": 128000,
+    "supports_finetune": true
+  }
+]
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/fine-tune/models \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+---
+
+## Create Fine-Tune Job
+
+```
+POST /api/v1/fine-tune/create
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `base_model` | string | Yes | Base model ID from the [available models list](#list-base-models). |
+| `training_data_file` | string | Yes | File ID or URL of the exported training data (from [Training Data API](/api-reference/training-data)). |
+| `name` | string | Yes | Name for the resulting fine-tuned model. |
+| `hyperparameters` | object | No | Optional hyperparameters: `epochs`, `batch_size`, `learning_rate`. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/fine-tune/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "base_model": "gpt-4o-mini",
+    "training_data_file": "file_01HXYZ",
+    "name": "My custom code model",
+    "hyperparameters": {
+      "epochs": 3,
+      "batch_size": 16
+    }
+  }'
+```
+
+### Response
+
+```json
+{
+  "id": "ftjob_01HXYZ",
+  "name": "My custom code model",
+  "base_model": "gpt-4o-mini",
+  "status": "queued",
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+<Callout type="info">
+  Fine-tune job statuses: `queued` → `running` → `succeeded` or `failed`. Poll the [jobs endpoint](#list-fine-tune-jobs) to track progress.
+</Callout>
+
+---
+
+## List Fine-Tune Jobs
+
+```
+GET /api/v1/fine-tune/jobs
+```
+
+Returns all fine-tune jobs for your organization, including status and resulting model ID.
+
+### Response
+
+```json
+[
+  {
+    "id": "ftjob_01HXYZ",
+    "name": "My custom code model",
+    "base_model": "gpt-4o-mini",
+    "status": "succeeded",
+    "result_model_id": "ft:gpt-4o-mini:custom-code:abc123",
+    "created_at": "2025-01-15T10:30:00Z",
+    "finished_at": "2025-01-15T12:45:00Z"
+  }
+]
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/fine-tune/jobs \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+## Fine-Tune Pipeline
+
+<Steps>
+  ### Export Training Data
+  Use the [Training Data API](/api-reference/training-data) to export high-quality query-response pairs from your query log.
+
+  ### Choose a Base Model
+  List available base models and select one that matches your use case. Smaller models like `gpt-4o-mini` are faster and cheaper to fine-tune.
+
+  ### Create a Job
+  Submit a fine-tune job with your training data and base model. Monitor status until the job succeeds.
+
+  ### Import the Model
+  Once the job succeeds, the fine-tuned model appears in your model list. Add it as a routing target in your [Routing Rules](/api-reference/routing-rules).
+
+  ### Evaluate
+  Use [Eval Datasets](/api-reference/eval-datasets) to compare the fine-tuned model's performance against the base model.
+</Steps>
+
+<Callout type="warning">
+  Fine-tuning requires a sufficient volume of high-quality training data. We recommend at least 500 records with faithfulness and relevance scores of 0.8 or higher. See the [Fine-Tuning Guide](/deployment/fine-tuning) for detailed guidance.
+</Callout>

@@ -4,16 +4,37 @@ title: Context Engine Design
 
 # Context Engine Design
 
-How the context engine extracts atomic facts, embeds them, and retrieves them for future queries.
+The Context Engine extracts knowledge from every query response and uses it to enrich future queries.
 
-## Sections
+## What It Does
 
-- Fact Extraction
-- Embedding Model
-- Vector Storage
-- Semantic Retrieval
-- Document Ingestion
+1. **Extract** — After each response, the Context Engine identifies key facts (atomic facts) in the response
+2. **Embed** — Each fact is embedded using a local embedding model and stored in the knowledge base
+3. **Retrieve** — When a new query arrives, the Context Engine searches for relevant facts and enriches the query with them
 
----
+## How It Enriches Queries
 
-*This page is a stub. Content will be added soon.*
+When a new query arrives:
+
+1. The query is embedded
+2. The Context Engine searches for similar facts in the knowledge base
+3. Relevant facts are added to the query context
+4. The enriched query is sent to the LLM
+
+This means the LLM receives not just the user's query, but also relevant context from previous interactions — without the user having to provide it.
+
+## Document Ingestion
+
+In addition to extracting facts from responses, the Context Engine can ingest external documents:
+
+1. Navigate to **Context** in the sidebar.
+2. Upload documents (text, markdown, PDF).
+3. The Context Engine extracts facts from the documents.
+4. These facts are available for enriching future queries.
+
+## Privacy and Data Isolation
+
+- All facts are scoped to the organization — no cross-organization data sharing
+- Facts are stored in the organization's database
+- Embedding generation runs locally — no external API calls
+

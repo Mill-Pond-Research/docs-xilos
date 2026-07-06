@@ -1,19 +1,129 @@
 ---
-title: Training Data Export API
+title: Training Data API
 ---
 
-# Training Data Export API
+import { Callout, Tabs, Steps } from 'nextra/components'
 
-Export the query log as a filtered training dataset for fine-tuning open-source models.
+# Training Data API
 
-## Sections
+The query log captures every request and response processed by Xilos, along with quality scores and routing metadata. Use these endpoints to export that data as a filtered training dataset for fine-tuning.
 
-- Export Endpoint
-- Preview Endpoint
-- Filter Parameters
-- Output Formats
-- Cost Estimation
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/training-data/export` | Export filtered training data as a downloadable file |
+| `GET` | `/training-data/preview` | Preview filtered training data before exporting |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## Export Training Data
+
+```
+POST /api/v1/training-data/export
+```
+
+Exports query-response pairs from the query log as a training dataset, filtered by quality scores, routing rule, and format.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `format` | string | No | Output format: `jsonl`, `csv`, or `json`. Default: `jsonl`. |
+| `min_faithfulness` | number | No | Minimum faithfulness score (0.0–1.0). Only includes responses with scores at or above this threshold. Default: `0.0`. |
+| `min_relevance` | number | No | Minimum relevance score (0.0–1.0). Only includes responses with scores at or above this threshold. Default: `0.0`. |
+| `routing_rule_id` | string | No | Only include queries that matched this routing rule. |
+| `limit` | integer | No | Maximum number of records to export. Default: `1000`. |
+
+<Callout type="info">
+  Setting `min_faithfulness` and `min_relevance` to `0.7` or higher is recommended for fine-tuning. This ensures your training data only includes high-quality responses.
+</Callout>
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/training-data/export \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "format": "jsonl",
+    "min_faithfulness": 0.8,
+    "min_relevance": 0.8,
+    "routing_rule_id": "rule_01HXYZ",
+    "limit": 500
+  }' \
+  -o training_data.jsonl
+```
+
+### Response
+
+Returns a binary file download with the requested format. The response includes the following headers:
+
+| Header | Description |
+|--------|-------------|
+| `Content-Type` | `application/jsonl`, `text/csv`, or `application/json` |
+| `Content-Disposition` | `attachment; filename="training_data.jsonl"` |
+| `X-Record-Count` | Number of records in the export |
+
+---
+
+## Preview Training Data
+
+```
+GET /api/v1/training-data/preview
+```
+
+Returns a preview of the filtered training data. Use this to inspect records before exporting the full dataset.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `format` | string | No | Preview format: `jsonl`, `csv`, or `json`. Default: `jsonl`. |
+| `min_faithfulness` | number | No | Minimum faithfulness score (0.0–1.0). |
+| `min_relevance` | number | No | Minimum relevance score (0.0–1.0). |
+| `routing_rule_id` | string | No | Filter by routing rule. |
+| `limit` | integer | No | Max records to preview. Default: `10`. Max: `50`. |
+
+### cURL
+
+```bash
+curl "https://api.xilos.ai/api/v1/training-data/preview?min_faithfulness=0.8&min_relevance=0.8&limit=5" \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "total_matching": 1247,
+  "preview_count": 5,
+  "records": [
+    {
+      "query": "Write a Python function to reverse a string",
+      "response": "def reverse_string(s): return s[::-1]",
+      "faithfulness": 0.92,
+      "relevance": 0.95,
+      "routing_rule_id": "rule_01HXYZ",
+      "llm_id": "gpt-4o",
+      "timestamp": "2025-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+## Building a Training Dataset
+
+<Steps>
+  ### Preview the Data
+  Use the preview endpoint with your desired filters to inspect sample records and verify quality.
+
+  ### Set Quality Thresholds
+  Apply `min_faithfulness` and `min_relevance` filters to exclude low-quality responses from your training data.
+
+  ### Export
+  Export the filtered dataset in your preferred format. JSONL is recommended for fine-tuning.
+
+  ### Create a Fine-Tune Job
+  Use the exported data to [create a fine-tune job](/api-reference/fine-tune) and produce a custom model.
+</Steps>

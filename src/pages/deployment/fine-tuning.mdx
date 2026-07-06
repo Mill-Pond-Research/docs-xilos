@@ -1,20 +1,85 @@
 ---
-title: Fine-Tuning Pipeline
+title: Fine-Tuning
 ---
 
-# Fine-Tuning Pipeline
+import { Callout, Card, Cards, Steps } from 'nextra/components'
 
-Use Xilos orchestration data to fine-tune open-source models. Export training data, create fine-tune jobs, and import the resulting model back into Xilos.
+# Fine-Tuning
 
-## Sections
+Fine-tuning produces a custom model specialized for your use case using high-quality query-response pairs from your Xilos query log. The fine-tuned model can be imported back into Xilos as a routing target, giving you better quality at lower cost.
 
-- Training Data Export
-- Quality Filters
-- Fine-Tune Providers
-- Creating a Job
-- Importing the Model
-- Cost Savings
+## The Fine-Tune Pipeline
 
----
+<Steps>
+  ### Export Training Data
+  Use the [Training Data API](/api-reference/training-data) to export query-response pairs from your query log. Apply quality filters — `min_faithfulness` and `min_relevance` set to 0.8 or higher — to ensure only high-quality responses are included.
 
-*This page is a stub. Content will be added soon.*
+  ### Choose a Base Model
+  List available base models via the [Fine-Tune API](/api-reference/fine-tune#list-base-models). Choose a model that balances capability and cost. Smaller models like GPT-4o mini are faster and cheaper to fine-tune, while larger models may yield better quality for complex tasks.
+
+  ### Create a Fine-Tune Job
+  Submit a fine-tune job with your training data and chosen base model. The job runs asynchronously — poll the [jobs endpoint](/api-reference/fine-tune#list-fine-tune-jobs) to track status from `queued` to `running` to `succeeded` or `failed`.
+
+  ### Import the Model
+  Once the job succeeds, the fine-tuned model appears in your model list. Import it into Xilos and add it as a routing target in your [Routing Rules](/api-reference/routing-rules).
+
+  ### Evaluate
+  Use [Eval Datasets](/api-reference/eval-datasets) to compare the fine-tuned model's performance against the base model. Measure routing accuracy, response quality, and cost.
+</Steps>
+
+## Prerequisites
+
+Before fine-tuning, ensure you have:
+
+- **Sufficient training data** — At least 500 high-quality query-response pairs. More data generally yields better results.
+- **Quality-filtered data** — Use the [Training Data API](/api-reference/training-data) with faithfulness and relevance filters to exclude low-quality responses.
+- **A clear use case** — Fine-tuning works best when targeting a specific routing rule or query pattern (e.g., code generation, summarization, customer support).
+- **A chosen base model** — Review available models and select one appropriate for your use case.
+
+<Callout type="warning">
+  Fine-tuning on noisy or low-quality data can degrade model performance. Always apply quality filters and review a sample of your training data before creating a fine-tune job.
+</Callout>
+
+## Choosing a Base Model
+
+| Use Case | Recommended Base Model | Rationale |
+|----------|----------------------|-----------|
+| Code generation | GPT-4o mini | Good code capability, cost-effective to fine-tune |
+| Summarization | GPT-4o mini | Sufficient for summarization, low cost |
+| Complex reasoning | GPT-4o | Higher capability for multi-step reasoning |
+| Customer support | Llama 3.1 8B | Open-weight, can be self-hosted on-premise |
+| General chat | GPT-4o mini | Balanced cost and quality |
+
+<Callout type="info">
+  If you plan to deploy to [On-Premise](/deployment/on-premise), choose an open-weight base model like Llama or Mistral so you can self-host the fine-tuned result.
+</Callout>
+
+## What to Expect
+
+- **Training time** — Typically 15–60 minutes depending on dataset size and base model.
+- **Cost** — Based on the base model and training data volume. Smaller models are significantly cheaper.
+- **Quality** — A well-tuned model can match or exceed a larger model's quality on your specific use case while reducing cost by 50–70%.
+- **Latency** — Fine-tuned smaller models often respond faster than the larger models they replace.
+
+## After Fine-Tuning
+
+Once your fine-tuned model is imported:
+
+1. **Update routing rules** — Point the relevant routing rule at the fine-tuned model.
+2. **Run eval datasets** — Compare accuracy and quality against the previous model.
+3. **Monitor cost** — Track cost reduction in the dashboard.
+4. **Iterate** — Continue collecting high-quality data and re-fine-tune periodically as your use case evolves.
+
+See the [Fine-Tune API reference](/api-reference/fine-tune) for endpoint details, and the [Fine-Tuning Guide](/guides/fine-tuning) for a step-by-step walkthrough.
+
+<Card title="Fine-Tune API" href="/api-reference/fine-tune">
+  API reference for listing base models, creating jobs, and tracking status.
+</Card>
+
+<Card title="Training Data API" href="/api-reference/training-data">
+  API reference for exporting and previewing training data.
+</Card>
+
+<Card title="Eval Datasets API" href="/api-reference/eval-datasets">
+  API reference for evaluating routing accuracy and model performance.
+</Card>

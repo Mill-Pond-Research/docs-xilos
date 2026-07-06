@@ -2,18 +2,65 @@
 title: Audit Trail
 ---
 
+import { Callout } from 'nextra/components'
+
 # Audit Trail
 
-Immutable audit logs capturing every governance action, restriction trigger, and security event.
+Xilos maintains an immutable audit trail capturing every governance action, restriction trigger, and security event.
 
-## Sections
+## What Is Logged
 
-- Audit Log Structure
-- Searching & Filtering
-- Retention Policy
-- SIEM Export
-- Compliance Reporting
+Every query that passes through Xilos generates audit entries for:
 
----
+- **Query received** — Timestamp, user, department, organization
+- **Routing decision** — Which model was selected, which rule matched (or default)
+- **Governance actions** — Block, mask, flag, or unrestricted
+- **Restriction triggers** — Which rule triggered, severity, action taken
+- **Guardrail alerts** — PII detected, injection attempt detected, HAP detected
+- **Cache hit/miss** — Whether the response was served from cache
+- **Compression applied** — Token count before and after, compression ratio
+- **Cost** — Input tokens, output tokens, total cost
+- **Quality scores** — Faithfulness, answer relevance, context relevance
 
-*This page is a stub. Content will be added soon.*
+## Searching and Filtering
+
+1. Navigate to **Audit Logs** in the sidebar.
+2. Filter by:
+   - Date range
+   - User
+   - Action type (block, mask, flag, unrestricted)
+   - Severity (high, medium, low)
+   - Rule name
+3. Click any entry to see the full details.
+
+## SIEM Export
+
+Forward audit events to your SIEM platform for continuous compliance monitoring:
+
+1. Navigate to **SIEM** in the sidebar.
+2. Create a SIEM webhook with your platform's endpoint URL.
+3. Choose a format: CEF, Syslog, or JSON.
+4. Select which event types to forward.
+
+See [Set Up SIEM Export](/guides/setup-siem) for detailed instructions.
+
+<Callout type="info">
+  SIEM events include user email, rule name, severity, and action — giving your security team full context for investigation.
+</Callout>
+
+## Retention
+
+- Audit logs are retained according to your organization's retention policy
+- Contact Mill Pond Research to configure custom retention periods
+- SIEM export provides an independent copy for long-term archival
+
+## Compliance Reporting
+
+Use the audit trail for:
+
+- HIPAA audit reports
+- GDPR data processing records
+- SOC 2 evidence collection
+- Internal security reviews
+- Incident investigation
+

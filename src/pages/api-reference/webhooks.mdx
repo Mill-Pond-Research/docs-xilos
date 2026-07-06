@@ -2,18 +2,178 @@
 title: Webhooks API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Webhooks API
 
-Create and manage event-driven webhook endpoints.
+Webhooks deliver event notifications to your endpoints via HTTP POST. Each webhook is HMAC-signed with a secret so you can verify authenticity. Configure event types to control which events each webhook receives.
 
-## Sections
+## Webhook Object
 
-- List Webhooks
-- Create Webhook
-- Update Webhook
-- Delete Webhook
-- Event Types
+```json
+{
+  "id": "wh_01HXYZ",
+  "name": "Query monitoring",
+  "url": "https://your-app.com/webhooks/xilos",
+  "secret": "whsec_abc123...",
+  "event_types": ["query.completed", "restriction.triggered"],
+  "is_active": true,
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/webhooks` | List all webhooks |
+| `POST` | `/webhooks` | Create a new webhook |
+| `PUT` | `/webhooks/{id}` | Update an existing webhook |
+| `DELETE` | `/webhooks/{id}` | Delete a webhook |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Webhooks
+
+```
+GET /api/v1/webhooks
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/webhooks \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+Returns an array of [Webhook Objects](#webhook-object).
+
+---
+
+## Create Webhook
+
+```
+POST /api/v1/webhooks
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the webhook. |
+| `url` | string | Yes | HTTPS URL that will receive webhook payloads. |
+| `secret` | string | Yes | Secret used to sign payloads. Used to verify the `X-Xilos-Signature` header. |
+| `event_types` | array | Yes | List of event types to subscribe to (see below). |
+| `is_active` | boolean | No | Whether the webhook is active. Default: `true`. |
+
+### Available Event Types
+
+| Event Type | Description |
+|------------|-------------|
+| `query.completed` | Fired when a query is fully processed and a response is returned. |
+| `restriction.triggered` | Fired when a restriction rule blocks, masks, or flags a query. |
+| `routine.completed` | Fired when a scheduled routine finishes. |
+| `fine_tune.completed` | Fired when a fine-tune job succeeds or fails. |
+| `suggestion.ready` | Fired when new suggestions are available. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/webhooks \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Query monitoring",
+    "url": "https://your-app.com/webhooks/xilos",
+    "secret": "whsec_abc123",
+    "event_types": ["query.completed", "restriction.triggered"],
+    "is_active": true
+  }'
+```
+
+### Response
+
+Returns the created [Webhook Object](#webhook-object).
+
+<Callout type="warning">
+  Store your webhook secret securely. Xilos uses it to sign every payload with HMAC-SHA256. Verify the signature on every request to confirm authenticity.
+</Callout>
+
+---
+
+## Update Webhook
+
+```
+PUT /api/v1/webhooks/{id}
+```
+
+Updates an existing webhook. All fields are optional.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `url` | string | No | Updated URL. |
+| `secret` | string | No | Updated secret. |
+| `event_types` | array | No | Updated event types. |
+| `is_active` | boolean | No | Toggle active state. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/webhooks/wh_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "event_types": ["query.completed", "restriction.triggered", "routine.completed"],
+    "is_active": true
+  }'
+```
+
+### Response
+
+Returns the updated webhook object.
+
+---
+
+## Delete Webhook
+
+```
+DELETE /api/v1/webhooks/{id}
+```
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/webhooks/wh_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "wh_01HXYZ",
+  "deleted": true
+}
+```
+
+## Verifying Webhook Signatures
+
+<Steps>
+  ### Extract the Signature
+  Read the `X-Xilos-Signature` header from the incoming request.
+
+  ### Compute the HMAC
+  Compute HMAC-SHA256 of the raw request body using your webhook secret.
+
+  ### Compare
+  Compare the computed HMAC to the signature header. If they match, the request is authentic.
+
+  ### Respond Quickly
+  Return a `200 OK` within 10 seconds. For slow processing, queue the event and respond immediately.
+</Steps>

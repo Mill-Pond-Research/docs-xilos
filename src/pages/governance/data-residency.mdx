@@ -2,17 +2,75 @@
 title: Data Residency
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Data Residency
 
-Enforce data residency to ensure prompts and responses stay in the selected region.
+Data residency controls where your Xilos data is stored. Configure the region in Model Config to meet regional data protection requirements, such as GDPR's requirement for EU data residency or HIPAA's preference for US-based storage.
 
-## Sections
+## Supported Regions
 
-- Region Configuration
-- Enforcement Mode
-- Provider Region Metadata
-- On-Prem as Residency
+| Region | Code | Data Location | Deployment Options |
+|--------|------|---------------|-------------------|
+| United States | `us` | US cloud region (AWS us-east-1 or equivalent) | Managed SaaS, Private Cloud, On-Premise |
+| European Union | `eu` | EU cloud region (AWS eu-west-1 or equivalent) | Managed SaaS, Private Cloud |
+| Asia-Pacific | `apac` | APAC cloud region (AWS ap-southeast-1 or equivalent) | Managed SaaS, Private Cloud |
+| On-Premise | `on-prem` | Your data center | On-Premise only |
 
----
+## Configuring Data Residency
 
-*This page is a stub. Content will be added soon.*
+<Steps>
+  ### Open Model Config
+  Navigate to **Settings → Model Config** in the Xilos dashboard.
+
+  ### Select a Region
+  Choose the region that matches your data residency requirements: US, EU, APAC, or On-Premise.
+
+  ### Enable Enforcement
+  Toggle the **Enforce region** switch. When enabled, Xilos rejects any request that would route to a model hosted outside the configured region.
+
+  ### Save Configuration
+  Save your changes. The region applies to all new queries immediately. Existing data remains in its original region.
+</Steps>
+
+<Callout type="warning">
+  Changing the region does not migrate existing data. New queries are stored in the new region, but historical data remains in the original region. Contact Xilos if you need to migrate historical data.
+</Callout>
+
+## Enforcement
+
+When enforcement is enabled, Xilos checks every routing decision against the configured region:
+
+- **Cloud-hosted models** — Xilos verifies the model provider's data center is in the configured region. If not, the query is rejected with a 403 error.
+- **Self-hosted models** (On-Premise) — All models are local, so enforcement is inherently satisfied.
+- **Hybrid setups** — If you use a mix of cloud and self-hosted models, only models in the configured region are available.
+
+<Callout type="info">
+  Enforcement ensures that no query is processed by a model outside your configured region, even if a routing rule points to a non-compliant model. This is a safety net — your routing rules should already target compliant models.
+</Callout>
+
+## GDPR and EU Residency
+
+For GDPR compliance, configure the EU region:
+
+1. Set the region to `eu` in Model Config.
+2. Enable enforcement to prevent any EU data from being processed by US- or APAC-hosted models.
+3. All query logs, audit trails, and configuration data are stored in the EU region.
+
+See [GDPR](/governance/gdpr) for more on data subject rights and EU data protection.
+
+## HIPAA and US Residency
+
+For HIPAA compliance, configure the US region:
+
+1. Set the region to `us` in Model Config.
+2. Enable enforcement to ensure all processing stays within the US.
+3. Execute a BAA with Xilos (see [HIPAA](/governance/hipaa)).
+
+## On-Premise Data Sovereignty
+
+For [On-Premise](/deployment/on-premise) deployments, all data resides in your data center. The region is set to `on-prem`, and enforcement is inherently satisfied — no data leaves your premises.
+
+<Callout type="info">
+  On-Premise deployments provide the strongest data residency guarantee: complete data sovereignty with no external dependencies. See the [Three-Phase Journey](/deployment/three-phase-journey) for guidance on when to move to On-Premise.
+</Callout>

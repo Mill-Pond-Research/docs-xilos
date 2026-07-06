@@ -1,19 +1,87 @@
 ---
-title: Private Cloud (VPC)
+title: Private Cloud
 ---
 
-# Private Cloud (VPC)
+import { Callout, Card, Cards, Steps } from 'nextra/components'
 
-Deploy Xilos in your own AWS, Azure, or GCP account for data isolation and network-level control.
+# Private Cloud
 
-## Sections
+Deploy Xilos in your own AWS, Azure, or GCP account for data isolation, network-level control, and compliance with data residency requirements. Xilos provides the deployment artifacts and guidance — your team operates the infrastructure.
 
-- Prerequisites
-- Infrastructure Requirements
-- Deployment Process
-- Network Configuration
-- Maintenance
+## What This Means for You
 
----
+With Private Cloud, the Xilos platform runs entirely within your cloud account. Your data never leaves your environment. You control the network, the encryption keys, and the compliance posture, while Xilos provides the software, deployment templates, and support.
 
-*This page is a stub. Content will be added soon.*
+## Prerequisites
+
+- A cloud account (AWS, Azure, or GCP) with sufficient permissions to create compute, database, and networking resources.
+- A VPC or virtual network with private subnets for the application and database.
+- An SSL certificate for the application endpoint.
+- A PostgreSQL database instance (managed service recommended).
+- GPU-enabled compute instances if hosting the internal SLM locally (optional — Xilos can also provide the SLM as a managed service).
+- API keys for the LLM providers you intend to use (OpenAI, Anthropic, Google, etc.).
+
+## Deployment Process
+
+<Steps>
+  ### Contact Xilos
+  Reach out to initiate a Private Cloud deployment. Xilos will provide deployment artifacts, a readiness checklist, and an assigned solutions architect.
+
+  ### Prepare Your Environment
+  Set up the required cloud resources: VPC, subnets, database, and compute instances. Xilos provides Infrastructure as Code templates.
+
+  ### Deploy the Platform
+  Run the deployment scripts to provision the Xilos application, database schema, and supporting services within your account.
+
+  ### Configure Networking
+  Set up load balancers, DNS, and security groups. Ensure the Xilos application is reachable from your agents and can reach your LLM provider endpoints.
+
+  ### Validate and Go Live
+  Run smoke tests, verify routing and restrictions, and confirm audit logging is working. Xilos support assists with validation.
+
+  ### Ongoing Operations
+  Your team manages day-to-day operations. Xilos provides software updates, patches, and support on a agreed cadence.
+</Steps>
+
+## Network Configuration
+
+| Component | Requirement |
+|-----------|-------------|
+| Inbound | HTTPS (443) from your agents to the Xilos application load balancer. |
+| Outbound | HTTPS (443) from the Xilos application to your LLM provider endpoints. |
+| Database | Private subnet, accessible only from the Xilos application. |
+| Internal SLM | If self-hosted, GPU instances must be reachable from the Xilos application via internal network. |
+
+<Callout type="warning">
+  The Xilos application must be able to reach your LLM provider endpoints. If your network restricts outbound traffic, add the provider domains to your allowlist.
+</Callout>
+
+## Security and Compliance
+
+- **Data residency** — Your data stays in your chosen cloud region. Configure [data residency](/governance/data-residency) to enforce region policies.
+- **Encryption** — Data is encrypted in transit (TLS) and at rest (database encryption). You manage the encryption keys.
+- **Network isolation** — The Xilos application runs in your private subnets. No inbound internet access is required.
+- **Compliance** — Supports HIPAA (with BAA), GDPR, and SOC 2 controls in your environment.
+
+## When to Choose Private Cloud
+
+<Cards>
+  <Card title="Data must stay in your cloud" href="/deployment">
+    Your data residency or compliance requirements mandate data stays in your account.
+  </Card>
+  <Card title="Network-level control" href="/deployment">
+    You need custom network policies, VPC peering, or private connectivity.
+  </Card>
+  <Card title="Compliance with BAA" href="/governance/hipaa">
+    You need HIPAA compliance with a Business Associate Agreement.
+  </Card>
+  <Card title="GDPR EU data residency" href="/governance/gdpr">
+    You need EU data residency for GDPR compliance.
+  </Card>
+</Cards>
+
+## Migration
+
+You can migrate to Private Cloud from Managed SaaS at any time. Xilos supports exporting your configuration (routing rules, restriction rules, workflows) and importing them into your Private Cloud deployment. Contact Xilos to plan your migration.
+
+For the full journey from Managed SaaS to Private Cloud to On-Premise, see the [Three-Phase Journey](/deployment/three-phase-journey).

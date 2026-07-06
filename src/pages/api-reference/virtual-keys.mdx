@@ -2,17 +2,202 @@
 title: Virtual Keys API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Virtual Keys API
 
-Create virtual API keys with budget limits and rate limits for per-user or per-team access control.
+Virtual keys are sub-keys with budget limits and rate limits. Use them to scope access for individual users, teams, or integrations without exposing your master API key. Each virtual key's usage is tracked independently.
 
-## Sections
+## Virtual Key Object
 
-- List Keys
-- Create Key
-- Update Key
-- Usage Endpoint
+```json
+{
+  "id": "vkey_01HXYZ",
+  "name": "Engineering team",
+  "key": "xilos_vkey_abc123...",
+  "budget_usd": 500.00,
+  "rate_limit_rpm": 100,
+  "is_active": true,
+  "usage": {
+    "spent_usd": 142.50,
+    "requests_this_minute": 12
+  },
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+<Callout type="warning">
+  The `key` field is only returned once — when the virtual key is created. Store it securely. You cannot retrieve it again.
+</Callout>
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/virtual-keys` | List all virtual keys |
+| `POST` | `/virtual-keys` | Create a new virtual key |
+| `PUT` | `/virtual-keys/{id}` | Update an existing virtual key |
+| `DELETE` | `/virtual-keys/{id}` | Delete a virtual key |
+| `GET` | `/virtual-keys/{id}/usage` | Get usage details for a key |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Virtual Keys
+
+```
+GET /api/v1/virtual-keys
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/virtual-keys \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+Returns an array of [Virtual Key Objects](#virtual-key-object). The `key` field is omitted in list responses for security.
+
+---
+
+## Create Virtual Key
+
+```
+POST /api/v1/virtual-keys
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the key. |
+| `budget_usd` | number | No | Monthly spend limit in USD. When the limit is reached, requests are rejected with a 429. Default: unlimited. |
+| `rate_limit_rpm` | integer | No | Maximum requests per minute. Default: unlimited. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/virtual-keys \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Engineering team",
+    "budget_usd": 500.00,
+    "rate_limit_rpm": 100
+  }'
+```
+
+### Response
+
+Returns the created [Virtual Key Object](#virtual-key-object), including the `key` field.
+
+---
+
+## Update Virtual Key
+
+```
+PUT /api/v1/virtual-keys/{id}
+```
+
+Updates an existing virtual key. All fields are optional.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `budget_usd` | number | No | Updated budget limit. |
+| `rate_limit_rpm` | integer | No | Updated rate limit. |
+| `is_active` | boolean | No | Activate or deactivate the key. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/virtual-keys/vkey_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "budget_usd": 750.00,
+    "rate_limit_rpm": 200
+  }'
+```
+
+### Response
+
+Returns the updated virtual key object.
+
+---
+
+## Delete Virtual Key
+
+```
+DELETE /api/v1/virtual-keys/{id}
+```
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/virtual-keys/vkey_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "vkey_01HXYZ",
+  "deleted": true
+}
+```
+
+---
+
+## Get Key Usage
+
+```
+GET /api/v1/virtual-keys/{id}/usage
+```
+
+Returns current usage details for a virtual key, including spend and request counts.
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/virtual-keys/vkey_01HXYZ/usage \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "vkey_01HXYZ",
+  "name": "Engineering team",
+  "spent_usd": 142.50,
+  "budget_usd": 500.00,
+  "budget_remaining_usd": 357.50,
+  "requests_this_minute": 12,
+  "rate_limit_rpm": 100,
+  "total_requests": 3420,
+  "period_start": "2025-01-01T00:00:00Z",
+  "period_end": "2025-01-31T23:59:59Z"
+}
+```
+
+## Managing Virtual Keys
+
+<Steps>
+  ### Create Keys Per Consumer
+  Give each team, user, or integration its own virtual key. This isolates budgets and makes usage attributable.
+
+  ### Set Conservative Limits
+  Start with lower budgets and rate limits. You can always increase them later — it's harder to recover from an unexpected overspend.
+
+  ### Monitor Usage
+  Check the usage endpoint or dashboard regularly. Watch for keys approaching their budget limit.
+
+  ### Deactivate, Don't Delete
+  If a key is compromised or no longer needed, set `is_active: false` first. Delete only after confirming no services depend on it.
+</Steps>

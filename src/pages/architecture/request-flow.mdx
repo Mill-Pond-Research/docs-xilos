@@ -4,23 +4,27 @@ title: Request Flow
 
 # Request Flow
 
-Trace a query as it flows through Xilos: from agent request to LLM response and back.
+When a query enters Xilos, it passes through a pipeline that observes, secures, and orchestrates the request before returning a response.
 
-## Sections
+## The Pipeline
 
-- Agent Request
-- Authentication
-- Consolidation
-- Guardrails
-- Restrictions
-- Cache Check
-- Routing
-- Compression
-- LLM Call
-- Response
-- Logging
-- Webhooks
+1. **Agent Request** — An AI agent sends a chat completion or query request to the Xilos API.
+2. **Authentication** — The API key is validated. If it is a virtual key, budget and rate limits are checked.
+3. **Consolidation** — Messages are consolidated into a single query for processing.
+4. **Guardrails** — PII detection, HAP, and jailbreak checks run locally. No external API calls.
+5. **Restrictions** — Restriction rules are evaluated. Queries may be blocked, masked, or flagged.
+6. **Cache Check** — The semantic cache is checked for a matching response. If found, the cached response is returned immediately.
+7. **Routing** — Smart Routing or routing rules select the target LLM based on query intent, cost, and model capabilities.
+8. **Compression** — If enabled and the prompt exceeds the threshold, context compression reduces the token count.
+9. **LLM Call** — The query is sent to the selected LLM provider.
+10. **Response** — The response is returned to the agent, logged, and cached for future queries.
+11. **Quality Scoring** — Faithfulness, answer relevance, and context relevance are scored automatically.
+12. **Webhooks** — Event-driven webhooks fire to notify subscribed endpoints.
 
----
+## What This Means for Users
 
-*This page is a stub. Content will be added soon.*
+- Every query is processed through the same pipeline, regardless of which agent or model is used
+- Security checks happen before any LLM call — sensitive data never reaches a provider
+- Caching and compression happen transparently — users get faster, cheaper responses
+- The full pipeline is visible in the Query Log
+

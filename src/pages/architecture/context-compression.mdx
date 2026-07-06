@@ -4,16 +4,30 @@ title: Compression Architecture
 
 # Compression Architecture
 
-The three compression strategies: prefix stabilizer, conversation summarizer, and BM25 content extractor.
+Xilos uses three complementary compression strategies to reduce token counts before queries reach the LLM. This achieves 50-90% token reduction with minimal quality impact.
 
-## Sections
+## The Three Strategies
 
-- Prefix Stabilizer
-- Conversation Summarizer
-- Content Extractor
-- Configuration
-- Performance
+### Prefix Stabilizer
 
----
+Stabilizes the system prompt prefix so that semantic cache lookups are more likely to match. Many queries share the same system prompt — by stabilizing the prefix, cache hits improve by 15-30%.
 
-*This page is a stub. Content will be added soon.*
+### Conversation Summarizer
+
+Summarizes long conversation histories into a compact summary. Instead of sending 20 previous messages, Xilos sends a summary paragraph. This dramatically reduces token count for multi-turn conversations.
+
+### Content Extractor
+
+Uses text ranking to extract the most relevant sentences from the prompt. Irrelevant content is removed while preserving query intent. This is particularly effective for long prompts with mixed relevance.
+
+## Performance
+
+- **Latency overhead:** Under 50ms — all compression runs locally with no external calls
+- **Token reduction:** 50-90% depending on prompt length and content
+- **Quality impact:** Minimal — the summarizer and extractor preserve query intent
+- **Cache improvement:** 15-30% better cache hit rates from prefix stabilization
+
+## Configuration
+
+Compression is configured at the organization level in Model Config and can be overridden per routing rule. See [Enable Context Compression](/guides/enable-compression) for instructions.
+

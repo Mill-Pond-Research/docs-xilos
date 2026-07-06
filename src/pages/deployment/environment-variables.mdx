@@ -2,18 +2,95 @@
 title: Environment Variables
 ---
 
+import { Callout } from 'nextra/components'
+
 # Environment Variables
 
-Complete reference for all environment variables used by the Xilos backend.
+When connecting to Xilos or self-hosting the platform, you may need to configure the following environment variables. This reference covers the variables users and integrators typically need.
 
-## Sections
+<Callout type="info">
+  This page covers user-facing environment variables only. Internal backend configuration variables are not documented here. For self-hosted deployments, Xilos provides a full configuration reference as part of the deployment package.
+</Callout>
 
-- Database
-- Authentication
-- LLM Provider Keys
-- Optional Services
-- Feature Flags
+## Connecting to Xilos
 
----
+When integrating your agents or applications with Xilos, configure these variables in your application environment:
 
-*This page is a stub. Content will be added soon.*
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `XILOS_API_KEY` | Your Xilos API key. Used for Bearer token authentication. | `xilos_live_abc123...` |
+| `XILOS_API_BASE_URL` | The base URL for the Xilos API. | `https://api.xilos.ai/api/v1` |
+| `XILOS_VIRTUAL_KEY` | A virtual key with budget and rate limits. Use instead of the master key for per-team access. | `xilos_vkey_def456...` |
+
+### Connecting via the OpenAI SDK
+
+If you're using the OpenAI SDK with Xilos, set these variables:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | Set to your Xilos API key or virtual key. | `xilos_live_abc123...` |
+| `OPENAI_BASE_URL` | Set to the Xilos API base URL. | `https://api.xilos.ai/api/v1` |
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["OPENAI_API_KEY"],
+    base_url=os.environ["OPENAI_BASE_URL"]
+)
+```
+
+## LLM Provider Keys
+
+When self-hosting or when Xilos needs to call LLM providers on your behalf, configure provider API keys:
+
+| Variable | Description | Required For |
+|----------|-------------|-------------|
+| `OPENAI_API_KEY` | OpenAI API key. | OpenAI models (GPT-4o, etc.) |
+| `ANTHROPIC_API_KEY` | Anthropic API key. | Anthropic models (Claude, etc.) |
+| `GOOGLE_API_KEY` | Google AI API key. | Google models (Gemini, etc.) |
+| `AZURE_OPENAI_API_KEY` | Azure OpenAI API key. | Azure OpenAI deployments |
+| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL. | Azure OpenAI deployments |
+
+<Callout type="warning">
+  Never commit API keys to version control. Use a secrets manager or environment variable injection in your deployment pipeline.
+</Callout>
+
+## Self-Hosted Deployments
+
+For [Private Cloud](/deployment/private-cloud) and [On-Premise](/deployment/on-premise) deployments, you may need to configure:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string for the Xilos database. | `postgresql://user:pass@db.internal:5432/xilos` |
+| `XILOS_HOST` | The host address the Xilos application binds to. | `0.0.0.0` |
+| `XILOS_PORT` | The port the Xilos application listens on. | `8000` |
+| `XILOS_ENV` | Environment label — `production`, `staging`, or `development`. | `production` |
+| `MODEL_REGISTRY_PATH` | Local path for model weights (on-premise only). | `/data/models` |
+
+## Webhook Verification
+
+When receiving webhooks from Xilos, use this variable in your webhook handler:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `XILOS_WEBHOOK_SECRET` | The secret used to verify webhook signatures. | `whsec_abc123...` |
+
+```python
+import os, hmac, hashlib
+
+def verify_signature(raw_body: bytes, signature: str) -> bool:
+    secret = os.environ["XILOS_WEBHOOK_SECRET"].encode()
+    expected = hmac.new(secret, raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)
+```
+
+## SIEM Integration
+
+When forwarding events to your SIEM, configure:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `SIEM_ENDPOINT` | Your SIEM ingestion URL. | `https://splunk.company.com:8088/services/collector` |
+| `SIEM_TOKEN` | Authentication token for your SIEM endpoint. | `splunk_token_abc123...` |

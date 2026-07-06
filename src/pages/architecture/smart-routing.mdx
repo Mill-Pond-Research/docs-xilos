@@ -2,18 +2,41 @@
 title: Smart Routing Engine
 ---
 
+import { Callout } from 'nextra/components'
+
 # Smart Routing Engine
 
-How the SLM classifies query intent and selects the optimal LLM, tools, and context.
+Smart Routing uses an internal Small Language Model (SLM) to classify query intent and automatically select the optimal LLM for each query.
 
-## Sections
+## What Smart Routing Does
 
-- SLM Architecture
-- Intent Classification
-- Model Selection
-- Workflow Selection
-- Tool Selection
+When Smart Routing is enabled, the SLM analyzes each query and considers:
 
----
+- **Query complexity** — Simple questions route to faster, cheaper models; complex reasoning routes to flagship models
+- **Model capabilities** — Matches query requirements (coding, analysis, creative) to model strengths
+- **Cost efficiency** — Selects the most cost-effective model that can handle the query
+- **Latency requirements** — Prioritizes faster models for time-sensitive queries
 
-*This page is a stub. Content will be added soon.*
+## How It Works
+
+1. The SLM receives the query and classifies its intent
+2. The classification is matched against available models
+3. The model with the best capability-to-cost ratio for that intent is selected
+4. If no clear match, the organization's default model is used
+
+<Callout type="info">
+  Smart Routing is transparent — users and agents always send queries to the same endpoint. The routing decision is visible in the Query Log.
+</Callout>
+
+## Enabling Smart Routing
+
+1. Navigate to **SuperAdmin** > **Model Config**.
+2. Toggle **Smart Routing Enabled** on.
+3. Smart Routing will be used for queries that do not match a specific routing rule.
+
+## Smart Routing vs. Routing Rules
+
+- **Routing Rules** — Explicit rules you create to route specific query types to specific models
+- **Smart Routing** — Automatic model selection for queries that do not match any routing rule
+- Both can be used together — routing rules take priority, Smart Routing handles the rest
+

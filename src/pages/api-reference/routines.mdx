@@ -2,18 +2,201 @@
 title: Routines API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Routines API
 
-Create, update, and manage scheduled agent runs.
+Routines are scheduled, recurring queries that run on a cron schedule. Use them to generate periodic reports, run automated checks, or trigger agent workflows on a fixed cadence. Each routine is associated with a routing rule that determines how its query is processed.
 
-## Sections
+## Routine Object
 
-- List Routines
-- Create Routine
-- Update Routine
-- Manual Run
-- Routine Object
+```json
+{
+  "id": "rtn_01HXYZ",
+  "name": "Daily market summary",
+  "query": "Summarize today's top market movements",
+  "schedule_cron": "0 9 * * *",
+  "routing_rule_id": "rule_01HXYZ",
+  "is_active": true,
+  "last_run_at": "2025-01-15T09:00:00Z",
+  "created_at": "2025-01-10T08:00:00Z",
+  "updated_at": "2025-01-10T08:00:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/routines` | List all routines |
+| `POST` | `/routines` | Create a new routine |
+| `PUT` | `/routines/{id}` | Update an existing routine |
+| `DELETE` | `/routines/{id}` | Delete a routine |
+| `POST` | `/routines/{id}/run` | Manually trigger a routine |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Routines
+
+```
+GET /api/v1/routines
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/routines \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+Returns an array of [Routine Objects](#routine-object).
+
+---
+
+## Create Routine
+
+```
+POST /api/v1/routines
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the routine. |
+| `query` | string | Yes | The query string to execute on each run. |
+| `schedule_cron` | string | Yes | Cron expression defining the schedule (e.g., `0 9 * * *` for daily at 9 AM). |
+| `routing_rule_id` | string | No | Routing rule to apply. If omitted, the default routing rule is used. |
+| `is_active` | boolean | No | Whether the routine is active. Default: `true`. |
+
+<Callout type="info">
+  Cron expressions use standard 5-field format: `minute hour day-of-month month day-of-week`. Times are in UTC.
+</Callout>
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/routines \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Daily market summary",
+    "query": "Summarize today'"'"'s top market movements",
+    "schedule_cron": "0 9 * * *",
+    "routing_rule_id": "rule_01HXYZ",
+    "is_active": true
+  }'
+```
+
+### Response
+
+Returns the created [Routine Object](#routine-object).
+
+---
+
+## Update Routine
+
+```
+PUT /api/v1/routines/{id}
+```
+
+Updates an existing routine. All fields are optional.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `query` | string | No | Updated query. |
+| `schedule_cron` | string | No | Updated schedule. |
+| `routing_rule_id` | string | No | Updated routing rule. |
+| `is_active` | boolean | No | Toggle active state. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/routines/rtn_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "schedule_cron": "0 8 * * 1-5",
+    "is_active": true
+  }'
+```
+
+### Response
+
+Returns the updated routine object.
+
+---
+
+## Delete Routine
+
+```
+DELETE /api/v1/routines/{id}
+```
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/routines/rtn_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "rtn_01HXYZ",
+  "deleted": true
+}
+```
+
+---
+
+## Manually Trigger a Routine
+
+```
+POST /api/v1/routines/{id}/run
+```
+
+Triggers an immediate execution of the routine, regardless of its schedule. Useful for testing or on-demand runs.
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/routines/rtn_01HXYZ/run \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "rtn_01HXYZ",
+  "status": "running",
+  "triggered_at": "2025-01-15T14:22:00Z"
+}
+```
+
+<Callout type="info">
+  Manual runs do not affect the scheduled cadence. The routine will still execute at its next scheduled time.
+</Callout>
+
+## Working With Routines
+
+<Steps>
+  ### Define the Query
+  Write the query string you want to run on a schedule. Keep it self-contained — routines do not maintain conversation context between runs.
+
+  ### Set the Schedule
+  Use a cron expression to define when the routine runs. Test the expression with a [cron parser](https://crontab.guru/) if needed.
+
+  ### Assign a Routing Rule
+  Point the routine at a routing rule to control which model handles it and whether caching is enabled.
+
+  ### Test Manually
+  Use the manual trigger endpoint to verify the routine works before relying on the schedule.
+</Steps>

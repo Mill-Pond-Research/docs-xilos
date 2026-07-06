@@ -4,16 +4,32 @@ title: AI Kernel
 
 # AI Kernel
 
-The core processing engine that orchestrates the full pipeline from query to response.
+The AI Kernel is the core processing engine that orchestrates the full pipeline from query to response.
 
-## Sections
+## What the AI Kernel Does
 
-- Process Flow
-- Smart Routing
-- Workflows
-- Quality Scoring
-- Fact Extraction
+The AI Kernel coordinates all processing steps for each query:
 
----
+- **Routing** — Determines which LLM handles the query, using routing rules or Smart Routing
+- **Workflows** — Executes multi-model workflows when a routing rule references a workflow
+- **Quality Scoring** — Computes faithfulness, answer relevance, and context relevance scores for each response
+- **Fact Extraction** — Extracts atomic facts from responses and stores them in the Context Engine
+- **Webhook Dispatch** — Fires event-driven webhooks when configured
 
-*This page is a stub. Content will be added soon.*
+## How It Works
+
+When a query arrives, the AI Kernel:
+
+1. Checks the semantic cache for a match
+2. Evaluates restriction rules and guardrails
+3. Selects the target model via routing rules or Smart Routing
+4. Applies context compression if enabled
+5. Sends the query to the LLM provider
+6. Receives the response
+7. Scores the response quality
+8. Extracts and stores atomic facts
+9. Logs the full pipeline to the query log
+10. Fires webhooks for subscribed events
+
+The AI Kernel handles all of this transparently — users and agents simply send a request and receive a response.
+

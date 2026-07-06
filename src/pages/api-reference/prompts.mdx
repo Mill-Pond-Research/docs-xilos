@@ -2,17 +2,220 @@
 title: Prompts API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Prompts API
 
-Create and manage versioned prompt templates.
+Prompts are reusable system prompt templates with versioning. Create a prompt, iterate on it across versions, and roll back to a prior version if needed. Each version is immutable once saved.
 
-## Sections
+## Prompt Object
 
-- List Prompts
-- Create Prompt
-- Version History
-- Update Prompt
+```json
+{
+  "id": "prmt_01HXYZ",
+  "name": "Customer support assistant",
+  "current_version": 3,
+  "versions": [
+    {
+      "version": 1,
+      "system_prompt": "You are a helpful customer support assistant.",
+      "created_at": "2025-01-10T08:00:00Z"
+    },
+    {
+      "version": 2,
+      "system_prompt": "You are a helpful customer support assistant. Always greet the customer first.",
+      "created_at": "2025-01-12T08:00:00Z"
+    },
+    {
+      "version": 3,
+      "system_prompt": "You are a helpful customer support assistant. Always greet the customer first. If you don't know the answer, say so.",
+      "created_at": "2025-01-15T08:00:00Z"
+    }
+  ],
+  "created_at": "2025-01-10T08:00:00Z",
+  "updated_at": "2025-01-15T08:00:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/prompts` | List all prompts |
+| `POST` | `/prompts` | Create a new prompt |
+| `PUT` | `/prompts/{id}` | Create a new version of an existing prompt |
+| `GET` | `/prompts/{id}/versions` | Get version history for a prompt |
+| `DELETE` | `/prompts/{id}` | Delete a prompt |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Prompts
+
+```
+GET /api/v1/prompts
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/prompts \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+Returns an array of [Prompt Objects](#prompt-object).
+
+---
+
+## Create Prompt
+
+```
+POST /api/v1/prompts
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the prompt. |
+| `system_prompt` | string | Yes | The system prompt text. This becomes version 1. |
+| `version` | integer | No | Starting version number. Default: `1`. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/prompts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Customer support assistant",
+    "system_prompt": "You are a helpful customer support assistant."
+  }'
+```
+
+### Response
+
+Returns the created [Prompt Object](#prompt-object) with version 1.
+
+---
+
+## Update Prompt (New Version)
+
+```
+PUT /api/v1/prompts/{id}
+```
+
+Creates a new version of an existing prompt. The previous version is preserved and can be retrieved via the [version history endpoint](#get-version-history).
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated name. |
+| `system_prompt` | string | Yes | The new system prompt text for this version. |
+| `version` | integer | No | Version number for the new version. Auto-increments if omitted. |
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/prompts/prmt_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "system_prompt": "You are a helpful customer support assistant. Always greet the customer first. If you don'"'"'t know the answer, say so."
+  }'
+```
+
+### Response
+
+Returns the updated [Prompt Object](#prompt-object) with the new version.
+
+<Callout type="info">
+  Updating a prompt does not affect running queries. New queries pick up the latest version automatically. To pin a specific version, reference it explicitly in your routing rule or workflow.
+</Callout>
+
+---
+
+## Get Version History
+
+```
+GET /api/v1/prompts/{id}/versions
+```
+
+Returns the full version history for a prompt, including all saved versions.
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/prompts/prmt_01HXYZ/versions \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "prmt_01HXYZ",
+  "name": "Customer support assistant",
+  "versions": [
+    {
+      "version": 1,
+      "system_prompt": "You are a helpful customer support assistant.",
+      "created_at": "2025-01-10T08:00:00Z"
+    },
+    {
+      "version": 2,
+      "system_prompt": "You are a helpful customer support assistant. Always greet the customer first.",
+      "created_at": "2025-01-12T08:00:00Z"
+    },
+    {
+      "version": 3,
+      "system_prompt": "You are a helpful customer support assistant. Always greet the customer first. If you don't know the answer, say so.",
+      "created_at": "2025-01-15T08:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+## Delete Prompt
+
+```
+DELETE /api/v1/prompts/{id}
+```
+
+Deletes a prompt and all its versions. This action cannot be undone.
+
+### cURL
+
+```bash
+curl -X DELETE https://api.xilos.ai/api/v1/prompts/prmt_01HXYZ \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "prmt_01HXYZ",
+  "deleted": true
+}
+```
+
+## Managing Prompt Versions
+
+<Steps>
+  ### Create the Initial Prompt
+  Define your system prompt and save it as version 1.
+
+  ### Iterate With New Versions
+  Update the prompt as you refine it. Each update creates a new version — previous versions are preserved.
+
+  ### Review History
+  Use the version history endpoint to compare versions and track changes over time.
+
+  ### Roll Back if Needed
+  If a new version underperforms, reference an earlier version in your routing rules or workflows to roll back.
+</Steps>
