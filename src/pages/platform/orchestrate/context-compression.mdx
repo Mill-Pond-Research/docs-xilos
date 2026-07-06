@@ -2,19 +2,70 @@
 title: Context Compression
 ---
 
+import { Callout } from 'nextra/components'
+
 # Context Compression
 
-Compress prompts before they reach the LLM — summarize conversation history, extract relevant sentences, and stabilize prompt prefixes for better cache hits. 50-90% token reduction.
+Compress prompts before they reach the LLM — summarize conversation history, extract relevant sentences, and stabilize prompt prefixes for better cache hits. Xilos achieves 50-90% token reduction with three complementary strategies.
 
-## Sections
+## How It Works
 
-- Three Strategies
-- Prefix Stabilizer
-- Conversation Summarizer
-- Content Extractor (BM25)
-- Configuration
-- Savings Tracking
+When compression is enabled, Xilos processes the prompt through three strategies before sending it to the LLM:
 
----
+### 1. Prefix Stabilizer
 
-*This page is a stub. Content will be added soon.*
+Stabilizes the system prompt prefix so that semantic cache hits are more likely. Many queries share the same system prompt — by stabilizing the prefix, Xilos ensures that cache lookups match even when the conversation history varies slightly.
+
+### 2. Conversation Summarizer
+
+Summarizes long conversation histories into a compact summary. Instead of sending 20 previous messages, Xilos sends a summary of the conversation context. This dramatically reduces token count for multi-turn conversations.
+
+### 3. Content Extractor (BM25)
+
+Uses BM25 (Best Matching 25) ranking to extract the most relevant sentences from the prompt. Irrelevant content is removed, keeping only the sentences that matter for the current query.
+
+## Configuration
+
+Configure compression at two levels:
+
+### Organization Level
+
+In **Model Config** (SuperAdmin), set:
+
+- **Compression Enabled** — Toggle compression on/off for the organization
+- **Compression Target Ratio** — Target compression ratio (e.g., 0.5 = compress to 50% of original)
+- **Compression Token Threshold** — Minimum token count before compression activates (default: 2000 tokens)
+
+### Per-Rule Level
+
+Each routing rule can override the organization setting:
+
+- Enable compression for high-volume, long-context rules
+- Disable for rules that need full-fidelity context
+- Set custom thresholds per rule
+
+<Callout type="info">
+  Compression only activates when the prompt exceeds the token threshold. Short prompts pass through uncompressed.
+</Callout>
+
+## Savings Tracking
+
+Compression savings are tracked and displayed in:
+
+- **Cost Controls** — Total token savings and estimated cost savings
+- **Dashboard** — Compression stats per query in the Query Log
+- **Per-query view** — Original token count vs. compressed token count
+
+## Performance Impact
+
+- **Latency:** Compression adds <50ms to query processing (local, CPU-based)
+- **Quality:** The summarizer and BM25 extractor preserve query intent while reducing tokens
+- **Cache hits:** The prefix stabilizer improves cache hit rates by 15-30%
+
+## Best Practices
+
+- Start with the default threshold (2000 tokens) and adjust based on your query patterns
+- Enable compression for rules with long conversation histories
+- Disable for rules where full-fidelity context is critical (e.g., code review)
+- Monitor the Cost Controls page to track savings
+- Adjust the target ratio based on quality feedback

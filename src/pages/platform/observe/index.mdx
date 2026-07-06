@@ -2,18 +2,60 @@
 title: Observe
 ---
 
+import { Card, Cards } from 'nextra/components'
+
 # Observe
 
 Gain total visibility into all AI traffic flowing through your organization. Every query, every model, every dollar — tracked in real time.
 
-## Sections
+## Visibility Features
 
-- Dashboards
-- Query Log
-- Cost Controls
-- Metrics & Analytics
-- Compression Savings
+<Cards>
+  <Card title="Dashboards" href="/platform/observe/dashboards">
+    Real-time dashboards showing query volume, governance actions, cost trends, and orchestration metrics.
+  </Card>
+  <Card title="Query Log" href="/platform/observe/query-log">
+    Every query logged with full context: original query, improved query, response, governance actions, and compression stats.
+  </Card>
+  <Card title="Cost Controls" href="/platform/observe/cost-controls">
+    Track AI spend by model, user, department, and routing rule. See savings from caching, routing, and compression.
+  </Card>
+  <Card title="Metrics & Analytics" href="/platform/observe/metrics">
+    Comprehensive metrics including context hit rate, tool call counts, workflow executions, and compression savings.
+  </Card>
+</Cards>
 
----
+## What Xilos Tracks
 
-*This page is a stub. Content will be added soon.*
+For every query that passes through the platform, Xilos records:
+
+- **Original query** — The exact user input
+- **Improved query** — The processed query after enrichment and compression
+- **Response** — The LLM's response
+- **Routing decision** — Which model was selected and why
+- **Governance actions** — Any restrictions, blocks, masks, or flags applied
+- **Compression stats** — Token count before and after compression
+- **Cost breakdown** — Input tokens, output tokens, and total cost
+- **Quality scores** — Faithfulness, answer relevance, context relevance
+- **Cache hit/miss** — Whether the response was served from cache
+- **Latency** — Time to first token and total response time
+- **User and department** — Who made the query
+
+## Real-Time Monitoring
+
+The dashboard updates in real time, showing:
+
+- Query volume over time (activity chart)
+- Query treatment breakdown (unrestricted, blocked, flagged, masked)
+- Trending topics in unrestricted and blocked queries
+- Executive report with AI-generated insights
+
+## Historical Analysis
+
+For any historical date range, Xilos provides:
+
+- Period-over-period comparison
+- Donut charts for query treatment breakdown
+- Executive report with contextual insights
+- Drill-down capability into specific categories
+- Export for custom reporting

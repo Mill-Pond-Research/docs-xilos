@@ -2,21 +2,175 @@
 title: Core Concepts
 ---
 
+import { Callout, Steps, Card, Cards } from 'nextra/components'
+
 # Core Concepts
 
-Understand the fundamental building blocks of Xilos: routing rules, restriction rules, workflows, the context engine, and more.
+Xilos is an AI infrastructure platform built on three pillars: **Observe**, **Secure**, and **Orchestrate**. Every query that passes through the Xilos gateway is logged, inspected against security policies, and routed to the optimal model. This page explains the building blocks that make that possible.
 
-## Sections
+```
+Agent → Xilos Gateway → LLM Provider
+         │
+         ├── Observe    (log, track, cost)
+         ├── Secure     (guardrails, PII, restrictions)
+         └── Orchestrate (route, cache, compress, enrich)
+```
 
-- Routing Rules
-- Restriction Rules
-- Workflows
-- Context Engine
-- Context Compression
-- Semantic Caching
-- Smart Routing
-- Guardrails
+## Routing Rules
+
+Routing Rules determine which Large Language Model (LLM) will process and respond to a user query based on defined criteria. By creating routing rules, you ensure that queries are handled by the most appropriate model — whether public or private — optimizing for performance, security, and cost-effectiveness.
+
+### Matching Methods
+
+Routing rules support two matching approaches:
+
+| Method | Best for | Behavior |
+| --- | --- | --- |
+| **Natural Language (AI)** | Intent-based routing, complex categorization | Uses AI to understand meaning and intent, not exact words. Matches queries phrased differently. |
+| **Keyword-Based** | Exact term detection, compliance terms | Performs a direct string search for specific words or phrases. Predictable, deterministic matching. |
+
+<Callout type="info">
+  A rule triggered by the natural-language phrase "billing inquiries" will match "How much does this cost?", "I have a question about my invoice", and "What are your pricing plans?" — even though none of them contain the word "billing."
+</Callout>
+
+### Rule Components
+
+Every routing rule includes:
+
+- **Rule Name** — A clear, descriptive name (for example, `HR_Policy_Questions`).
+- **Trigger Phrase** — A natural-language description of the query categories the rule should capture.
+- **Target Model** — The LLM that handles matched queries. Xilos supports public models (Claude, GPT, Gemini) and private models (Llama, Phi).
+- **Sample Queries** — Up to three examples that fine-tune the routing algorithm and serve as test cases.
+- **Cache Toggle** — Optionally cache responses for frequently asked queries to reduce cost and latency.
+
+### Target Model Selection
+
+| Factor | Recommendation |
+| --- | --- |
+| Sensitive data | Route to private models for confidential information. |
+| Complex reasoning | Use flagship models (Claude Opus, GPT-4.1). |
+| Speed and volume | Consider lightweight models (Haiku, mini variants). |
+| Cost optimization | Balance model capability with query complexity. |
+| Specialized tasks | Match model strengths to query type (coding, analysis, etc.). |
+
+<Callout type="warning">
+  Routing rules cannot be edited after saving. You can enable, disable, or delete a rule, or create a new rule with updated criteria. Always test your rule with the Rule Tester before saving.
+</Callout>
+
+Learn more in the [Create a Routing Rule](/guides/create-routing-rule) guide.
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## Restriction Rules
+
+Restriction Rules are security and compliance policies that inspect queries for sensitive content. Based on what is found, a query can be **blocked**, **masked**, or **flagged** before it reaches an LLM.
+
+### System Actions
+
+| Action | Effect | Best for |
+| --- | --- | --- |
+| **Block** 🚫 | Complete query termination. The query is never sent to the LLM. | Security threats, policy violations, malware detection. |
+| **Mask** 🎭 | Sensitive content is redacted; safe portions proceed. | PII protection, data privacy compliance. |
+| **Flag** 🚩 | The query proceeds, but an alert and audit trail are created. | Compliance monitoring, behavioral analysis, trend detection. |
+
+### Rule Components
+
+Every restriction rule includes:
+
+- **Rule Name** — Descriptive and specific (for example, `PII-Detection-SSN-Block`).
+- **Severity Level** — High, Medium, or Low, based on the potential impact.
+- **Trigger Phrase** — Completes the sentence: "The rule is triggered if the query [your trigger phrase]."
+- **System Action** — Block, Mask, or Flag.
+- **Sample Queries** — Three diverse examples that validate rule accuracy and document intent.
+
+<Callout type="info">
+  Start with **Flag** (audit-only) for new sensitive-data rules. After a tuning period, switch to **Mask** or **Block** once you are confident the rule produces minimal false positives.
+</Callout>
+
+### Foundational Security Rules
+
+Every Xilos tenant should deploy these three rules on day one:
+
+1. **API-Key-Exposed-Block** — Blocks queries containing high-entropy strings matching API keys, tokens, or passwords.
+2. **Sensitive-Data-PII-Financial-Confidential-Flag** — Flags queries containing PII, financial records, or confidential business data.
+3. **Malicious-Code-Prompt-Injection-Block** — Blocks prompt injection attempts and malicious code execution requests.
+
+Learn more in the [Create a Restriction Rule](/guides/create-restriction-rule) guide.
+
+---
+
+## Workflows
+
+Workflows are multi-stage LLM pipelines that chain models sequentially or run them in parallel. A workflow lets you compose multiple LLM calls into a single logical operation — for example, generating a draft with one model, then refining it with a second model, or running two models in parallel and selecting the best response.
+
+Use workflows when a single model call is not sufficient and you need orchestrated, multi-step processing.
+
+---
+
+## Context Compression
+
+Context Compression reduces prompt token count by 50–90% before the prompt reaches the LLM. By compressing context, you lower latency and cost without sacrificing response quality. Compression is especially valuable for long conversations, large document inputs, and agent loops that accumulate context over many turns.
+
+Learn more in the [Enable Context Compression](/guides/enable-compression) guide.
+
+---
+
+## Context Engine
+
+The Context Engine extracts atomic facts from LLM responses and uses them to enrich future queries. Rather than sending the full conversation history every time, the Context Engine maintains a compact, structured knowledge layer that grows smarter with each interaction. This reduces token usage while preserving the information the LLM needs to produce high-quality responses.
+
+---
+
+## Semantic Caching
+
+Semantic Caching stores LLM responses and reuses them for semantically similar queries. When a new query arrives, Xilos checks the cache for a prior query with matching intent — even if the wording differs. If a match is found, the cached response is returned instantly without an additional LLM call.
+
+**Benefits:**
+
+- ⚡ Faster response times — instant delivery of cached answers.
+- 💰 Cost reduction — fewer API calls to expensive LLM services.
+- 📊 Consistency — identical answers to equivalent questions.
+
+**Best use cases:**
+
+- FAQ-type queries with stable answers.
+- Product information and specifications.
+- Policy and procedure questions.
+- Common troubleshooting steps.
+
+<Callout type="warning">
+  Do not enable caching for queries requiring real-time data, personalized responses, or rapidly changing information. Caching is also not recommended for creative or generative tasks that require unique outputs.
+</Callout>
+
+---
+
+## Smart Routing
+
+Smart Routing uses an internal Small Language Model (SLM) to classify query intent and select the optimal model automatically. Rather than relying solely on manually configured routing rules, Smart Routing evaluates each query in real time and directs it to the model best suited for the task — balancing capability, speed, and cost.
+
+Smart Routing works alongside your explicit routing rules. Rules you create take precedence; Smart Routing handles queries that do not match any rule.
+
+---
+
+## Guardrails
+
+Guardrails are the collective security and compliance controls that protect your organization when using AI. In Xilos, guardrails are implemented through Restriction Rules, which inspect every query for sensitive content and take action — block, mask, or flag — before the query reaches the LLM.
+
+Guardrails cover three critical areas:
+
+1. **Credential protection** — Prevents accidental leakage of API keys, tokens, and secrets.
+2. **Data safeguarding** — Controls the flow of PII, financial data, and confidential information.
+3. **Model integrity** — Defends against prompt injection and malicious code attempts.
+
+<Callout type="info">
+  Guardrails apply automatically to every request sent through the Xilos gateway, including the OpenAI-compatible endpoint. No application code changes are required.
+</Callout>
+
+---
+
+## Next Steps
+
+- [Connect Your Agent](/getting-started/connect-agent) — Wire up Hermes, Claude Code, LangChain, or any OpenAI-compatible framework.
+- [Glossary](/getting-started/glossary) — Definitions of every key term used in Xilos.
+- [Create a Routing Rule](/guides/create-routing-rule) — Step-by-step routing rule creation.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Set up guardrails for your organization.

@@ -2,19 +2,85 @@
 title: Architecture Overview
 ---
 
+import { Callout, Card, Cards } from 'nextra/components'
+
 # Architecture Overview
 
-Understand the Xilos architecture: middleware gateway, AI kernel, smart routing, context engine, and multi-tenancy model.
+Xilos is a middleware gateway that intercepts, analyzes, and processes every prompt before it reaches an LLM destination. This page provides a high-level overview of the system architecture.
 
-## Sections
+## High-Level Architecture
 
-- High-Level Architecture
-- Request Flow
-- AI Kernel
-- Multi-Tenancy
-- Security Model
-- Technology Stack
+```
+┌─────────────┐     ┌──────────────────────────────────┐     ┌──────────────┐
+│   Agents    │────▶│         Xilos Gateway            │────▶│  LLM Provider│
+│ (OpenAI-    │     │                                  │     │  (OpenAI,    │
+│  compatible)│     │  ┌─────────┐  ┌──────────┐      │     │   Anthropic, │
+└─────────────┘     │  │ Observe  │  │  Secure  │      │     │   Google,    │
+                    │  └─────────┘  └──────────┘      │     │   Private)   │
+                    │  ┌─────────────────────────┐     │     └──────────────┘
+                    │  │      Orchestrate         │     │
+                    │  │  (Route, Cache, Compress)│     │
+                    │  └─────────────────────────┘     │
+                    │                                  │
+                    │  ┌─────────────────────────┐     │
+                    │  │   AI Kernel (Core)       │     │
+                    │  └─────────────────────────┘     │
+                    │  ┌─────────────────────────┐     │
+                    │  │   SLM (Smart Routing)    │     │
+                    │  └─────────────────────────┘     │
+                    └──────────────────────────────────┘
+```
 
----
+## Technology Stack
 
-*This page is a stub. Content will be added soon.*
+- **Frontend:** React, TypeScript, MUI (Material UI)
+- **Backend:** FastAPI, Python, SQLModel, SQLAlchemy 2.0+
+- **Database:** PostgreSQL (Neon for SaaS, RDS for VPC/On-Prem)
+- **Embeddings:** all-MiniLM-L6-v2 (local, CPU-based)
+- **SLM (Smart Routing):** Internal Small Language Model with 16k token context window
+- **Deployment:** Vercel (frontend), Railway (backend), Neon (database)
+
+## Key Components
+
+<Cards>
+  <Card title="Request Flow" href="/architecture/request-flow">
+    Trace a query from agent request through the full pipeline to response.
+  </Card>
+  <Card title="AI Kernel" href="/architecture/ai-kernel">
+    The core processing engine that orchestrates the full pipeline.
+  </Card>
+  <Card title="Smart Routing" href="/architecture/smart-routing">
+    How the SLM classifies intent and selects the optimal model.
+  </Card>
+  <Card title="Context Compression" href="/architecture/context-compression">
+    Three compression strategies for token reduction.
+  </Card>
+  <Card title="Context Engine" href="/architecture/context-engine">
+    Atomic fact extraction and semantic retrieval.
+  </Card>
+  <Card title="Multi-Tenancy" href="/architecture/multi-tenancy">
+    PostgreSQL RLS for organization isolation.
+  </Card>
+  <Card title="Security Model" href="/architecture/security-model">
+    Encryption, authentication, guardrails, and audit logging.
+  </Card>
+  <Card title="Data Flow" href="/architecture/data-flow">
+    Visual diagram of data flow through the platform.
+  </Card>
+</Cards>
+
+## Infrastructure
+
+For the Managed SaaS deployment:
+
+- **Frontend:** CloudFront + S3 (or Vercel)
+- **Backend:** Application Load Balancer + ECS Fargate (or Railway)
+- **Database:** RDS Serverless PostgreSQL (or Neon)
+- **Internal SLLM:** Internal ALB + Auto Scaling Group with EC2 GPU instances
+
+The core principle is that all persistent data resides within the PostgreSQL database. All other components are stateless and can be rebuilt from Infrastructure as Code (Terraform and Atmos).
+
+<Callout type="info">
+  **RTO:** 4 hours (RDS Point-in-Time Recovery + IaC redeployment)
+  **RPO:** 1 hour (continuous RDS backups)
+</Callout>

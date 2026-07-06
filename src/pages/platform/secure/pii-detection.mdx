@@ -2,18 +2,133 @@
 title: PII Detection
 ---
 
+import { Callout, Tabs } from 'nextra/components'
+
 # PII Detection
 
-Automatically detect and mask Personally Identifiable Information (PII) in queries before they reach the LLM.
+Personally Identifiable Information (PII) detection automatically identifies and masks sensitive data in user queries before they reach the LLM. Xilos uses Microsoft Presidio as its detection engine, combining regular expression matching, rule-based logic, and machine learning models to identify sensitive data patterns in unstructured text. All detection runs locally within the platform — no query content is sent to external APIs for analysis.
 
-## Sections
+## Detection Engine (Presidio)
 
-- Supported PII Types
-- Detection Engine (Presidio)
-- Masking Strategies
-- Custom PII Patterns
-- Configuration
+Microsoft Presidio is an open-source PII detection and anonymization engine. Xilos integrates Presidio as the core PII guardrail, running it locally on every query before model routing.
 
----
+**How Presidio works:**
 
-*This page is a stub. Content will be added soon.*
+1. **Text analysis** — Presidio analyzes the query text using a pipeline of recognizers.
+2. **Pattern matching** — Each recognizer applies regular expressions, rule-based logic, and ML models to identify specific PII types.
+3. **Confidence scoring** — Detected entities are assigned confidence scores. Entities above the threshold are flagged as PII.
+4. **Anonymization** — Flagged entities are masked according to the configured masking strategy before the query proceeds to the LLM.
+
+<Callout type="info">
+  Presidio runs entirely within the Xilos platform. No PII, query content, or detection telemetry is transmitted to external services. Sensitive data never leaves your environment during the detection stage.
+</Callout>
+
+## Supported PII Types
+
+Xilos ships with Presidio's built-in recognizers for common PII categories:
+
+| PII Type | Recognizer | Examples |
+|----------|------------|----------|
+| Social Security Number | `SpacyRecognizer` + regex | `123-45-6789` |
+| Credit Card Number | `CreditCardRecognizer` | `4532-1234-5678-9010` |
+| Email Address | `EmailRecognizer` | `user@example.com` |
+| Phone Number | `PhoneRecognizer` | `(555) 123-4567` |
+| Bank Account Number | `BankAccountRecognizer` | `1234567890` |
+| IBAN Code | `IbanRecognizer` | `GB29 NWBK 6016 1331 9268 19` |
+| US Passport Number | `UsPassportRecognizer` | `123456789` |
+| US Driver License | `UsLicenseRecognizer` | `D1234567` |
+| IP Address | `IpRecognizer` | `192.168.1.100` |
+| URL | `UrlRecognizer` | `https://example.com/path` |
+| Date | `DateRecognizer` | `January 15, 2024` |
+| Person Name | `SpacyRecognizer` | `John Smith` |
+| Organization | `SpacyRecognizer` | `Acme Corporation` |
+| Location | `SpacyRecognizer` | `San Francisco` |
+| US Bank Routing Number | `UsBankRecognizer` | `123456789` |
+
+<Callout type="info">
+  NER-based recognizers (person names, organizations, locations) use spaCy models. The accuracy of these recognizers depends on the language model quality and the context of the text.
+</Callout>
+
+## Masking Strategies
+
+When Presidio detects PII, Xilos applies a masking strategy to redact the sensitive content before the query reaches the LLM. You can configure the masking strategy per PII type or globally.
+
+<Tabs>
+  <Tabs.Tab title="Replace">
+    Replaces detected PII with a fixed placeholder string.
+
+    **Example:** `My SSN is 123-45-6789` → `My SSN is <SSN>`
+  </Tabs.Tab>
+  <Tabs.Tab title="Mask">
+    Replaces detected PII with asterisks, preserving the length and format.
+
+    **Example:** `My SSN is 123-45-6789` → `My SSN is ***-**-****`
+  </Tabs.Tab>
+  <Tabs.Tab title="Redact">
+    Removes detected PII entirely, replacing it with an empty string.
+
+    **Example:** `My SSN is 123-45-6789` → `My SSN is`
+  </Tabs.Tab>
+  <Tabs.Tab title="Hash">
+    Replaces detected PII with a hash of the original value. Useful when you need to correlate masked values across queries without exposing the original.
+
+    **Example:** `My SSN is 123-45-6789` → `My SSN is a1b2c3d4`
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="warning">
+  The Mask strategy preserves format, which may leak partial information (such as the number of digits in a credit card). For maximum privacy, use the Redact or Replace strategy.
+</Callout>
+
+## Custom PII Patterns
+
+For organization-specific data formats not covered by the built-in recognizers, Xilos supports custom PII patterns. Custom patterns use regular expressions to define the detection logic.
+
+### Creating a Custom Pattern
+
+1. **Define the pattern** — Write a regular expression that matches your organization's data format.
+2. **Name the recognizer** — Provide a unique name for the custom PII type (e.g., `EMPLOYEE_ID`).
+3. **Set the confidence score** — Assign a confidence level (0.0 to 1.0) for matches.
+4. **Select a masking strategy** — Choose how detected custom PII is masked.
+5. **Test** — Validate the pattern against sample queries containing your custom data format.
+
+**Example custom pattern — Employee ID:**
+
+| Field | Value |
+|------|-------|
+| Name | `EMPLOYEE_ID` |
+| Regex | `\bEMP-\d{6}\b` |
+| Confidence | `0.9` |
+| Masking | Replace with `<EMPLOYEE_ID>` |
+
+With this custom pattern, the query "Look up the record for EMP-123456" would be masked to "Look up the record for `<EMPLOYEE_ID>`" before reaching the LLM.
+
+## Configuration
+
+### Enabling and Disabling Recognizers
+
+Individual PII recognizers can be enabled or disabled per tenant. This allows organizations to tailor detection to their specific compliance requirements.
+
+1. Navigate to **Secure → PII Detection**.
+2. Toggle individual recognizers on or off.
+3. Save changes.
+
+### Threshold Configuration
+
+Each recognizer uses a confidence threshold. Detected entities scoring below the threshold are not flagged as PII. Adjust thresholds to balance detection sensitivity against false positive rates.
+
+| Threshold | Behavior |
+|-----------|----------|
+| 0.5 | Conservative — flags more potential PII |
+| 0.7 | Balanced — default |
+| 0.85 | Permissive — flags only high-confidence matches |
+
+### Per-Rule Overrides
+
+PII detection can be combined with restriction rules for more granular control. For example, a restriction rule can Block queries containing specific PII types while allowing others to be masked. See [Restriction Rules](/platform/secure/restriction-rules) for rule creation.
+
+## Related
+
+- [Guardrails](/platform/secure/guardrails) — PII detection as part of the built-in guardrail suite.
+- [Restriction Rules](/platform/secure/restriction-rules) — Combine PII detection with custom Block, Mask, or Flag actions.
+- [Prompt Injection Defense](/platform/secure/prompt-injection) — The Sensitive-Data-PII-Financial-Confidential-Flag rule.

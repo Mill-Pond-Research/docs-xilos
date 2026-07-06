@@ -1,19 +1,94 @@
 ---
-title: API Reference
+title: API Overview
 ---
+
+import { Callout, Card, Cards } from 'nextra/components'
 
 # API Reference
 
-Complete REST API reference for Xilos. All endpoints are OpenAI-compatible and use Bearer token authentication.
+The Xilos API is a REST API that provides programmatic access to all Xilos features. All endpoints are OpenAI-compatible and use Bearer token authentication.
 
-## Sections
+## Base URL
 
-- Base URL
-- Authentication
-- Rate Limits
-- Request/Response Format
-- OpenAPI Schema
+```
+https://api.xilos.ai/api/v1
+```
 
----
+## Authentication
 
-*This page is a stub. Content will be added soon.*
+All authenticated API requests must include a Bearer token in the `Authorization` header:
+
+```
+Authorization: Bearer YOUR_XILOS_API_KEY
+```
+
+You can generate API keys from the dashboard, or create [Virtual Keys](/api-reference/virtual-keys) with budget limits and rate limits for per-user or per-team access.
+
+## Key API Capabilities
+
+<Cards>
+  <Card title="Chat Completions" href="/api-reference/chat-completions">
+    OpenAI-compatible chat completions endpoint with streaming support. Drop-in replacement for the OpenAI API.
+  </Card>
+  <Card title="Query Endpoint" href="/api-reference/query">
+    Send queries with full governance metadata, conversation threading, and quality scoring.
+  </Card>
+  <Card title="Routing Rules" href="/api-reference/routing-rules">
+    CRUD endpoints for managing routing rules that determine which LLM handles each query.
+  </Card>
+  <Card title="Restriction Rules" href="/api-reference/restriction-rules">
+    CRUD endpoints for managing security policies that block, mask, or flag queries.
+  </Card>
+  <Card title="Workflows" href="/api-reference/workflows">
+    Create and manage multi-model workflows.
+  </Card>
+  <Card title="Training Data" href="/api-reference/training-data">
+    Export the query log as a filtered training dataset for fine-tuning.
+  </Card>
+  <Card title="Fine-Tune" href="/api-reference/fine-tune">
+    Create and manage fine-tune jobs using Xilos orchestration data.
+  </Card>
+  <Card title="Suggestions" href="/api-reference/suggestions">
+    Get AI-powered suggestions for cost optimization and fine-tune targets.
+  </Card>
+  <Card title="Routines" href="/api-reference/routines">
+    Schedule recurring agent queries with cron expressions.
+  </Card>
+  <Card title="Webhooks" href="/api-reference/webhooks">
+    Event-driven notifications with HMAC-signed payloads.
+  </Card>
+  <Card title="SIEM Export" href="/api-reference/siem">
+    Export governance events to SIEM platforms (CEF, Syslog, JSON).
+  </Card>
+  <Card title="Virtual Keys" href="/api-reference/virtual-keys">
+    API keys with budget limits and rate limits.
+  </Card>
+</Cards>
+
+## OpenAI Compatibility
+
+Xilos provides a drop-in replacement for the OpenAI API. Any library that supports the OpenAI API — including the official OpenAI SDK, LangChain, and more — works with Xilos by changing the base URL:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_XILOS_API_KEY",
+    base_url="https://api.xilos.ai/api/v1"
+)
+```
+
+All requests sent to the OpenAI-compatible endpoint are automatically processed through your Xilos routing rules and security restrictions, ensuring compliance and cost control without changing your application code.
+
+## Request and Response Format
+
+- **Content-Type:** `application/json`
+- **Authentication:** Bearer token in `Authorization` header
+- **Responses:** JSON with standard HTTP status codes
+
+## Support
+
+For API questions or integration assistance:
+
+- Technical Support: support@millpondresearch.com
+- Service Status: https://status.xilos.ai

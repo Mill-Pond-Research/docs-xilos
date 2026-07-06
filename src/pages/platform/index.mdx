@@ -2,18 +2,91 @@
 title: Platform Overview
 ---
 
+import { Card, Cards, Callout, Steps } from 'nextra/components'
+
 # Platform Overview
 
-Xilos operates as a middleware gateway built on three pillars: Observe, Secure, and Orchestrate. Learn how they work together.
+Xilos is an AI infrastructure platform that sits between your users and the Large Language Models (LLMs) they call. Every prompt, every response, and every token flows through Xilos, where it is observed, secured, and orchestrated before a single inference call is made.
 
-## Sections
+The platform is built on three pillars — **Observe**, **Secure**, and **Orchestrate** — each of which can be adopted independently and composed as your needs grow.
 
-- The Three Pillars
-- Request Flow
-- Multi-Tenancy Model
-- Model-Agnostic Integration
-- Deployment Options
+## The Three Pillars
 
----
+<Cards>
+  <Card title="Observe" href="/platform/observe">
+    Gain total visibility into AI traffic. Dashboards, query logs, cost controls, and metrics surface every query, every treatment, and every dollar in real time.
+  </Card>
+  <Card title="Secure" href="/platform/secure">
+    Enforce policy before the model is called. Guardrails detect PII, block prompt injection, and apply restriction rules that block, mask, or flag queries by intent.
+  </Card>
+  <Card title="Orchestrate" href="/platform/orchestrate">
+    Route each query to the right model, compress prompts to cut cost, cache semantically equivalent responses, and compound knowledge across every interaction.
+  </Card>
+</Cards>
 
-*This page is a stub. Content will be added soon.*
+## Request Flow
+
+Every query that enters Xilos follows the same path. The pillars apply sequentially, and each stage can act on or transform the request before it reaches the model.
+
+<Steps>
+  <Step title="Ingest">
+    A user submits a query through a connected application, API, or agent. Xilos receives the request and attaches a trace identifier that follows it end to end.
+  </Step>
+  <Step title="Secure">
+    Restriction rules evaluate the query for blocked, masked, or flagged content. PII detection redacts sensitive fields. Prompt injection defense runs before any model is invoked. Queries that violate policy are terminated here.
+  </Step>
+  <Step title="Orchestrate">
+    The internal Small Language Model (SLM) classifies query intent, selects the optimal target LLM, and applies context compression, semantic caching, and enrichment from the Context Engine. Multi-model workflows, tools, and routines are applied as configured.
+  </Step>
+  <Step title="Execute">
+    The AI Kernel dispatches the prepared request to the selected model — public or private — and retrieves the response.
+  </Step>
+  <Step title="Observe">
+    The response, governance actions, compression statistics, and cost breakdown are written to the Query Log and rendered on the Dashboard in real time.
+  </Step>
+</Steps>
+
+<Callout type="info">
+  Stages 2 and 3 can transform the request. A masked query, for example, reaches the model with sensitive fields already redacted — the model never sees the original PII.
+</Callout>
+
+## Multi-Tenancy
+
+Xilos supports multi-tenant deployments out of the box. Each tenant is an isolated boundary with its own:
+
+- **Routing rules** — query-to-model mappings scoped to the tenant.
+- **Restriction rules** — governance policies that block, mask, or flag by tenant.
+- **Dashboards and Query Log** — activity and audit data isolated per tenant.
+- **Users and roles** — authentication and authorization managed independently.
+- **Cost controls** — budgets, limits, and model allow-lists set per tenant.
+
+Tenants share infrastructure but never share data. A query submitted under Tenant A cannot be observed, governed, or served by Tenant B.
+
+## Model-Agnostic Integration
+
+Xilos integrates with public and private models through a single, unified API. Public providers include Anthropic (Claude), OpenAI (GPT), and Google (Gemini). Private models include self-hosted deployments such as Llama and Phi.
+
+Integration is model-agnostic in two respects:
+
+1. **Routing rules target any supported model.** A rule can send billing inquiries to Claude Sonnet, sensitive HR data to a private Llama deployment, and general knowledge questions to GPT-4 — all from the same tenant.
+2. **Applications call one endpoint.** Client applications send queries to Xilos, not to the underlying provider. Xilos handles authentication, routing, and response delivery, so swapping models requires no client-side changes.
+
+## Deployment Options
+
+Xilos can be deployed in three configurations:
+
+| Deployment | Description | Best For |
+| --- | --- | --- |
+| **Xilos Cloud** | Fully managed SaaS hosted by Mill Pond Research. | Organizations that want zero infrastructure overhead. |
+| **Self-Hosted** | Xilos runs in your own cloud or on-premises environment. Private models stay inside your network. | Regulated industries and organizations with data residency requirements. |
+| **Hybrid** | Xilos Cloud manages the control plane; private models run in your environment. | Teams that want managed convenience alongside private model control. |
+
+<Callout type="info">
+  All deployment options expose the same API surface. Applications built against Xilos work identically across Cloud, Self-Hosted, and Hybrid configurations.
+</Callout>
+
+## Next Steps
+
+- Explore the [Observe](/platform/observe) pillar to understand dashboards, query logs, and cost controls.
+- Review the [Secure](/platform/secure) pillar to configure guardrails and restriction rules.
+- Start with the [Orchestrate](/platform/orchestrate) pillar to build routing rules and workflows.

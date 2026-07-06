@@ -2,19 +2,148 @@
 title: Dashboards
 ---
 
+import { Callout, Steps } from 'nextra/components'
+
 # Dashboards
 
-Real-time dashboards showing query volume, governance actions, cost trends, and orchestration metrics.
+The Xilos Dashboard is the central hub for monitoring query activity. It surfaces query volumes, treatment categories, trending topics, and executive reports in real time and across historical ranges.
 
-## Sections
+The dashboard is organized into four components: the Activity Chart, Query Treatment Metrics, Trending Topics, and the Activity Overview & Executive Report.
 
-- Dashboard Overview
-- Insights Tab
-- Cost Controls Tab
-- Governance Tab
-- Time Ranges
-- Exporting Reports
+## Activity Chart
 
----
+The Activity Chart is a time-series graph at the top of the dashboard. It plots query activity over the selected time period and breaks each point down by treatment:
 
-*This page is a stub. Content will be added soon.*
+- **Total Query Volume** — All queries processed during the period.
+- **Unrestricted Queries** — Queries that passed through without intervention.
+- **Blocked Queries** — Queries prevented from processing.
+- **Flagged Queries** — Queries marked for review or attention.
+- **Masked Queries** — Queries where sensitive information was concealed before reaching the model.
+
+### Interacting with the Chart
+
+- Hover over the graph to see specific values at any point in time.
+- Use the time range selector in the top right to switch between Day, Week, Month, or custom ranges.
+- Use the arrow buttons to navigate between dates.
+
+## Query Treatment Metrics
+
+Below the Activity Chart, five metric cards summarize treatment for the selected period. Each card shows a count, a percentage of total volume, and a period-over-period comparison indicator.
+
+### Query Total
+
+The complete number of queries processed during the selected period, with a percentage change relative to the previous period.
+
+### Unrestricted
+
+Percentage and count of queries that proceeded without any intervention, plus a period-over-period comparison.
+
+### Blocked
+
+Percentage and count of queries that were prevented from processing, with trend indicators.
+
+### Flagged
+
+Percentage and count of queries marked for attention or review, including change metrics.
+
+### Masked
+
+Percentage and count of queries where data masking was applied, with a historical comparison.
+
+<Callout type="info">
+  Period-over-period comparison is calculated against the immediately preceding range of equal length. A Week view compares against the prior week; a Month view compares against the prior month.
+</Callout>
+
+## Trending Topics
+
+The Trending Topics section identifies patterns in query activity:
+
+- **Top Unrestricted Topics** — The most common subjects in queries that passed through without intervention.
+- **Top Blocked Topics** — The most frequent categories that triggered blocks.
+
+When no topics are detected in a category, the section displays "No topics found" with an empty state indicator.
+
+## Activity Overview & Executive Report
+
+The right panel provides an intelligent summary of the selected time period.
+
+### Highlights
+
+- Snapshot summary including total volume, peak activity times, and surge drivers.
+- Key observations about blocked, masked, and flagged prompts.
+- Overall activity assessment and trends.
+
+### Detailed Analysis
+
+- Contextual insights about employee engagement patterns.
+- Comparative analysis against previous periods.
+- Recommendations for investigation or action items.
+- Identification of potential barriers or usage patterns.
+
+### When Insights Are Available
+
+Insights are generated automatically after a time period concludes:
+
+- **Daily reports** — Generated at midnight for the previous day.
+- **Weekly reports** — Generated on Sunday for the previous week.
+- **Monthly reports** — Generated on the 1st of each month for the previous month.
+
+<Callout type="warning">
+  If you are viewing today's dashboard, the chart and metric cards display real-time activity, but the Activity Overview and Trending Topics are not available until the automated report runs at the close of the period.
+</Callout>
+
+## Historical Date Range Selection
+
+When you select a past date range, the dashboard renders additional detail:
+
+- **Donut charts** — Visual breakdowns of query treatments appear on the right side of the dashboard.
+- **Executive report** — A comprehensive analysis helps you understand key patterns and focus areas.
+- **Drill-down** — Click any category to explore more granular details and specific examples.
+
+## Time Ranges
+
+Use the time range selector in the top right to control the scope of the dashboard:
+
+| Range | Scope | Comparison |
+| --- | --- | --- |
+| **Day** | A single calendar day. | Prior day. |
+| **Week** | Seven calendar days. | Prior week. |
+| **Month** | A calendar month. | Prior month. |
+| **Custom** | A user-defined range. | The immediately preceding range of equal length. |
+
+Navigate between periods using the arrow buttons next to the selector.
+
+## Custom Reporting
+
+For insights beyond the standard dashboard, the Mill Pond Research team can create custom reports tailored to your requirements.
+
+To request a custom report:
+
+1. Contact the Mill Pond Research team with your reporting needs.
+2. Specify the metrics, time periods, and analysis depth you require.
+3. The team will work with you to deliver actionable insights.
+
+## Navigation & Settings
+
+Use the left sidebar to access additional Xilos features:
+
+- **Dashboard** — Your current view.
+- **Query Log** — Detailed record of individual queries.
+- **Restrictions Rules** — Configure blocking and flagging criteria.
+- **Routing Rules** — Manage query routing logic.
+- **Rules Sandbox** — Test rule configurations safely.
+- **Settings** — System configuration and preferences.
+
+The **Monitoring** button in the top right provides quick access to system health and performance indicators.
+
+## Best Practices
+
+- **Daily check-ins** — Review yesterday's report each morning to stay informed about query patterns.
+- **Trend monitoring** — Watch for significant changes in the percentage metrics period-over-period.
+- **Topic analysis** — Regularly review trending topics to understand what users are asking about.
+- **Historical comparison** — Use date range selection to compare periods and identify long-term trends.
+- **Investigation follow-up** — When the Activity Overview suggests further investigation, drill down into specific categories for details.
+
+## Support
+
+For assistance with the dashboard or to request custom reporting, contact the Mill Pond Research team.

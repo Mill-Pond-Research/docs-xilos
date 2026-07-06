@@ -2,18 +2,54 @@
 title: Welcome to Xilos
 ---
 
+import { Callout, Card, Cards } from 'nextra/components'
+
 # Welcome to Xilos
 
-Xilos is an intelligent agentic AI infrastructure platform by Mill Pond Research that observes, secures, and orchestrates agentic AI across enterprise networks.
+Xilos is an intelligent agentic AI infrastructure platform by Mill Pond Research that observes, secures, and orchestrates agentic AI across enterprise networks. It operates as a middleware gateway that intercepts, analyzes, and processes every prompt before it reaches an LLM destination.
 
-## Sections
+## The Three Pillars
 
-- What is Xilos?
-- The Three Pillars: Observe, Secure, Orchestrate
-- Who Is This Documentation For?
-- Key Differentiators
-- Get Started in 5 Minutes
+Xilos is built on three foundational pillars:
 
----
+<Cards>
+  <Card title="Observe" href="/platform/observe" >
+    Total visibility into all AI traffic. Every query, every model, every dollar — tracked in real time.
+  </Card>
+  <Card title="Secure" href="/platform/secure" >
+    Local guardrails, PII detection, prompt injection defense, and policy enforcement — all running before any model is called.
+  </Card>
+  <Card title="Orchestrate" href="/platform/orchestrate" >
+    Semantic caching, multi-model workflows, context compression, and a context engine that compounds knowledge.
+  </Card>
+</Cards>
 
-*This page is a stub. Content will be added soon.*
+## Who Is This Documentation For?
+
+Xilos documentation serves three distinct audiences:
+
+- **CIOs and CISOs** — Strategic, risk-aware stakeholders who need governance, compliance, and security information. Start with [Governance and Compliance](/governance) and [Deployment](/deployment).
+- **Innovation Leaders** — Visionary decision-makers who need speed-to-value and business outcome content. Start with [Getting Started](/getting-started) and [Platform Overview](/platform).
+- **Technical Practitioners** — Engineers and architects who need API references, integration specs, and deployment procedures. Start with the [API Reference](/api-reference) and [Guides](/guides).
+
+## Key Differentiators
+
+- **Semantic caching** — Reuses responses for semantically similar queries, even if phrased differently. Reduces cost and latency by 50-90%.
+- **Query decomposition and contextual enrichment** — Breaks down complex queries and enriches them with relevant context from the Context Engine.
+- **Comprehensive observability dashboards** — Real-time visibility into query volume, governance actions, cost trends, and orchestration metrics.
+- **Auditable compliance logs** — Immutable audit trail capturing every governance action, restriction trigger, and security event.
+- **Model-agnostic integration** — Unified API surface for OpenAI, Anthropic, Google, and privately hosted open-source models.
+- **Intelligent routing** — Intent-based model routing using an internal Small Language Model (SLM) with a 16k token context window.
+- **Three deployment options** — Managed SaaS, Private Cloud (VPC), and On-Premise (air-gapped capable).
+
+## Get Started in 5 Minutes
+
+Xilos is OpenAI-compatible — if your tool speaks the OpenAI API, it works with Xilos. Point your existing agents at Xilos and get governance, caching, and cost control immediately.
+
+```bash
+# Point any OpenAI-compatible client at Xilos
+export OPENAI_API_KEY="your-xilos-api-key"
+export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
+```
+
+Ready to start? Head to the [Quickstart](/getting-started/quickstart) guide.

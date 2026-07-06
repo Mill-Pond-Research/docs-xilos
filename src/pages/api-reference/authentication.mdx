@@ -2,18 +2,66 @@
 title: Authentication
 ---
 
+import { Callout } from 'nextra/components'
+
 # Authentication
 
-Xilos uses Bearer token authentication. Get your API key from the dashboard or create virtual keys with budget limits.
+Xilos uses Bearer token authentication for all API requests. Get your API key from the dashboard, or create virtual keys with budget limits for per-user or per-team access.
 
-## Sections
+## API Keys
 
-- API Keys
-- Virtual Keys
-- Bearer Token Format
-- Key Management
-- Budget Limits
+Your organization's API key is available in the dashboard under **Settings**. Use this key in the `Authorization` header:
 
----
+```
+Authorization: Bearer YOUR_XILOS_API_KEY
+```
 
-*This page is a stub. Content will be added soon.*
+<Callout type="warning">
+  Treat your API key like a password. Do not commit it to version control or expose it in client-side code.
+</Callout>
+
+## Virtual Keys
+
+[Virtual Keys](/api-reference/virtual-keys) are sub-keys with additional controls:
+
+- **Budget limits** — Set a monthly USD spend limit per key
+- **Rate limits** — Set requests per minute per key
+- **Per-user tracking** — Each key's usage is tracked separately
+- **Deactivation** — Disable a key without affecting others
+
+Virtual keys are ideal for:
+
+- Per-team access control
+- Per-user budget limits
+- CI/CD pipeline authentication
+- Third-party integrations with scoped access
+
+### Creating a Virtual Key
+
+```bash
+curl https://api.xilos.ai/api/v1/virtual-keys \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+  -d '{
+    "name": "Engineering Team",
+    "budget_usd": 500.00,
+    "rate_limit_rpm": 100
+  }'
+```
+
+## Authentication Flow
+
+1. Client sends request with `Authorization: Bearer <key>` header.
+2. Xilos validates the key against the database.
+3. If the key is a virtual key, Xilos checks budget and rate limits.
+4. If the key is valid, the request is processed.
+5. If the key is invalid, expired, or over budget, a 401 or 429 is returned.
+
+## Security Best Practices
+
+- Use virtual keys for all non-administrative access
+- Rotate keys periodically
+- Set conservative budget limits initially
+- Monitor usage in the dashboard
+- Never share your master API key across services
+- Use environment variables to store keys

@@ -2,18 +2,122 @@
 title: Quickstart
 ---
 
+import { Steps, Callout, Tabs } from 'nextra/components'
+
 # Quickstart
 
 Connect your first AI agent to Xilos in under 5 minutes using the OpenAI-compatible API.
 
-## Sections
+## Prerequisites
 
-- Create a Xilos Account
-- Get Your API Key
-- Point Your Agent at Xilos
-- Send Your First Query
-- Verify in the Dashboard
+- A Xilos account (sign up at [xilos.ai](https://www.xilos.ai))
+- An API key from your Xilos dashboard
+- Any OpenAI-compatible client (Python SDK, JavaScript SDK, cURL, LangChain, etc.)
 
----
+## Step 1: Get Your API Key
 
-*This page is a stub. Content will be added soon.*
+1. Log in to your Xilos dashboard.
+2. Navigate to **Settings**.
+3. Copy your organization's API key.
+
+<Callout type="info">
+  For production use, create a [Virtual Key](/guides/virtual-keys) with budget limits and rate limits instead of using your master key.
+</Callout>
+
+## Step 2: Make Your First Request
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+    ```bash
+    curl https://api.xilos.ai/api/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+      -d '{
+        "model": "xilos",
+        "messages": [
+          {"role": "user", "content": "Hello, Xilos!"}
+        ]
+      }'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        api_key="YOUR_XILOS_API_KEY",
+        base_url="https://api.xilos.ai/api/v1"
+    )
+
+    response = client.chat.completions.create(
+        model="xilos",
+        messages=[
+            {"role": "user", "content": "Hello, Xilos!"}
+        ]
+    )
+
+    print(response.choices[0].message.content)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import OpenAI from "openai";
+
+    const client = new OpenAI({
+      apiKey: "YOUR_XILOS_API_KEY",
+      baseURL: "https://api.xilos.ai/api/v1",
+    });
+
+    const response = await client.chat.completions.create({
+      model: "xilos",
+      messages: [{ role: "user", content: "Hello, Xilos!" }],
+    });
+
+    console.log(response.choices[0].message.content);
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Step 3: Verify in the Dashboard
+
+After sending your first query:
+
+1. Open your Xilos dashboard.
+2. Navigate to **Query Log**.
+3. You should see your query with:
+   - The routing decision (which model was selected)
+   - Governance actions (any restrictions or guardrails applied)
+   - Cost breakdown (input/output tokens, total cost)
+   - Compression stats (if compression is enabled)
+
+## Step 4: Add Routing Rules
+
+By default, all queries route through your organization's default model. To route specific queries to different models:
+
+1. Navigate to **Routing Rules** in the sidebar.
+2. Click **Create New Rule**.
+3. Choose between Natural Language (AI-based) or Keyword matching.
+4. Write a trigger phrase describing the query intent.
+5. Select the target model.
+6. Test the rule with sample queries.
+7. Save and activate.
+
+Learn more in the [Create a Routing Rule](/guides/create-routing-rule) guide.
+
+## Step 5: Enable Guardrails
+
+Protect your organization by enabling security features:
+
+1. Navigate to **Restriction Rules**.
+2. Create rules to block, mask, or flag sensitive queries.
+3. Configure PII detection and prompt injection defense.
+
+Start with the three foundational security rules outlined in [Create a Restriction Rule](/guides/create-restriction-rule).
+
+## What's Next?
+
+- [Connect a specific agent framework](/getting-started/connect-agent) (Hermes, Claude Code, LangChain, etc.)
+- [Enable context compression](/guides/enable-compression) to reduce token costs
+- [Set up webhooks](/guides/setup-webhooks) for event-driven notifications
+- [Create a multi-model workflow](/guides/build-workflow)
+- [Explore the full API reference](/api-reference)

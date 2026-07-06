@@ -2,17 +2,106 @@
 title: Glossary
 ---
 
+import { Callout } from 'nextra/components'
+
 # Glossary
 
-Definitions of key terms used throughout the Xilos documentation.
+Definitions of key terms used throughout the Xilos documentation. Terms are grouped by domain for easy reference.
 
-## Sections
+## AI and Model Terms
 
-- Platform Terms
-- Security Terms
-- Infrastructure Terms
-- ML/AI Terms
+### LLM
+
+**Large Language Model.** A neural network trained on vast quantities of text data to understand and generate human language. LLMs power conversational AI, code generation, summarization, and more. Xilos routes queries to both public LLMs (Claude, GPT, Gemini) and private LLMs (Llama, Phi).
+
+### SLM
+
+**Small Language Model.** A compact language model optimized for speed and efficiency. SLMs are used internally by Xilos for tasks such as query intent classification in Smart Routing, where a full-scale LLM is unnecessary.
+
+### AI Kernel
+
+The core processing layer of the Xilos platform that handles query intake, routing decisions, restriction enforcement, caching, and response delivery. The AI Kernel sits between your agents and the LLM providers, ensuring every request is observed, secured, and orchestrated.
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## Security and Compliance Terms
+
+### PII
+
+**Personally Identifiable Information.** Any data that can be used to identify a specific individual, such as names, Social Security numbers, email addresses, phone numbers, or dates of birth. Xilos restriction rules can detect, mask, flag, or block queries containing PII before it reaches an LLM.
+
+### DLP
+
+**Data Loss Prevention.** A set of policies and technologies designed to prevent sensitive data from leaving an organization's control. In Xilos, DLP is enforced through restriction rules that block or mask queries containing confidential, financial, or regulated information.
+
+### RLS
+
+**Row-Level Security.** A database access-control mechanism that restricts which rows a user or role can query. In the context of Xilos, RLS principles inform how virtual keys and routing rules scope data access per user, department, or organization.
+
+### Guardrails
+
+The collective security and compliance controls that protect an organization when using AI. In Xilos, guardrails are implemented through restriction rules that inspect every query for sensitive content and take action — block, mask, or flag — before the query reaches the LLM. Guardrails cover credential protection, data safeguarding, and model integrity.
+
+### SIEM
+
+**Security Information and Event Management.** A category of software that aggregates and analyzes security logs from across an organization's IT infrastructure. Xilos supports SIEM export, allowing you to forward query logs, restriction actions, and governance events to your existing SIEM platform for centralized monitoring and compliance reporting.
+
+---
+
+## Routing and Orchestration Terms
+
+### Routing Rule
+
+A rule that determines which LLM will process a query based on defined criteria. Routing rules use either natural-language (AI-based) matching or keyword-based matching to identify query intent, then direct the query to a specified target model. Routing rules optimize for performance, security, and cost.
+
+### Restriction Rule
+
+A security policy that inspects queries for sensitive content. Based on what is found, a restriction rule can block the query entirely, mask sensitive information, or flag the query for review. Every restriction rule has a name, severity level, trigger phrase, system action, and optional sample queries.
+
+### Smart Routing
+
+A feature that uses an internal SLM to classify query intent and automatically select the optimal LLM. Smart Routing works alongside manually configured routing rules; rules take precedence, and Smart Routing handles queries that do not match any rule.
+
+### Workflow
+
+A multi-stage LLM pipeline that chains models sequentially or runs them in parallel. Workflows compose multiple LLM calls into a single logical operation, enabling tasks such as draft-and-refine pipelines or parallel model comparison.
+
+### Routine
+
+A reusable, scheduled automation within Xilos that executes a defined sequence of operations on a recurring basis. Routines can trigger workflows, generate reports, or perform maintenance tasks without manual intervention.
+
+### Webhook
+
+An HTTP callback that Xilos sends to your service when a specific event occurs, such as a query being blocked or a report finishing generation. Webhooks enable event-driven integrations between Xilos and your external systems. Configure webhooks in the dashboard or via the API.
+
+---
+
+## Context and Performance Terms
+
+### Context Compression
+
+A feature that reduces prompt token count by 50–90% before the prompt reaches the LLM. Compression lowers latency and cost without sacrificing response quality, and is especially valuable for long conversations, large document inputs, and agent loops.
+
+### Context Engine
+
+A subsystem that extracts atomic facts from LLM responses and uses them to enrich future queries. The Context Engine maintains a compact, structured knowledge layer that reduces token usage while preserving the information the LLM needs to produce high-quality responses.
+
+### Semantic Cache
+
+A caching layer that stores LLM responses and reuses them for semantically similar queries. When a new query matches the intent of a cached query — even if the wording differs — the cached response is returned instantly without an additional LLM call. Semantic caching reduces latency, lowers cost, and ensures consistent answers.
+
+---
+
+## Platform Terms
+
+### Virtual Key
+
+A scoped API key with configurable budget limits, rate limits, and model access controls. Virtual keys allow you to issue API keys to individual users, departments, or applications without exposing your master organization key. Create and manage virtual keys from the Xilos dashboard or via the API.
+
+### MCP
+
+**Model Context Protocol.** An open standard for connecting AI applications to external data sources, tools, and services. MCP enables agents to access context beyond their training data. Xilos integrates with MCP-compatible clients and can route MCP-sourced queries through its standard observability, security, and orchestration layers.
+
+<Callout type="info">
+  Looking for a term that is not listed here? Check the [Core Concepts](/getting-started/concepts) page or the [API reference](/api-reference). If you still cannot find it, contact the Mill Pond Research team.
+</Callout>

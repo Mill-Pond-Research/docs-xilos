@@ -2,19 +2,165 @@
 title: Routing Rules
 ---
 
+import { Callout, Tabs } from 'nextra/components'
+
 # Routing Rules
 
-Route every query to the right model based on cost, latency, or capability. Define rules in natural language or with keywords — no code required.
+Routing rules in Xilos determine which Large Language Model (LLM) will process and respond to user queries based on defined criteria. By creating intelligent routing rules, you can ensure that queries are handled by the most appropriate model — whether public or private — optimizing for performance, security, and cost-effectiveness.
 
-## Sections
+## Rule Types: Natural Language vs. Keyword-Based
 
-- Rule Types
-- Creating Rules
-- Smart Routing
-- Per-Rule Compression
-- Per-Rule Tool Attachment
-- Model Risk Leaderboard
+### Natural Language Routing (Recommended)
 
----
+Best for intent-based routing and complex query categorization.
 
-*This page is a stub. Content will be added soon.*
+Natural language routing uses the internal SLM to understand the meaning and intent behind user queries, not just the exact words used. This approach:
+
+- Recognizes queries even when phrased differently
+- Understands context and nuance
+- Handles variations in terminology and language
+- Provides more flexible and intelligent routing
+
+**Example:** A rule triggered by "billing inquiries" would match:
+- "How much does this cost?"
+- "I have a question about my invoice"
+- "When will I be charged?"
+- "What are your pricing plans?"
+
+### Keyword-Based Routing
+
+Best for specific term detection and exact phrase matching.
+
+Keyword-based routing performs a direct string search for specific words or phrases. This approach:
+
+- Provides predictable, exact matching
+- Works well for unique technical terms or product names
+- Offers straightforward logic for simple use cases
+
+<Callout type="warning">
+  Keyword-based routing may miss queries phrased differently. A rule triggered by the keyword "invoice" only matches queries containing that exact word.
+</Callout>
+
+## Creating a Routing Rule
+
+### Step 1: General Information
+
+- **Rule Name** (required) — Provide a clear, descriptive name. Use naming conventions like `HR_Policy_Questions` or `Technical_Support_Tier1`.
+- **Trigger Phrase** (required) — Describe the types of user queries that will activate this rule. Write a natural description of the query categories.
+
+**Trigger phrase examples:**
+- "Inquiries related to billing, technical support, or HR policies"
+- "Questions about product features, specifications, and compatibility"
+- "Requests for code generation, debugging assistance, or programming help"
+- "Sensitive information requests involving personal data, financials, or confidential business information"
+
+### Step 2: Sample Queries (Recommended)
+
+Provide up to 3 sample queries that exemplify the types of user inputs this rule should match. These samples:
+
+- Fine-tune the routing algorithm
+- Serve as test cases to ensure the rule works as expected
+
+### Step 3: Select Target Model
+
+Choose which LLM will handle queries matched by this rule. Available models include:
+
+<Tabs>
+  <Tabs.Tab title="Claude (Anthropic)">
+    - Claude Opus 4
+    - Claude Sonnet 4
+    - Claude Sonnet 3.7
+    - Claude Haiku 3.5
+  </Tabs.Tab>
+  <Tabs.Tab title="GPT (OpenAI)">
+    - GPT-4.1
+    - GPT-4.1-mini
+    - GPT-4.1-nano
+    - GPT-4o
+    - GPT-4o-mini
+  </Tabs.Tab>
+  <Tabs.Tab title="Gemini (Google)">
+    - Gemini 2.0 Flash
+    - Gemini 2.0 Flash-Lite
+  </Tabs.Tab>
+  <Tabs.Tab title="Private Models">
+    - Llama-3.3-70B-Instruct
+    - Llama-3.2-1B-Instruct
+    - Phi-4 Mini
+  </Tabs.Tab>
+</Tabs>
+
+**Selection considerations:**
+
+| Factor | Recommendation |
+|--------|---------------|
+| Sensitive Data | Route to private models for confidential information |
+| Complex Reasoning | Use flagship models (Claude Opus, GPT-4.1) |
+| Speed and Volume | Consider lightweight models (Haiku, mini variants) |
+| Cost Optimization | Balance model capability with query complexity |
+| Specialized Tasks | Match model strengths to query type |
+
+### Step 4: Configure Cache Responses (Optional)
+
+Enable response caching to improve performance and reduce costs for frequently asked questions.
+
+When enabled, Xilos caches the response to the initial query. Future queries with similar intent (even if worded differently) retrieve the cached response without making an additional API call.
+
+**When to cache:**
+- FAQ-type queries with stable answers
+- Product information and specifications
+- Policy and procedure questions
+- Common troubleshooting steps
+
+**When not to cache:**
+- Queries requiring real-time data
+- Personalized responses based on user context
+- Rapidly changing information
+- Creative or generative tasks
+
+## Smart Routing
+
+Smart Routing uses the internal SLM (Small Language Model) to classify query intent and automatically select the optimal LLM. When enabled, Xilos analyzes each query and routes it to the best model based on:
+
+- Query complexity
+- Model capabilities
+- Cost efficiency
+- Latency requirements
+
+See [Smart Routing Architecture](/architecture/smart-routing) for technical details.
+
+## Per-Rule Overrides
+
+Each routing rule can override organization-level settings:
+
+- **Compression** — Enable or disable context compression for this rule's queries
+- **Tools** — Attach specific tools or MCP servers to this rule
+- **System Prompt** — Override the default system prompt
+- **Temperature** — Set a custom temperature for this rule
+- **Max Tokens** — Set a custom max_tokens for this rule
+
+## Model Risk Leaderboard
+
+The Model Config page includes a risk leaderboard showing safety scores, hallucination risk, cost efficiency, and speed tier for each model. Use these scores to make informed routing decisions.
+
+## Testing Your Routing Rule
+
+Use the Rule Tester panel (right side of the rule creation window) to validate your rule before saving:
+
+1. Enter a sample query in the test input.
+2. Review the routing results — query intent, model selection, cache indicator.
+3. Test multiple query variations, including edge cases and queries that should NOT trigger the rule.
+4. Adjust your trigger phrase if routing isn't working as expected.
+
+<Callout type="warning">
+  Routing rules cannot be edited after saving. However, you can enable/disable rules, create new rules with updated criteria, or delete rules. Thoroughly test before saving.
+</Callout>
+
+## Best Practices
+
+- **Start with high-value routes** — Create rules for your most common query types first.
+- **Avoid rule overlap** — Ensure clear boundaries between different rules.
+- **Use all 3 sample queries** — More samples improve routing accuracy.
+- **Monitor and refine** — Review query logs to identify misrouted queries.
+- **Protect sensitive information** — Route all PII to private models.
+- **Cache wisely** — Enable for stable, repeated queries. Disable for dynamic content.

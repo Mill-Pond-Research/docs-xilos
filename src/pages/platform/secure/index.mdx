@@ -2,19 +2,94 @@
 title: Secure
 ---
 
+import { Card, Cards, Callout } from 'nextra/components'
+
 # Secure
 
-Xilos secures every AI interaction with local guardrails, PII detection, prompt injection defense, and policy enforcement — all running before any model is called.
+The Secure pillar protects every AI interaction before a model is ever called. Xilos inspects each query through local guardrails, restriction rules, and PII detection, then writes every governance decision to an immutable audit log. Security enforcement happens at the platform layer — not inside the model — so policies apply consistently across every LLM, tool, and workflow.
 
-## Sections
+## Security Architecture
 
-- Security Architecture
-- Guardrails Overview
-- Restriction Rules
-- PII Detection
-- Prompt Injection Defense
-- Audit Logs
+Xilos applies security controls in a layered pipeline that executes before any LLM inference begins. Every query passes through the following stages:
 
----
+1. **Ingest** — The query enters the AI Kernel and is normalized for analysis.
+2. **Guardrail scan** — Built-in guardrails scan for PII, hate speech and profanity (HAP), and jailbreak patterns using local engines.
+3. **Restriction rule evaluation** — Custom restriction rules evaluate the query for policy violations, sensitive data, and prohibited content.
+4. **Action enforcement** — Based on rule outcomes, Xilos blocks the query, masks sensitive content, flags it for monitoring, or allows it to proceed.
+5. **Model routing** — Only queries that pass all security checks are routed to the target LLM.
+6. **Audit logging** — Every decision — allow, block, mask, or flag — is written to an immutable audit log.
 
-*This page is a stub. Content will be added soon.*
+<Callout type="info">
+  All security processing runs locally within the Xilos platform. No query content, PII, or telemetry is sent to external APIs for security analysis. This design ensures that sensitive data never leaves your environment during the guardrail and rule evaluation stages.
+</Callout>
+
+## Secure Features
+
+<Cards>
+  <Card title="Guardrails" href="/platform/secure/guardrails">
+    Built-in guardrails for PII detection, HAP and jailbreak detection, and content moderation. All local, zero external API dependencies.
+  </Card>
+  <Card title="Restriction Rules" href="/platform/secure/restriction-rules">
+    Create custom rules that block, mask, or flag queries using AI or keyword matching. Natural language rule creation — no code required.
+  </Card>
+  <Card title="PII Detection" href="/platform/secure/pii-detection">
+    Detect and mask personally identifiable information using the Presidio engine. Supports standard PII types and custom patterns.
+  </Card>
+  <Card title="Prompt Injection Defense" href="/platform/secure/prompt-injection">
+    Detect and block prompt injection attacks, jailbreak attempts, and credential exfiltration. Deploy the three foundational security rules.
+  </Card>
+  <Card title="Audit Logs" href="/platform/secure/audit-logs">
+    Immutable audit logs capture every governance action, restriction trigger, and security event. Export to SIEM for compliance reporting.
+  </Card>
+</Cards>
+
+## Guardrails Overview
+
+Guardrails are the first layer of defense. They run automatically on every query and require no configuration to activate. The built-in guardrail suite includes:
+
+- **PII detection** — Powered by Microsoft Presidio, identifies SSNs, credit card numbers, email addresses, phone numbers, and more.
+- **HAP detection** — Scans for hate speech, abuse, and profanity before queries reach the model.
+- **Jailbreak detection** — Identifies known prompt injection and jailbreak patterns.
+- **Content moderation** — Filters queries that violate organizational content policies.
+
+See [Guardrails](/platform/secure/guardrails) for configuration details and threshold tuning.
+
+## Restriction Rules
+
+Restriction rules extend the built-in guardrails with custom policies tailored to your organization. Rules use either AI-based semantic matching or keyword-based exact matching, and enforce one of three actions:
+
+| Action | Effect | Best For |
+|--------|--------|----------|
+| **Block** | Terminates the query entirely | Security threats, credential leaks, malware |
+| **Mask** | Redacts sensitive content, allows the query to proceed | PII protection, data privacy compliance |
+| **Flag** | Allows the query, creates an audit alert | Compliance monitoring, trend analysis |
+
+See [Restriction Rules](/platform/secure/restriction-rules) for the full rule creation guide.
+
+## PII Detection
+
+Xilos uses Microsoft Presidio as its PII detection engine. Presidio combines regular expression matching, rule-based logic, and machine learning models to identify sensitive data patterns. Supported PII types include Social Security numbers, credit card numbers, email addresses, phone numbers, bank account numbers, and more. You can also define custom PII patterns for organization-specific data formats.
+
+See [PII Detection](/platform/secure/pii-detection) for the full list of supported types and masking strategies.
+
+## Prompt Injection Defense
+
+Prompt injection attacks attempt to manipulate an LLM into ignoring its instructions, revealing system prompts, or executing unintended actions. Xilos defends against these attacks through restriction rules that detect injection patterns, credential exfiltration, and malicious code execution requests.
+
+The three foundational security rules every Xilos tenant should deploy on day one:
+
+1. **API-Key-Exposed-Block** — Blocks queries containing API keys, tokens, or passwords.
+2. **Sensitive-Data-PII-Financial-Confidential-Flag** — Flags queries containing PII, financial records, or confidential business data.
+3. **Malicious-Code-Prompt-Injection-Block** — Blocks prompt injection attempts and malicious code execution requests.
+
+See [Prompt Injection Defense](/platform/secure/prompt-injection) for full rule configurations and sample queries.
+
+## Audit Logs
+
+Every security decision is recorded in an immutable audit log. Audit entries capture the timestamp, user, query content, matched rules, action taken, and guardrail results. Logs are searchable, exportable to Security Information and Event Management (SIEM) systems, and retained according to your organization's retention policy.
+
+See [Audit Logs](/platform/secure/audit-logs) for field definitions, search syntax, and SIEM export configuration.
+
+<Callout type="warning">
+  Security is enforced before model routing. If a query triggers a Block action, the target LLM is never called. This ensures that policy violations never consume model tokens or generate responses that could leak sensitive information.
+</Callout>

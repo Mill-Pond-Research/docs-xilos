@@ -2,17 +2,62 @@
 title: Getting Started Overview
 ---
 
-# Getting Started Overview
+import { Steps, Callout } from 'nextra/components'
+
+# Getting Started
 
 Learn how Xilos works, connect your first agent, and understand the core concepts of the platform.
 
-## Sections
+## Architecture at a Glance
 
-- Prerequisites
-- Architecture at a Glance
-- Quickstart Guide
-- Next Steps
+Xilos operates as a middleware gateway between your AI agents and LLM providers. Every query passes through Xilos, where it is observed, secured, and orchestrated before reaching the destination model.
 
----
+```
+Agent → Xilos Gateway → LLM Provider
+         │
+         ├── Observe (log, track, cost)
+         ├── Secure (guardrails, PII, restrictions)
+         └── Orchestrate (route, cache, compress, enrich)
+```
 
-*This page is a stub. Content will be added soon.*
+## Quickstart
+
+<Steps>
+  <Steps.Step title="Create a Xilos Account">
+    Sign up at [xilos.ai](https://www.xilos.ai) and create your organization.
+  </Steps.Step>
+  <Steps.Step title="Get Your API Key">
+    Navigate to **Settings** in the dashboard and copy your API key, or create a [Virtual Key](/guides/virtual-keys) with budget limits.
+  </Steps.Step>
+  <Steps.Step title="Point Your Agent at Xilos">
+    Set the base URL to `https://api.xilos.ai/api/v1` and use your Xilos API key as the bearer token. Any OpenAI-compatible client works.
+  </Steps.Step>
+  <Steps.Step title="Send Your First Query">
+    Make a chat completion request — Xilos will route it, log it, and apply any configured guardrails.
+  </Steps.Step>
+  <Steps.Step title="Verify in the Dashboard">
+    Check the [Query Log](/platform/observe/query-log) to see your query, the routing decision, governance actions, and cost.
+  </Steps.Step>
+</Steps>
+
+## Core Concepts
+
+Xilos has a few fundamental building blocks you should understand:
+
+- **Routing Rules** — Direct specific types of queries to the most appropriate LLM based on intent, keywords, or AI-generated descriptions.
+- **Restriction Rules** — Security policies that inspect queries for sensitive content. Queries can be blocked, masked, or flagged.
+- **Workflows** — Multi-stage LLM pipelines that chain models sequentially or run them in parallel.
+- **Context Compression** — Reduces prompt token count by 50-90% before reaching the LLM.
+- **Context Engine** — Extracts atomic facts from responses and uses them to enrich future queries.
+- **Semantic Caching** — Caches LLM responses and reuses them for semantically similar queries.
+- **Smart Routing** — Uses an internal SLM to classify query intent and select the optimal model.
+
+Learn more in [Core Concepts](/getting-started/concepts).
+
+## Next Steps
+
+- [Connect a specific agent framework](/getting-started/connect-agent)
+- [Create your first routing rule](/guides/create-routing-rule)
+- [Create a restriction rule](/guides/create-restriction-rule)
+- [Enable context compression](/guides/enable-compression)
+- [Explore the API reference](/api-reference)

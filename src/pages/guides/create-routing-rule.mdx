@@ -2,18 +2,128 @@
 title: Create a Routing Rule
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Create a Routing Rule
 
 Route queries to specific models based on intent, keywords, or AI-generated descriptions.
 
-## Sections
+## Prerequisites
 
-- Rule Types
-- Creating with AI
-- Manual Configuration
-- Testing
-- Enabling Compression
+- A Xilos account with admin access
+- At least one LLM configured in Model Config
+- An understanding of your query patterns
 
----
+## Step 1: Access Routing Rules
 
-*This page is a stub. Content will be added soon.*
+Navigate to **Routing Rules** from the left sidebar menu, then click **Create New Rule**.
+
+## Step 2: Choose Rule Type
+
+Choose between two matching approaches:
+
+<Callout type="info">
+  **Natural Language (Recommended)** — Uses the internal SLM to understand query intent. Recognizes queries even when phrased differently. Best for intent-based routing.
+
+  **Keyword-Based** — Performs a direct string search for specific words. Best for exact match requirements and regulatory compliance.
+</Callout>
+
+## Step 3: Complete General Information
+
+### Rule Name (Required)
+
+Provide a clear, descriptive name. Good naming examples:
+
+- `Customer_Billing_Inquiries` → Claude Sonnet
+- `Sensitive_HR_Data` → Private LLM
+- `General_Knowledge` → GPT-4o
+
+### Trigger Phrase (Required)
+
+Describe the types of user queries that will activate this rule. Write a natural description:
+
+- "Inquiries related to billing, technical support, or HR policies"
+- "Questions about product features, specifications, and compatibility"
+- "Requests for code generation, debugging assistance, or programming help"
+
+**Tips for effective trigger phrases:**
+- Be specific but not overly narrow
+- Include related topics that share similar intent
+- Think about the user's goal, not just the keywords they might use
+- List multiple related categories separated by commas
+
+## Step 4: Add Sample Queries (Recommended)
+
+Provide up to 3 sample queries that exemplify the types of user inputs this rule should match:
+
+**Example set for "Customer Support Inquiries":**
+1. "How do I reset my password?"
+2. "My account is locked and I can't log in"
+3. "I need help accessing the customer portal"
+
+**Do:**
+- Use realistic examples that users would actually type
+- Include variations in phrasing and terminology
+- Cover different aspects of the trigger phrase
+
+**Don't:**
+- Use overly formal or artificial phrasing
+- Make samples too similar to each other
+- Include queries that are too generic or vague
+
+## Step 5: Select Target Model
+
+Choose which LLM will handle queries matched by this rule. Consider:
+
+| Factor | Recommendation |
+|--------|---------------|
+| Sensitive Data | Route to private models for confidential information |
+| Complex Reasoning | Use flagship models (Claude Opus, GPT-4.1) |
+| Speed and Volume | Consider lightweight models (Haiku, mini variants) |
+| Cost Optimization | Balance model capability with query complexity |
+
+## Step 6: Configure Optional Settings
+
+- **Cache Responses** — Enable for FAQ-type queries with stable answers. Disable for dynamic or personalized content.
+- **Compression** — Enable per-rule context compression to reduce token costs.
+- **System Prompt Override** — Set a custom system prompt for this rule's queries.
+- **Temperature** — Set a custom sampling temperature.
+- **Max Tokens** — Set a custom max token limit.
+
+## Step 7: Test Your Rule
+
+Use the Rule Tester panel on the right side of the rule creation window:
+
+1. Enter a sample query in the test input.
+2. Review the routing results:
+   - **Query Intent** — How Xilos interpreted the query
+   - **Model Selection** — Which model will handle it
+   - **Cache Response Indicator** — Whether caching is enabled
+3. Test edge cases — queries that should and should NOT trigger this rule.
+4. Test variations — rephrase the same question multiple ways.
+
+<Callout type="warning">
+  Routing rules cannot be edited after saving. You can enable/disable, create new rules, or delete. Test thoroughly before saving.
+</Callout>
+
+## Step 8: Save
+
+Once saved, your routing rule becomes active immediately and will begin routing matching queries to the specified target model.
+
+## Best Practices
+
+- **Start with high-value routes** — Create rules for your most common query types first.
+- **Prioritize sensitive data routing** — Route all PII to private models.
+- **Build general-purpose fallback rules last** — Let smart routing handle unclassified queries.
+- **Avoid rule overlap** — Ensure clear boundaries between different rules.
+- **Monitor and refine** — Review query logs to identify misrouted queries.
+- **Use all 3 sample queries** — More samples improve routing accuracy.
+- **Cache wisely** — Enable for stable queries, disable for dynamic content.
+
+## Troubleshooting
+
+**Rule matches too many queries:** Make your trigger phrase more specific. Create separate rules for distinct subcategories.
+
+**Rule matches too few queries:** Broaden your trigger phrase. Add more diverse sample queries. Review actual user queries that should have matched.
+
+**Queries routing to wrong rule:** Review all active rules for overlapping trigger phrases. Refine trigger phrases to create clearer boundaries.

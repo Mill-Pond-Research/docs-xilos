@@ -2,17 +2,36 @@
 title: Integrations Overview
 ---
 
-# Integrations Overview
+import { Callout, Card, Cards } from 'nextra/components'
 
-Xilos is OpenAI-compatible — if your tool speaks the OpenAI API, it works with Xilos. Connect your existing agents in minutes.
+# Integrations
 
-## Sections
+Xilos is OpenAI-compatible — if your tool speaks the OpenAI API, it works with Xilos. Connect your existing agents in minutes by changing the base URL and API key.
 
-- OpenAI-Compatible API
-- Base URL Configuration
-- Supported Frameworks
-- Custom Integrations
+## OpenAI-Compatible API
 
----
+All integrations use the same pattern:
 
-*This page is a stub. Content will be added soon.*
+1. Set the base URL to `https://api.xilos.ai/api/v1`
+2. Set the API key to your Xilos API key
+3. Use `"xilos"` as the model name for smart routing
+
+That's it. Xilos handles routing, security, caching, and cost control automatically.
+
+## Supported Frameworks
+
+<Cards>
+  <Card title="Hermes Agent" href="/integrations/hermes">Connect Hermes Agent to Xilos via profile configuration.</Card>
+  <Card title="OpenClaw" href="/integrations/openclaw">Route OpenClaw traffic through Xilos.</Card>
+  <Card title="Claude Code" href="/integrations/claude-code">Point Claude Code at Xilos using environment variables.</Card>
+  <Card title="OpenAI SDK" href="/integrations/openai-sdk">Use the official OpenAI SDK with Xilos.</Card>
+  <Card title="LangChain" href="/integrations/langchain">Route LangChain agents through Xilos.</Card>
+  <Card title="GitHub Copilot" href="/integrations/copilot">Configure Copilot to route through Xilos.</Card>
+  <Card title="Kilo Code" href="/integrations/kilo-code">Connect Kilo Code for governance and cost control.</Card>
+  <Card title="OpenWebUI" href="/integrations/openwebui">Add Xilos as a connection in OpenWebUI.</Card>
+  <Card title="Custom Application" href="/integrations/custom-app">Integrate any application with the Xilos API.</Card>
+</Cards>
+
+<Callout type="info">
+  Don't see your framework? Since Xilos is OpenAI-compatible, any tool that supports custom OpenAI base URLs will work. See [Custom Application](/integrations/custom-app) for generic integration steps.
+</Callout>

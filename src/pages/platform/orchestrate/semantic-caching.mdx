@@ -2,18 +2,73 @@
 title: Semantic Caching
 ---
 
+import { Callout } from 'nextra/components'
+
 # Semantic Caching
 
-Cache LLM responses and reuse them for semantically similar queries — even if phrased differently. Reduces cost and latency by 50-90%.
+Cache LLM responses and reuse them for semantically similar queries — even if phrased differently. Semantic caching reduces cost and latency by 50-90% for repetitive query patterns.
 
-## Sections
+## How It Works
 
-- How It Works
-- Similarity Thresholds
-- Cache Hit Rate
-- Cache Invalidation
-- Cost Savings
+Unlike traditional exact-match caching, Xilos uses semantic similarity to determine cache hits:
 
----
+1. When a query arrives, Xilos generates an embedding of the query using the local embedding model (all-MiniLM-L6-v2).
+2. Xilos searches the semantic cache for similar queries using cosine similarity.
+3. If a cached response has a similarity score above the threshold, it is returned immediately — no LLM call is made.
+4. If no cache hit, the query proceeds through the normal pipeline and the response is cached for future use.
 
-*This page is a stub. Content will be added soon.*
+## Cache Hit Example
+
+A cached response for "What is the capital of France?" will also match:
+
+- "What's the capital city of France?"
+- "Name the capital of France"
+- "Which city is the capital of France?"
+
+## Enabling Caching
+
+Caching can be enabled per routing rule:
+
+1. Navigate to **Routing Rules**.
+2. Create or edit a rule.
+3. Toggle **Cache Responses** on.
+4. Test with sample queries.
+
+<Callout type="info">
+  Caching is configured per-rule, not globally. This lets you cache stable queries (FAQs, policies) while leaving dynamic queries uncached.
+</Callout>
+
+## When to Cache
+
+**Cache:**
+- FAQ-type queries with stable answers
+- Product information and specifications
+- Policy and procedure questions
+- Common troubleshooting steps
+
+**Do not cache:**
+- Queries requiring real-time data
+- Personalized responses based on user context
+- Rapidly changing information
+- Creative or generative tasks requiring unique outputs
+
+## Cache Hit Rate
+
+Monitor cache performance in the dashboard:
+
+- **Cache hit rate** — Percentage of queries served from cache
+- **Cost savings** — Estimated dollar savings from cached responses
+- **Latency savings** — Average response time reduction
+
+## Cache Invalidation
+
+Cached responses are automatically invalidated when:
+
+- The routing rule's target model changes
+- The routing rule's system prompt is updated
+- The cache entry expires (configurable TTL)
+- A manual cache clear is performed
+
+## Cost Impact
+
+For organizations with repetitive query patterns, semantic caching can reduce LLM API costs by 50-90%. The more queries flow through Xilos, the higher the cache hit rate becomes.

@@ -2,19 +2,165 @@
 title: Chat Completions
 ---
 
+import { Callout, Tabs } from 'nextra/components'
+
 # Chat Completions
 
-POST /api/v1/chat/completions — OpenAI-compatible chat completions endpoint with streaming support.
+```
+POST /api/v1/chat/completions
+```
 
-## Sections
+The chat completions endpoint is OpenAI-compatible. Send chat messages and receive model responses with streaming support. All requests are automatically processed through your Xilos routing rules, guardrails, and orchestration pipeline.
 
-- Request Body
-- Response Format
-- Streaming
-- Tool Calls
-- Parameters
-- Examples
+## Request Body
 
----
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `model` | string | No | Model ID or `"xilos"` for smart routing. Defaults to `"xilos"`. |
+| `messages` | array | Yes | Array of message objects with `role` and `content`. |
+| `temperature` | number | No | Sampling temperature (0-2). Defaults to rule or org config. |
+| `max_tokens` | number | No | Maximum tokens in the response. |
+| `stream` | boolean | No | If true, returns a stream of server-sent events. Default: `false`. |
+| `tools` | array | No | Array of tool definitions for function calling. |
+| `tool_choice` | string | No | Tool selection strategy (`"auto"`, `"none"`, or specific tool). |
 
-*This page is a stub. Content will be added soon.*
+### Message Object
+
+```typescript
+{
+  role: "system" | "user" | "assistant" | "tool",
+  content: string | Array<ContentPart>  // ContentPart supports text and image_url
+}
+```
+
+<Callout type="info">
+  Xilos supports multi-modal content. Set the message `content` to an array of parts (text + image_url) to send images. Only models with `supports_images: true` will accept image content.
+</Callout>
+
+## Examples
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+    ```bash
+    curl https://api.xilos.ai/api/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+      -d '{
+        "model": "xilos",
+        "messages": [
+          {"role": "system", "content": "You are a helpful assistant."},
+          {"role": "user", "content": "What is the capital of France?"}
+        ]
+      }'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        api_key="YOUR_XILOS_API_KEY",
+        base_url="https://api.xilos.ai/api/v1"
+    )
+
+    response = client.chat.completions.create(
+        model="xilos",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "What is the capital of France?"}
+        ]
+    )
+
+    print(response.choices[0].message.content)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import OpenAI from "openai";
+
+    const client = new OpenAI({
+      apiKey: "YOUR_XILOS_API_KEY",
+      baseURL: "https://api.xilos.ai/api/v1",
+    });
+
+    const response = await client.chat.completions.create({
+      model: "xilos",
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "What is the capital of France?" },
+      ],
+    });
+
+    console.log(response.choices[0].message.content);
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Streaming
+
+Set `stream: true` to receive a stream of server-sent events (SSE):
+
+```python
+stream = client.chat.completions.create(
+    model="xilos",
+    messages=[{"role": "user", "content": "Tell me a story."}],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="")
+```
+
+## Response Format
+
+```json
+{
+  "id": "chatcmpl-...",
+  "object": "chat.completion",
+  "created": 1234567890,
+  "model": "claude-sonnet-4-20250514",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The capital of France is Paris."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 8,
+    "total_tokens": 33
+  }
+}
+```
+
+## How Xilos Processes the Request
+
+When you send a chat completion request to Xilos:
+
+1. **Authentication** — The API key is validated.
+2. **Consolidation** — Messages are consolidated into a query.
+3. **Guardrails** — PII detection, HAP, and jailbreak checks run locally.
+4. **Restrictions** — Restriction rules are evaluated (block, mask, or flag).
+5. **Cache Check** — Semantic cache is checked for a matching response.
+6. **Routing** — Smart Routing or routing rules select the target model.
+7. **Compression** — Context compression reduces token count (if enabled).
+8. **LLM Call** — The query is sent to the selected LLM provider.
+9. **Response** — The response is returned, logged, and cached.
+10. **Webhooks** — Event-driven webhooks fire (if configured).
+
+## Error Codes
+
+| Status | Description |
+|--------|-------------|
+| 400 | Bad request — invalid message format or parameters |
+| 401 | Unauthorized — invalid or missing API key |
+| 403 | Forbidden — query blocked by restriction rule |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
+See [Error Codes](/api-reference/errors) for the complete list.

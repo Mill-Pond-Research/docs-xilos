@@ -2,19 +2,217 @@
 title: Restriction Rules
 ---
 
+import { Callout, Tabs } from 'nextra/components'
+
 # Restriction Rules
 
-Create restriction rules that block, mask, or warn on queries matching specific patterns. Rules can be created in natural language — no code required.
+Restriction rules are custom security policies that extend Xilos's built-in guardrails. Each rule evaluates incoming queries for specific threats, policy violations, or sensitive data patterns, then enforces an action — Block, Mask, or Flag. Rules are created in natural language through the Xilos dashboard. No code is required.
 
-## Sections
+## Rule Types: AI vs. Keyword Matching
 
-- Rule Types
-- Creating Rules with AI
-- Actions: Block, Mask, Warn
-- Rule Priority
-- Testing Rules
-- Per-Rule Overrides
+The foundation of effective rule creation begins with selecting the appropriate rule processing method. This decision affects how the rule interprets and responds to incoming queries.
 
----
+### AI Matching (Recommended)
 
-*This page is a stub. Content will be added soon.*
+<Callout type="info">
+  Recommended for new users and for rules requiring natural language understanding.
+</Callout>
+
+AI matching uses natural language processing to understand context and semantic meaning. It analyzes the intent behind queries rather than matching specific words.
+
+**When to use AI matching:**
+
+- Scenarios requiring natural language understanding and contextual interpretation
+- Rules that need to detect semantic meaning rather than exact phrases
+- Cases involving nuanced language patterns or varying expressions of the same concept
+- Complex intent detection where the same meaning can be expressed differently
+
+**How AI processing works:**
+
+- Utilizes advanced natural language processing to understand context and meaning
+- Analyzes the semantic intent behind queries rather than matching specific words
+- Provides flexibility for handling variations in phrasing and terminology
+- Better suited for detecting sophisticated attempts to bypass traditional keyword filters
+
+### Keyword Matching
+
+Keyword matching performs a direct string search for specific words and phrases. It provides consistent, deterministic matching behavior.
+
+**When to use keyword matching:**
+
+- Exact match requirements where precision is critical
+- Regulatory compliance scenarios requiring specific terminology detection
+- Structured data environments with standardized language patterns
+- Cases where predictable, deterministic behavior is essential
+- Performance-critical applications where speed is paramount
+
+**How keyword processing works:**
+
+- Searches for exact words and phrases as specified
+- Provides consistent, predictable matching behavior
+- Faster processing for simple pattern recognition
+- Ideal for compliance-related terms and specific identifiers
+
+## Rule Components
+
+Every Xilos rule requires four fundamental components. Missing any of these elements prevents successful rule creation and deployment.
+
+### 1. Rule Name
+
+Use clear, descriptive names that immediately convey the rule's purpose. Include context referencing the threat type, data category, or business function.
+
+**Effective naming examples:**
+
+- ✅ `PII-Detection-SSN-Block`
+- ✅ `Confidential-Data-Financial-Flag`
+- ✅ `Malware-URL-Block-High-Severity`
+
+**Avoid:**
+
+- ❌ `Rule1` or `Test` (too vague)
+- ❌ `Important-Security-Thing` (too generic)
+
+### 2. Severity Level
+
+Severity classifies the importance of the rule and drives alerting behavior.
+
+| Severity | Use Cases | Examples |
+|----------|-----------|----------|
+| High | Significant policy violations | PII exposure, unauthorized access |
+| Medium | Policy deviations requiring attention | Suspicious patterns, minor violations |
+| Low | Information gathering, monitoring | Usage tracking, trend analysis |
+
+### 3. Trigger Phrase
+
+The trigger phrase is the core intelligence of your rule. It must complete the sentence:
+
+> "The rule is triggered if the query [your trigger phrase]"
+
+**Recommended verb starters for AI rules:**
+
+| Verb | Use Case |
+|------|----------|
+| `contains` | Detecting presence of specific content within larger text |
+| `includes` | Identifying specific elements or components |
+| `mentions` | References to topics, entities, or concepts |
+| `discusses` | Conversational content analysis |
+| `describes` | Detailed explanations or depictions |
+| `requests` | Action-oriented queries |
+| `attempts to` | Behavior detection |
+| `references` | Indirect mentions or citations |
+
+**Effective trigger phrase examples:**
+
+- ✅ `contains personally identifiable information such as social security numbers or credit card data`
+- ✅ `mentions competitor pricing or proprietary financial information`
+- ✅ `requests access to confidential system configurations or passwords`
+- ✅ `attempts to bypass security controls or authentication mechanisms`
+
+**Avoid these common pitfalls:**
+
+- ❌ `bad stuff` (too vague and ambiguous)
+- ❌ `inappropriate content` (subjective interpretation)
+- ❌ `security issues` (overly broad scope)
+- ❌ `sensitive data` (lacks specific criteria)
+
+### 4. System Action
+
+Action types determine what happens when a rule triggers.
+
+<Tabs>
+  <Tabs.Tab title="Block 🚫">
+    **Use case:** Prevent dangerous or prohibited queries from processing.
+
+    **Impact:** Complete query termination. The LLM is never called.
+
+    **Best for:** Security threats, policy violations, malware detection, credential leaks.
+
+    **Consideration:** May impact user experience if overused.
+  </Tabs.Tab>
+  <Tabs.Tab title="Mask 🎭">
+    **Use case:** Allow query processing while hiding sensitive information.
+
+    **Impact:** Redacts specific content, permits safe portions to proceed.
+
+    **Best for:** PII protection, data privacy compliance.
+
+    **Consideration:** Balances security with functionality.
+  </Tabs.Tab>
+  <Tabs.Tab title="Flag 🚩">
+    **Use case:** Allow query while generating alerts for monitoring.
+
+    **Impact:** Creates audit trail without blocking functionality.
+
+    **Best for:** Compliance monitoring, behavioral analysis, trend detection.
+
+    **Consideration:** Requires active monitoring and response processes.
+  </Tabs.Tab>
+</Tabs>
+
+## Sample Queries
+
+Including three diverse sample queries is essential for rule validation and long-term success.
+
+**Why three samples matter:**
+
+- **Immediate validation** — Tests rule accuracy before deployment
+- **Edge case detection** — Identifies potential false positives and false negatives
+- **Documentation** — Provides clear examples for future reference
+- **Quality assurance** — Ensures comprehensive rule testing
+- **Team training** — Helps colleagues understand rule intent and scope
+
+<Callout type="warning">
+  Rules cannot be edited after saving. You can enable, disable, or delete rules, or create new rules with updated criteria. Thoroughly test before saving using the Rule Tester panel.
+</Callout>
+
+## Creating a Rule
+
+<Tabs>
+  <Tabs.Tab title="Step 1: Rule Type">
+    Choose **Use AI** or **Keywords** based on your matching requirements. AI matching is recommended for new users and for rules requiring semantic understanding. Keyword matching is recommended for exact-match and compliance scenarios.
+  </Tabs.Tab>
+  <Tabs.Tab title="Step 2: Rule Components">
+    Provide the four required components:
+
+    1. **Rule Name** — Descriptive, follows your naming convention.
+    2. **Severity Level** — High, Medium, or Low.
+    3. **Trigger Phrase** — Completes the sentence "The rule is triggered if the query..."
+    4. **System Action** — Block, Mask, or Flag.
+  </Tabs.Tab>
+  <Tabs.Tab title="Step 3: Sample Queries">
+    Provide exactly three sample queries that exemplify the types of user inputs this rule should match. These samples fine-tune the matching algorithm and serve as test cases.
+  </Tabs.Tab>
+  <Tabs.Tab title="Step 4: Test & Save">
+    Use the Rule Tester panel to validate your rule:
+
+    1. Enter a sample query in the test input.
+    2. Review the matching results.
+    3. Test multiple query variations, including edge cases and queries that should NOT trigger the rule.
+    4. Adjust your trigger phrase if matching isn't working as expected.
+    5. Save the rule when satisfied.
+  </Tabs.Tab>
+</Tabs>
+
+## Rule Priority
+
+When multiple rules match a single query, Xilos evaluates them in priority order. The first rule that triggers a Block action terminates the query immediately. Mask and Flag actions are cumulative — a single query can be masked by one rule and flagged by another.
+
+<Callout type="info">
+  Block actions take precedence over Mask and Flag. If any matching rule specifies Block, the query is terminated regardless of other rules' actions.
+</Callout>
+
+## Best Practices
+
+- **Be descriptive** — Use clear, specific rule names that convey purpose immediately.
+- **Be specific in trigger phrases** — Vague triggers produce false positives and miss real threats.
+- **Always provide three sample queries** — This is essential, not optional, for rule accuracy.
+- **Start with Flag, escalate to Mask or Block** — For sensitive data rules, begin with audit-only Flagging for a tuning period, then escalate to Mask or Block once false positive rates are acceptable.
+- **Avoid rule overlap** — Ensure clear boundaries between rules to prevent redundant evaluation.
+- **Test with negative cases** — Verify that queries that should NOT trigger the rule are correctly allowed.
+- **Monitor audit logs** — Review triggered rules regularly to identify false positives and tune trigger phrases.
+
+## Related
+
+- [Guardrails](/platform/secure/guardrails) — Built-in security scanning that runs before restriction rules.
+- [PII Detection](/platform/secure/pii-detection) — Presidio-powered PII detection and masking.
+- [Prompt Injection Defense](/platform/secure/prompt-injection) — The three foundational security rules.

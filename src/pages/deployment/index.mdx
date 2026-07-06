@@ -2,17 +2,65 @@
 title: Deployment Overview
 ---
 
+import { Card, Cards, Callout } from 'nextra/components'
+
 # Deployment Overview
 
-Xilos offers three deployment options: Managed SaaS, Private Cloud (VPC), and On-Premise. Choose the one that fits your security and compliance requirements.
+Xilos offers three deployment options to fit your security, compliance, and operational requirements. Choose the one that matches your organization's needs, and migrate between them as your requirements evolve.
 
-## Sections
+## Deployment Options
 
-- Deployment Options
-- Three-Phase Ownership Journey
-- Choosing the Right Option
-- Migration Paths
+<Cards>
+  <Card title="Managed SaaS" href="/deployment/managed-saas">
+    The fastest way to get started. Xilos hosts and manages everything — you just connect your agents.
+  </Card>
+  <Card title="Private Cloud (VPC)" href="/deployment/private-cloud">
+    Deploy Xilos in your own AWS, Azure, or GCP account for data isolation and network-level control.
+  </Card>
+  <Card title="On-Premise" href="/deployment/on-premise">
+    Air-gapped capable, full data sovereignty, no external dependencies.
+  </Card>
+</Cards>
 
----
+## Choosing the Right Option
 
-*This page is a stub. Content will be added soon.*
+| Requirement | Recommended Option |
+|-------------|-------------------|
+| Fast time-to-value | Managed SaaS |
+| Data must stay in your cloud account | Private Cloud |
+| Air-gapped network | On-Premise |
+| HIPAA compliance with BAA | Private Cloud or On-Premise |
+| GDPR data residency (EU) | Private Cloud (EU region) |
+| Full data sovereignty | On-Premise |
+| No external API dependencies | On-Premise |
+| Minimal IT overhead | Managed SaaS |
+
+## Three-Phase Ownership Journey
+
+Xilos guides organizations through a three-phase journey toward full AI ownership:
+
+### Phase 1: Deploy and Connect
+
+Start with Managed SaaS. Connect your existing AI agents to Xilos. Xilos begins observing, securing, and orchestrating your AI traffic immediately. The platform learns your query patterns, cost drivers, and security needs.
+
+### Phase 2: Fine-Tune and Optimize
+
+Use Xilos orchestration data to fine-tune open-source models. The [Training Data Exporter](/guides/export-training-data) transforms your query log into a filtered training dataset. The [Fine-Tune Pipeline](/deployment/fine-tuning) manages the job lifecycle. Import the resulting model back into Xilos and update your routing rules.
+
+### Phase 3: Deploy On-Premises
+
+Migrate to Private Cloud or On-Premise. Xilos packages your configurations, rules, fine-tuned models, and context engine data into a deployable bundle. You own your AI infrastructure completely — zero dependencies on external services.
+
+<Callout type="info">
+  Throughout all phases, Xilos continuously optimizes routing rules, compression settings, and context enrichment based on your query patterns. The platform gets smarter the more you use it.
+</Callout>
+
+## Migration Paths
+
+Migration between deployment options is supported at any time:
+
+- **SaaS → Private Cloud:** Xilos exports your configuration and data. Deploy in your VPC using Terraform/Atmos.
+- **Private Cloud → On-Premise:** Package your VPC deployment for air-gapped installation.
+- **On-Premise → Private Cloud:** Sync on-prem configurations back to a VPC deployment.
+
+All migrations preserve your routing rules, restriction rules, workflows, compression settings, context engine data, and query history.

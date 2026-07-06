@@ -2,19 +2,131 @@
 title: Guardrails
 ---
 
+import { Callout, Tabs } from 'nextra/components'
+
 # Guardrails
 
-Built-in guardrails including PII detection (Presidio), HAP/jailbreak detection, and content moderation — all running locally with zero external API dependencies.
+Guardrails are the built-in security layer that inspects every query before it reaches an LLM. Xilos ships with a comprehensive guardrail suite that runs locally on the platform — no query content, PII, or telemetry is sent to external APIs for analysis. This design ensures that sensitive data never leaves your environment during the security evaluation stage.
 
-## Sections
+## Available Guardrails
 
-- Available Guardrails
-- Configuring Guardrails
-- HAP Thresholds
-- Jailbreak Detection
-- Content Moderation
-- Custom Validators
+| Guardrail | Engine | Detects | Default |
+|-----------|--------|---------|---------|
+| PII Detection | Microsoft Presidio | SSNs, credit cards, emails, phone numbers, bank accounts | Enabled |
+| HAP Detection | Local classifier | Hate speech, abuse, profanity | Enabled |
+| Jailbreak Detection | Pattern + semantic | Prompt injection, role manipulation, instruction override | Enabled |
+| Content Moderation | Local classifier | Policy-violating content, harmful requests | Enabled |
 
----
+<Callout type="info">
+  All guardrails run locally within the Xilos platform. Zero external API dependencies means zero data leaves your environment during security scanning.
+</Callout>
 
-*This page is a stub. Content will be added soon.*
+## PII Detection (Presidio)
+
+The PII guardrail uses Microsoft Presidio, an open-source PII detection engine. Presidio combines regular expression matching, rule-based logic, and machine learning models to identify sensitive data patterns in unstructured text.
+
+When the PII guardrail detects sensitive data, it can:
+
+- **Mask** the PII before the query reaches the LLM, replacing it with redacted tokens.
+- **Block** the query entirely if configured to do so via a restriction rule.
+- **Flag** the query for audit review while allowing it to proceed.
+
+See [PII Detection](/platform/secure/pii-detection) for the full list of supported PII types, masking strategies, and custom pattern configuration.
+
+## HAP Detection
+
+The Hate, Abuse, and Profanity (HAP) guardrail scans queries for offensive, abusive, or hateful language. The local classifier evaluates text across multiple categories:
+
+- **Hate speech** — Content that attacks or degrades individuals or groups based on protected characteristics.
+- **Abuse** — Harassing, threatening, or insulting language directed at individuals.
+- **Profanity** — Vulgar or offensive words and phrases.
+
+### HAP Thresholds
+
+HAP detection uses configurable confidence thresholds. Queries that score above the threshold are flagged for action.
+
+| Threshold | Sensitivity | Use Case |
+|-----------|-------------|----------|
+| Low (0.5) | Conservative — flags more content | Regulated environments, strict policies |
+| Medium (0.7) | Balanced — default | Standard enterprise deployments |
+| High (0.85) | Permissive — flags only clear violations | Environments prioritizing user flexibility |
+
+<Callout type="warning">
+  Lower thresholds increase false positives. Start with the medium threshold and adjust based on your organization's tolerance and audit log review.
+</Callout>
+
+## Jailbreak Detection
+
+The jailbreak guardrail identifies attempts to manipulate the LLM into bypassing its instructions, safety policies, or system constraints. It detects:
+
+- **Instruction override** — "Ignore all previous instructions" or "You are now in Developer Mode" patterns.
+- **Role manipulation** — Attempts to reassign the model's role or persona to bypass safety controls.
+- **Policy circumvention** — Requests that explicitly ask the model to ignore content or safety policies.
+- **System prompt extraction** — Attempts to reveal, exfiltrate, or reconstruct the system prompt.
+
+The jailbreak guardrail combines pattern-based matching for known attack signatures with semantic analysis for novel injection attempts. See [Prompt Injection Defense](/platform/secure/prompt-injection) for the foundational restriction rules that complement this guardrail.
+
+## Content Moderation
+
+The content moderation guardrail filters queries that violate organizational content policies. It evaluates requests across categories including:
+
+- Violence and self-harm
+- Illegal activities
+- Sexual content
+- Weapons and exploitation
+
+Content moderation policies are configurable per tenant. Queries that violate active policies are blocked before reaching the LLM.
+
+## Configuring Guardrails
+
+<Tabs>
+  <Tabs.Tab title="Enable / Disable">
+    Guardrails can be enabled or disabled per tenant from the Secure settings panel. Disabling a guardrail removes it from the security pipeline for all queries.
+
+    <Callout type="warning">
+      Disabling guardrails reduces your security posture. Only disable a guardrail if you have an equivalent restriction rule covering the same threat surface.
+    </Callout>
+  </Tabs.Tab>
+  <Tabs.Tab title="Threshold Tuning">
+    Adjust confidence thresholds for HAP and content moderation guardrails:
+
+    1. Navigate to **Secure → Guardrails**.
+    2. Select the guardrail to configure.
+    3. Adjust the confidence threshold slider.
+    4. Save and monitor the audit log for false positive and false negative rates.
+  </Tabs.Tab>
+  <Tabs.Tab title="PII Configuration">
+    Configure which PII types are detected and how they are masked:
+
+    1. Navigate to **Secure → PII Detection**.
+    2. Enable or disable individual PII recognizers.
+    3. Select a masking strategy (replace, mask, redact).
+    4. Add custom PII patterns for organization-specific data formats.
+  </Tabs.Tab>
+</Tabs>
+
+## Custom Validators
+
+For organizations with specialized security requirements, Xilos supports custom validators that extend the built-in guardrail suite. Custom validators can:
+
+- Enforce organization-specific data classification policies.
+- Integrate with internal threat intelligence feeds.
+- Apply industry-specific compliance rules.
+
+Custom validators are deployed as restriction rules. See [Restriction Rules](/platform/secure/restriction-rules) for the rule creation guide.
+
+## Guardrail Execution Order
+
+Guardrails execute in a fixed sequence on every query:
+
+1. **PII Detection** — Identify and mask sensitive data.
+2. **HAP Detection** — Scan for offensive content.
+3. **Jailbreak Detection** — Identify manipulation attempts.
+4. **Content Moderation** — Apply policy filters.
+5. **Restriction Rules** — Evaluate custom rules.
+
+If any guardrail triggers a Block action, subsequent stages are skipped and the query is terminated.
+
+<Callout type="info">
+  Guardrails run before restriction rules. This ensures that built-in security protections are always applied, even if no custom rules are configured.
+</Callout>
