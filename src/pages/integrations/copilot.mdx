@@ -2,16 +2,109 @@
 title: GitHub Copilot
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # GitHub Copilot
 
-Configure GitHub Copilot to route through Xilos for governance and cost control.
+Configure GitHub Copilot to route through Xilos for governance, caching, and cost control. Xilos is OpenAI-compatible, so Copilot can connect by pointing at the Xilos base URL with your Xilos API key.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Configuration
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- GitHub Copilot access with the ability to configure a custom endpoint or proxy.
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+<Callout type="warning">
+  Copilot configuration options vary by client and version. The steps below cover the two supported methods: a custom endpoint override and a local proxy. Check the Copilot documentation for your specific client (VS Code, JetBrains, Neovim, CLI) to confirm which method applies.
+</Callout>
 
-*This page is a stub. Content will be added soon.*
+## Configuration
+
+### Option 1: Custom Endpoint Override
+
+If your Copilot client supports a custom OpenAI-compatible endpoint, set the base URL and API key directly. This is the simplest approach — no proxy required.
+
+<Steps>
+  <Steps.Step title="Set environment variables">
+    ```bash
+    export OPENAI_API_KEY="your-xilos-api-key"
+    export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
+    ```
+  </Steps.Step>
+
+  <Steps.Step title="Configure the Copilot model">
+    Set the model name to `xilos` so the Xilos routing engine selects the underlying LLM. If your client requires a specific model identifier, use `xilos`.
+
+    ```json
+    {
+      "github.copilot.advanced": {
+        "debug.overrideCAPIUrl": "https://api.xilos.ai/api/v1",
+        "debug.overrideCAPIKey": "your-xilos-api-key",
+        "debug.overrideEngine": "xilos"
+      }
+    }
+    ```
+
+    <Callout type="info">
+      The exact setting keys differ between Copilot versions. The principle is the same: set the API URL to `https://api.xilos.ai/api/v1`, the API key to your Xilos key, and the model to `xilos`.
+    </Callout>
+  </Steps.Step>
+
+  <Steps.Step title="Restart your editor">
+    Reload VS Code or your JetBrains IDE so the new settings take effect.
+  </Steps.Step>
+</Steps>
+
+### Option 2: Local Proxy
+
+If your Copilot client does not expose a custom endpoint setting, run a lightweight local proxy that forwards requests to Xilos. Point Copilot at the proxy and the proxy rewrites the target to the Xilos base URL.
+
+<Steps>
+  <Steps.Step title="Start a local proxy">
+    Use any HTTP reverse proxy (for example, `socat`, `nginx`, or a small Node.js script). The proxy listens on a local port and forwards to `https://api.xilos.ai/api/v1`.
+
+    ```bash
+    socat TCP-LISTEN:8080,fork,reuseaddr TCP:api.xilos.ai:443
+    ```
+
+    For TLS termination, use `nginx` or `caddy` with a self-signed certificate for `localhost`.
+  </Steps.Step>
+
+  <Steps.Step title="Point Copilot at the local proxy">
+    Set the Copilot endpoint to `http://localhost:8080` (or your proxy address) and provide your Xilos API key in the `Authorization` header. The proxy injects the header and forwards the request to Xilos.
+  </Steps.Step>
+
+  <Steps.Step title="Set the model name">
+    Use `xilos` as the model name in your Copilot configuration so the Xilos routing engine selects the underlying LLM.
+  </Steps.Step>
+</Steps>
+
+## Verify the Connection
+
+1. Trigger a Copilot completion or chat action in your editor.
+2. Open your Xilos dashboard.
+3. Navigate to **Query Log**.
+4. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Copilot still hits GitHub directly | The override setting was not applied or is unsupported in your version. | Verify the setting keys match your Copilot version. Use the proxy method if the client does not support a custom endpoint. |
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update the override or proxy configuration. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| Proxy connection refused | The local proxy is not running or is listening on the wrong port. | Confirm the proxy process is active and the port matches the Copilot endpoint setting. |
+| Certificate errors with proxy | The proxy uses a self-signed certificate that the editor does not trust. | Install the certificate in your system trust store, or use `nginx` or `caddy` with a locally trusted certificate from `mkcert`. |
+| Routing rules do not apply | The model name is set to a concrete model instead of `xilos`. | Set the model to `xilos` so the Xilos routing engine processes each query. |
+
+<Callout type="warning">
+  GitHub Copilot may update its configuration schema between releases. If the settings above do not work, check the release notes for your Copilot version and adapt the override keys accordingly. The Xilos base URL and API key values remain the same.
+</Callout>
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.

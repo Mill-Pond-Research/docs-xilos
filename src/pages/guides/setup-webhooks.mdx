@@ -2,18 +2,152 @@
 title: Set Up Webhooks
 ---
 
+import { Steps, Callout, Tabs } from 'nextra/components'
+
 # Set Up Webhooks
 
-Receive event-driven notifications when queries complete, are blocked, or are cached.
+Receive event-driven notifications when queries complete, are blocked, cached, or compressed. HMAC-signed payloads for secure integration.
 
-## Sections
+## Prerequisites
 
-- Creating a Webhook
-- Event Types
-- HMAC Verification
-- Payload Format
-- Testing
+- A Xilos account with admin access
+- An endpoint URL that can receive POST requests
+- (Optional) A secret for HMAC signature verification
 
----
+## Event Types
 
-*This page is a stub. Content will be added soon.*
+Xilos fires webhooks for the following events:
+
+| Event | Description |
+|-------|-------------|
+| `query.completed` | A query was successfully processed |
+| `query.blocked` | A query was blocked by a restriction rule |
+| `query.cached` | A query was served from the semantic cache |
+| `query.compressed` | Context compression was applied to a query |
+| `cost.threshold` | A cost threshold was reached |
+| `user.created` | A new user was created in the organization |
+
+## Step 1: Create a Webhook
+
+1. Navigate to **Integrations** in the sidebar.
+2. Click the **Webhooks** tab.
+3. Click **Create Webhook**.
+4. Fill in the form:
+   - **Name** — A descriptive name (e.g., "Slack Notifications")
+   - **URL** — Your endpoint URL
+   - **Secret** (optional) — Used for HMAC-SHA256 signature verification
+   - **Event Types** — Select which events to subscribe to
+5. Click **Save**.
+
+## Step 2: Verify the HMAC Signature (Recommended)
+
+When a secret is set, Xilos signs every payload with HMAC-SHA256. The signature is sent in the `X-Xilos-Signature` header.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    import hmac
+    import hashlib
+
+    def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
+        expected = hmac.new(
+            secret.encode(),
+            payload,
+            hashlib.sha256
+        ).hexdigest()
+        return hmac.compare_digest(expected, signature)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import crypto from "crypto";
+
+    function verifySignature(payload, signature, secret) {
+      const expected = crypto
+        .createHmac("sha256", secret)
+        .update(payload)
+        .digest("hex");
+      return crypto.timingSafeEqual(
+        Buffer.from(expected),
+        Buffer.from(signature)
+      );
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Step 3: Handle the Payload
+
+Example payload for `query.completed`:
+
+```json
+{
+  "event": "query.completed",
+  "timestamp": "2026-07-06T12:00:00Z",
+  "organization_id": "uuid",
+  "data": {
+    "query_id": "uuid",
+    "user_id": "uuid",
+    "model": "claude-sonnet-4-20250514",
+    "prompt_tokens": 150,
+    "completion_tokens": 80,
+    "cost": 0.0024,
+    "latency_ms": 1200,
+    "cache_hit": false,
+    "compressed": true,
+    "compression_ratio": 0.45
+  }
+}
+```
+
+## Step 4: Return 200 OK
+
+Your endpoint must return a 200 status code quickly. If it takes longer than 10 seconds, Xilos will time out and retry.
+
+```python
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.post("/webhooks/xilos")
+async def handle_webhook(request: Request):
+    payload = await request.body()
+    signature = request.headers.get("X-Xilos-Signature", "")
+    
+    # Verify signature (if secret is set)
+    # verify_signature(payload, signature, YOUR_SECRET)
+    
+    # Process the event asynchronously
+    # ...
+    
+    return {"status": "ok"}
+```
+
+<Callout type="warning">
+  Return 200 OK immediately, then process the event asynchronously. Webhooks that take too long will be retried, potentially causing duplicate processing.
+</Callout>
+
+## Retry Logic
+
+If your endpoint returns a non-200 status code or times out, Xilos will retry:
+
+1. First retry: after 30 seconds
+2. Second retry: after 2 minutes
+3. Third retry: after 10 minutes
+4. After 3 failed attempts, the webhook is marked as failed
+
+## Testing Your Webhook
+
+1. Create the webhook in the dashboard.
+2. Send a test query through Xilos.
+3. Check your endpoint logs for the incoming POST request.
+4. Verify the HMAC signature matches.
+5. Confirm your endpoint returns 200 OK.
+
+## Use Cases
+
+- **Slack/Discord notifications** — Alert on blocked queries
+- **SIEM integration** — Forward security events to Splunk or Datadog
+- **Cost monitoring** — Alert when spending thresholds are reached
+- **Workflow triggers** — Trigger downstream processes when queries complete
+- **Audit logging** — Maintain an external log of all AI activity

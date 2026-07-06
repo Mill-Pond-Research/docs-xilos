@@ -2,17 +2,80 @@
 title: Claude Code
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Claude Code
 
-Point Claude Code at Xilos using environment variables for the API base URL and key.
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's CLI coding agent. Connect it to Xilos by overriding the API base URL and key so every coding task routes through the Xilos gateway for governance, caching, and cost control.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Environment Variables
-- Verify Connection
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- Claude Code installed (see the [Claude Code docs](https://docs.anthropic.com/en/docs/claude-code) for installation).
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Configuration
 
-*This page is a stub. Content will be added soon.*
+Claude Code respects the standard `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` environment variables. Because Xilos is OpenAI-compatible, use the OpenAI-compatible override to route traffic through Xilos.
+
+<Steps>
+  <Steps.Step title="Set environment variables">
+    ```bash
+    export OPENAI_API_KEY="your-xilos-api-key"
+    export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
+    ```
+
+    Add these lines to your shell profile (`~/.bashrc` or `~/.zshrc`) so they persist across sessions.
+
+    <Callout type="info">
+      If your version of Claude Code requires the Anthropic-specific variables instead, you can set those to the same Xilos values:
+      ```bash
+      export ANTHROPIC_API_KEY="your-xilos-api-key"
+      export ANTHROPIC_BASE_URL="https://api.xilos.ai/api/v1"
+      ```
+    </Callout>
+  </Steps.Step>
+
+  <Steps.Step title="Launch Claude Code with the OpenAI provider">
+    ```bash
+    claude-code --provider openai --model xilos
+    ```
+
+    The `--model xilos` flag tells Xilos to apply your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
+  </Steps.Step>
+
+  <Steps.Step title="Verify in the dashboard">
+    Check the **Query Log** in your Xilos dashboard to confirm Claude Code traffic is flowing through Xilos.
+  </Steps.Step>
+</Steps>
+
+<Callout type="warning">
+  If your version of Claude Code does not support the `--provider openai` flag, check the latest Claude Code documentation for the current override mechanism. The principle remains the same: point the base URL at `https://api.xilos.ai/api/v1` and use your Xilos API key.
+</Callout>
+
+## Verify the Connection
+
+Send a test prompt from Claude Code and confirm it appears in the Xilos dashboard:
+
+1. Run any Claude Code command that triggers an LLM call (for example, `claude-code "Explain this function"`).
+2. Open your Xilos dashboard.
+3. Navigate to **Query Log**.
+4. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| `--provider openai` not recognized | Your version of Claude Code uses a different flag. | Check the Claude Code release notes. Set `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` instead, or use the OpenAI-compatible override supported by your version. |
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update the environment variable. |
+| Requests reach Anthropic directly | `ANTHROPIC_BASE_URL` is not set or is overridden by a config file. | Ensure the environment variable is exported in the shell where you launch Claude Code. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| Tool calls fail or time out | The model name does not match a model Xilos recognizes. | Use `xilos` for smart routing, or verify the model identifier in the Xilos dashboard under **Models**. |
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.

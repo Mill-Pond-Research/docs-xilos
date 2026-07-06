@@ -2,18 +2,232 @@
 title: OpenAI SDK
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # OpenAI SDK
 
-Use the official OpenAI Python or JavaScript SDK with Xilos by changing the base URL.
+The official OpenAI SDKs for Python and JavaScript work with Xilos out of the box. Only the `base_url` and `api_key` change — no other code modifications are required. Xilos accepts the full OpenAI Chat Completions API surface, including streaming and tool calls.
 
-## Sections
+## Prerequisites
 
-- Python SDK
-- JavaScript SDK
-- Streaming
-- Tool Calls
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- The OpenAI SDK installed for your language.
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Install the SDK
 
-*This page is a stub. Content will be added soon.*
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```bash
+    pip install openai
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```bash
+    npm install openai
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Configuration
+
+Create an OpenAI client with the Xilos base URL and your Xilos API key.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        api_key="your-xilos-api-key",
+        base_url="https://api.xilos.ai/api/v1"
+    )
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import OpenAI from "openai";
+
+    const client = new OpenAI({
+      apiKey: "your-xilos-api-key",
+      baseURL: "https://api.xilos.ai/api/v1",
+    });
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="cURL">
+    ```bash
+    curl https://api.xilos.ai/api/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer your-xilos-api-key" \
+      -d '{
+        "model": "xilos",
+        "messages": [{"role": "user", "content": "Hello, Xilos!"}]
+      }'
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+  When `model` is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
+</Callout>
+
+## Basic Usage
+
+Send a chat completion request through the Xilos gateway:
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    response = client.chat.completions.create(
+        model="xilos",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "What is the capital of France?"}
+        ]
+    )
+
+    print(response.choices[0].message.content)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    const response = await client.chat.completions.create({
+      model: "xilos",
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "What is the capital of France?" },
+      ],
+    });
+
+    console.log(response.choices[0].message.content);
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Streaming
+
+Set `stream: true` to receive a stream of server-sent events (SSE). This is useful for chat interfaces and real-time applications where you want to display tokens as they arrive.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    stream = client.chat.completions.create(
+        model="xilos",
+        messages=[{"role": "user", "content": "Tell me a story."}],
+        stream=True
+    )
+
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="")
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    const stream = await client.chat.completions.create({
+      model: "xilos",
+      messages: [{ role: "user", content: "Tell me a story." }],
+      stream: true,
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) process.stdout.write(content);
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Tool Calls
+
+Xilos supports OpenAI-compatible function calling. Define tools, let the model decide when to call them, and return results for the model to act on.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_weather",
+                "description": "Get the current weather for a city",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "city": {"type": "string", "description": "City name"}
+                    },
+                    "required": ["city"]
+                }
+            }
+        }
+    ]
+
+    response = client.chat.completions.create(
+        model="xilos",
+        messages=[{"role": "user", "content": "What is the weather in Paris?"}],
+        tools=tools
+    )
+
+    tool_call = response.choices[0].message.tool_calls[0]
+    print(tool_call.function.name)   # "get_weather"
+    print(tool_call.function.arguments)  # '{"city": "Paris"}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "get_weather",
+          description: "Get the current weather for a city",
+          parameters: {
+            type: "object",
+            properties: {
+              city: { type: "string", description: "City name" },
+            },
+            required: ["city"],
+          },
+        },
+      },
+    ];
+
+    const response = await client.chat.completions.create({
+      model: "xilos",
+      messages: [{ role: "user", content: "What is the weather in Paris?" }],
+      tools,
+    });
+
+    const toolCall = response.choices[0].message.tool_calls[0];
+    console.log(toolCall.function.name);       // "get_weather"
+    console.log(toolCall.function.arguments);  // '{"city": "Paris"}'
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Verify the Connection
+
+After sending your first request:
+
+1. Open your Xilos dashboard.
+2. Navigate to **Query Log**.
+3. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update the client configuration. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| 429 Rate limit exceeded | You exceeded your organization or Virtual Key rate limit. | Reduce request frequency or create a Virtual Key with a higher limit. |
+| Routing rules do not apply | The `model` parameter is set to a concrete model name. | Set `model` to `xilos` so the Xilos routing engine selects the model. |
+| Streaming stops mid-response | A network interruption or proxy timeout. | Implement a retry with exponential backoff. The OpenAI SDK retries automatically for most transient errors. |
+| Tool calls not returned | The model selected by routing does not support function calling. | Verify the target model supports tools, or set `model` to a model known to support function calling. |
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Set Up Webhooks](/guides/setup-webhooks) — Receive real-time event notifications.

@@ -2,18 +2,95 @@
 title: Create Eval Datasets
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Create Eval Datasets
 
-Create test datasets and run regression tests against routing rules.
+Create test datasets and run regression tests against routing rules to ensure consistent quality.
 
-## Sections
+## Prerequisites
 
-- Creating a Dataset
-- Adding Test Cases
-- Generating Variants
-- Running Tests
-- Reviewing Results
+- A Xilos account with admin access
+- At least one routing rule configured
 
----
+## What Are Eval Datasets?
 
-*This page is a stub. Content will be added soon.*
+Eval datasets are collections of test cases — each with an input query and an expected output. Run a dataset against a routing rule to verify that the model produces acceptable responses. This is essential for:
+
+- Validating model changes before deploying
+- Regression testing when switching models
+- Quality assurance for routing rule updates
+- Comparing model performance on your specific queries
+
+## Step 1: Create a Dataset
+
+1. Navigate to **Eval Datasets** in the sidebar.
+2. Click **Create Dataset**.
+3. Enter a name and description.
+4. Save the dataset.
+
+## Step 2: Add Test Cases
+
+1. Open the dataset.
+2. Click **Add Test Case**.
+3. Fill in:
+   - **Input** — The user query
+   - **Expected Output** — The desired response (or a description of what a good response should contain)
+   - **Notes** — Any context about this test case
+4. Save.
+
+Add multiple test cases covering:
+
+- Common queries (happy path)
+- Edge cases (ambiguous, short, long queries)
+- Queries that should NOT trigger this rule
+- Queries with PII (to test guardrails)
+
+## Step 3: Generate Variants (Optional)
+
+Use the Synthetic Data Generator to automatically create edge-case variants:
+
+1. Open the dataset.
+2. Click **Generate** (sparkles icon).
+3. Enter a source query.
+4. Select the number of variants (3-10).
+5. The SLM generates variants:
+   - Paraphrases — Same intent, different wording
+   - Adversarial — Attempts to bypass routing
+   - Ambiguous — Unclear intent
+   - Multi-language — Non-English variants
+6. Review and add the variants to your dataset.
+
+<Callout type="info">
+  Synthetic data generation uses the internal SLM — it runs locally with zero external API calls.
+</Callout>
+
+## Step 4: Run the Dataset
+
+1. Open the dataset.
+2. Click **Run Tests**.
+3. Select the routing rule to test against.
+4. Xilos sends each test case through the routing rule's pipeline.
+5. Results show:
+   - Actual response for each test case
+   - Whether it matched the expected output
+   - Quality scores (faithfulness, relevance)
+   - Pass/fail status
+
+## Step 5: Review Results
+
+After the run completes:
+
+1. Review each test case result.
+2. Identify failures — cases where the response didn't match expectations.
+3. Adjust the routing rule, model, or system prompt.
+4. Re-run the dataset to verify improvements.
+
+## Best Practices
+
+- Create separate datasets for each routing rule
+- Include at least 10-20 test cases per dataset
+- Re-run datasets after any model or rule change
+- Use synthetic data generation to expand test coverage
+- Review failures to identify patterns
+- Keep expected outputs updated as your quality requirements evolve

@@ -2,18 +2,272 @@
 title: Custom Application
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Custom Application
 
-Integrate any application with Xilos using the OpenAI-compatible API, Python SDK, or direct HTTP calls.
+Integrate any application with Xilos using the OpenAI-compatible API. Xilos supports three integration paths: the Xilos Python SDK (`xilos` package), the official OpenAI SDK, and direct HTTP calls. All three use the same base URL and API key.
 
-## Sections
+## Prerequisites
 
-- Python Example
-- JavaScript Example
-- cURL Example
-- Streaming Example
-- Error Handling
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Choose Your Integration Path
 
-*This page is a stub. Content will be added soon.*
+| Method | Best for |
+|--------|----------|
+| **Xilos Python SDK** | Python applications that want first-class Xilos features (routing metadata, governance events, structured responses). |
+| **OpenAI SDK** | Applications already using the OpenAI SDK for Python or JavaScript. |
+| **Direct HTTP (cURL)** | Languages without an SDK, or environments where you want minimal dependencies. |
+
+## Xilos Python SDK
+
+The `xilos` package is a thin wrapper around the OpenAI SDK that adds Xilos-specific conveniences: typed routing decisions, governance event payloads, and helper methods for streaming and tool calls.
+
+### Install
+
+```bash
+pip install xilos
+```
+
+### Basic Usage
+
+```python
+from xilos import XilosClient
+
+client = XilosClient(
+    api_key="your-xilos-api-key",
+    # base_url defaults to https://api.xilos.ai/api/v1
+)
+
+response = client.chat.completions.create(
+    model="xilos",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is the capital of France?"}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+### Streaming
+
+```python
+stream = client.chat.completions.create(
+    model="xilos",
+    messages=[{"role": "user", "content": "Tell me a story."}],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="")
+```
+
+## OpenAI SDK
+
+Use the official OpenAI SDK with a custom `base_url`. This is the fastest path if your application already depends on the OpenAI SDK.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        api_key="your-xilos-api-key",
+        base_url="https://api.xilos.ai/api/v1"
+    )
+
+    response = client.chat.completions.create(
+        model="xilos",
+        messages=[
+            {"role": "user", "content": "Hello, Xilos!"}
+        ]
+    )
+
+    print(response.choices[0].message.content)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import OpenAI from "openai";
+
+    const client = new OpenAI({
+      apiKey: "your-xilos-api-key",
+      baseURL: "https://api.xilos.ai/api/v1",
+    });
+
+    const response = await client.chat.completions.create({
+      model: "xilos",
+      messages: [{ role: "user", content: "Hello, Xilos!" }],
+    });
+
+    console.log(response.choices[0].message.content);
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Direct HTTP (cURL)
+
+For languages without an SDK, call the Xilos Chat Completions endpoint directly. The request and response formats are identical to the OpenAI API.
+
+```bash
+curl https://api.xilos.ai/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-xilos-api-key" \
+  -d '{
+    "model": "xilos",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is the capital of France?"}
+    ]
+  }'
+```
+
+## Streaming
+
+Set `stream: true` to receive a stream of server-sent events (SSE). Each event is a JSON object with a `choices` array containing a `delta` with the incremental content.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    stream = client.chat.completions.create(
+        model="xilos",
+        messages=[{"role": "user", "content": "Tell me a story."}],
+        stream=True
+    )
+
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="")
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    const stream = await client.chat.completions.create({
+      model: "xilos",
+      messages: [{ role: "user", content: "Tell me a story." }],
+      stream: true,
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) process.stdout.write(content);
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="cURL">
+    ```bash
+    curl https://api.xilos.ai/api/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer your-xilos-api-key" \
+      -d '{
+        "model": "xilos",
+        "messages": [{"role": "user", "content": "Tell me a story."}],
+        "stream": true
+      }'
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Error Handling
+
+The Xilos API returns standard HTTP status codes. Handle errors gracefully with retry logic for transient failures.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    from openai import OpenAI, APIError, RateLimitError, APIConnectionError
+
+    client = OpenAI(
+        api_key="your-xilos-api-key",
+        base_url="https://api.xilos.ai/api/v1"
+    )
+
+    try:
+        response = client.chat.completions.create(
+            model="xilos",
+            messages=[{"role": "user", "content": "Hello, Xilos!"}]
+        )
+        print(response.choices[0].message.content)
+
+    except RateLimitError:
+        print("Rate limit exceeded. Retry with exponential backoff.")
+    except APIConnectionError:
+        print("Network error. Check your connection and retry.")
+    except APIError as e:
+        print(f"API error: {e.status_code} — {e.message}")
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import OpenAI from "openai";
+
+    const client = new OpenAI({
+      apiKey: "your-xilos-api-key",
+      baseURL: "https://api.xilos.ai/api/v1",
+    });
+
+    try {
+      const response = await client.chat.completions.create({
+        model: "xilos",
+        messages: [{ role: "user", content: "Hello, Xilos!" }],
+      });
+      console.log(response.choices[0].message.content);
+    } catch (error) {
+      if (error.status === 429) {
+        console.error("Rate limit exceeded. Retry with exponential backoff.");
+      } else if (error.status === 403) {
+        console.error("Blocked by restriction rule:", error.message);
+      } else {
+        console.error(`API error: ${error.status} — ${error.message}`);
+      }
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Common Error Codes
+
+| Status | Description | Action |
+|--------|-------------|--------|
+| 400 | Bad request — invalid message format or parameters. | Validate the request body against the [Chat Completions schema](/api-reference/chat-completions). |
+| 401 | Unauthorized — invalid or missing API key. | Regenerate the key in the Xilos dashboard and update your configuration. |
+| 403 | Forbidden — query blocked by a restriction rule. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| 429 | Rate limit exceeded. | Retry with exponential backoff. Create a [Virtual Key](/guides/virtual-keys) with a higher limit if needed. |
+| 500 | Internal server error. | Retry with exponential backoff. Contact Xilos support if the error persists. |
+
+## Verify the Connection
+
+After sending your first request:
+
+1. Open your Xilos dashboard.
+2. Navigate to **Query Log**.
+3. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update your application configuration. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| 429 Rate limit exceeded | You exceeded your organization or Virtual Key rate limit. | Implement exponential backoff, reduce request frequency, or create a Virtual Key with a higher limit. |
+| Routing rules do not apply | The `model` parameter is set to a concrete model name. | Set `model` to `xilos` so the Xilos routing engine selects the model. |
+| Streaming stops mid-response | A network interruption or proxy timeout. | Implement a retry with exponential backoff. The OpenAI SDK retries automatically for most transient errors. |
+| `xilos` package not found | The package is not installed or the Python environment is wrong. | Run `pip install xilos` in the correct virtual environment. |
+
+<Callout type="info">
+  For production deployments, use a [Virtual Key](/guides/virtual-keys) instead of your master API key. Virtual Keys support scoped budget limits, rate limits, and per-key usage tracking — ideal for multi-tenant applications.
+</Callout>
+
+## Next Steps
+
+- [Chat Completions API Reference](/api-reference/chat-completions) — Full endpoint documentation.
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Set Up Webhooks](/guides/setup-webhooks) — Receive real-time event notifications.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.

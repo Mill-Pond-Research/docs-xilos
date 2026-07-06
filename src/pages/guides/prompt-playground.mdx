@@ -2,17 +2,72 @@
 title: Using the Prompt Playground
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Using the Prompt Playground
 
-Test prompts against different models with adjustable parameters before deploying.
+Test prompts against different models with adjustable parameters before deploying them as routing rules.
 
-## Sections
+## Prerequisites
 
-- Accessing the Playground
-- Setting Parameters
-- Testing Queries
-- Reviewing Results
+- A Xilos account with access to the dashboard
+- At least one LLM configured in Model Config
 
----
+## What Is the Prompt Playground?
 
-*This page is a stub. Content will be added soon.*
+The Prompt Playground (formerly Rules Sandbox) lets you test how different models respond to specific prompts with different parameters — without creating a routing rule or affecting production traffic. It's a safe space to experiment with:
+
+- Different LLM models
+- Temperature settings
+- Max token limits
+- System prompts
+- Query variations
+
+## Step 1: Access the Playground
+
+1. Navigate to **Prompt Playground** in the sidebar.
+2. You'll see a chat interface with parameter controls.
+
+## Step 2: Set Parameters
+
+Configure the test parameters:
+
+- **Model** — Select any available model from the dropdown
+- **Temperature** — Adjust the slider (0 = deterministic, 2 = creative)
+- **Max Tokens** — Set the maximum response length
+- **System Prompt** — Write or paste a system prompt to test
+
+## Step 3: Enter a Test Query
+
+Type a query in the input field and submit. The response shows:
+
+- The model's response
+- Token count (input + output)
+- Estimated cost
+- Latency
+
+## Step 4: Compare Models
+
+1. Send the same query with different models selected.
+2. Compare response quality, cost, and latency.
+3. Use this to decide which model to assign in your routing rule.
+
+## Step 5: Test System Prompts
+
+1. Write different system prompt variants.
+2. Send the same query with each variant.
+3. Identify which prompt produces the best results.
+4. Use the winning prompt when creating your routing rule.
+
+<Callout type="info">
+  The Prompt Playground does not consume your production query log — test queries are isolated and don't affect dashboards or cost tracking.
+</Callout>
+
+## Best Practices
+
+- Test with realistic queries that represent your actual use case
+- Try multiple temperature settings — some tasks benefit from creativity, others need determinism
+- Test edge cases — ambiguous queries, short queries, long queries
+- Compare at least 2-3 models before deciding
+- Save the best system prompt for use in your routing rule
+- Use the results to set appropriate max_tokens limits

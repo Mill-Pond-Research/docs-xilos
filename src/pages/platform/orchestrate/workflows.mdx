@@ -2,19 +2,256 @@
 title: Multi-Model Workflows
 ---
 
+import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
+
 # Multi-Model Workflows
 
-Chain LLMs sequentially, run them in parallel, and merge outputs. Build multi-stage pipelines with the visual workflow builder or API.
+Chain LLMs sequentially, run them in parallel, and merge outputs into a single response. Build multi-stage pipelines with the visual Workflow Builder or the API — each stage can use a different model, skill, tool, or branch of logic.
 
-## Sections
+## Workflow Concepts
 
-- Workflow Concepts
-- Sequential Chains
-- Parallel Execution
-- Merge Strategies
-- Visual Workflow Builder
-- Skills in Workflows
+A **workflow** is a directed graph of nodes. Each node performs one operation and passes its output to the next node. Xilos supports five node types:
 
----
+| Node | Purpose |
+|------|---------|
+| **Input** | Entry point. Accepts the user query and any variables. |
+| **LLM Stage** | Calls a single LLM with a model, system prompt, and optional skill. |
+| **Conditional** | Branches based on a rule or LLM classification. |
+| **Merge** | Combines outputs from multiple upstream stages. |
+| **Output** | Terminal node. Returns the final response to the caller. |
 
-*This page is a stub. Content will be added soon.*
+Workflows are versioned. Every save creates a new version, and previous versions remain runnable for rollback.
+
+<Callout type="info">
+  Workflows complement routing rules. A routing rule decides *which* workflow to run; the workflow decides *how* multiple models cooperate to produce the answer.
+</Callout>
+
+## Sequential Chains
+
+A sequential chain runs stages one after another. Each stage receives the output of the previous stage as input. Use chains when later stages depend on earlier reasoning — for example, drafting an answer, then refining it with a stronger model.
+
+```json
+{
+  "name": "draft-then-refine",
+  "nodes": [
+    { "id": "input",  "type": "input" },
+    { "id": "draft",  "type": "llm", "model": "claude-haiku-3.5", "skill": "draft-answer" },
+    { "id": "refine", "type": "llm", "model": "claude-opus-4",   "skill": "refine-answer" },
+    { "id": "output", "type": "output" }
+  ],
+  "edges": [
+    { "from": "input",  "to": "draft"  },
+    { "from": "draft",  "to": "refine" },
+    { "from": "refine", "to": "output" }
+  ]
+}
+```
+
+<Steps>
+  <Steps.Step title="Draft">
+    Claude Haiku 3.5 produces a first-pass answer quickly and cheaply.
+  </Steps.Step>
+  <Steps.Step title="Refine">
+    Claude Opus 4 receives the draft and rewrites it for accuracy, tone, and completeness.
+  </Steps.Step>
+  <Steps.Step title="Return">
+    The Output node returns the refined response to the caller.
+  </Steps.Step>
+</Steps>
+
+## Parallel Execution
+
+A parallel fan-out runs multiple stages concurrently and collects their outputs at a Merge node. Use parallel execution when stages are independent — for example, asking three models the same question and picking the best answer.
+
+```json
+{
+  "name": "three-way-vote",
+  "nodes": [
+    { "id": "input",   "type": "input" },
+    { "id": "gpt",     "type": "llm", "model": "gpt-4.1"         },
+    { "id": "claude",  "type": "llm", "model": "claude-sonnet-4" },
+    { "id": "gemini",  "type": "llm", "model": "gemini-2.0-flash" },
+    { "id": "merge",   "type": "merge", "strategy": "best_of"     },
+    { "id": "output",  "type": "output" }
+  ],
+  "edges": [
+    { "from": "input", "to": "gpt"    },
+    { "from": "input", "to": "claude" },
+    { "from": "input", "to": "gemini" },
+    { "from": "gpt",    "to": "merge" },
+    { "from": "claude", "to": "merge" },
+    { "from": "gemini", "to": "merge" },
+    { "from": "merge",  "to": "output" }
+  ]
+}
+```
+
+Parallel stages begin as soon as their upstream dependencies complete. Xilos waits for all upstream stages of a Merge node to finish before invoking the merge strategy.
+
+## Merge Strategies
+
+The Merge node decides how to combine outputs from multiple stages.
+
+| Strategy | Behavior |
+|----------|----------|
+| `concat` | Joins outputs in arrival order with a separator. |
+| `best_of` | Uses an LLM judge to select the highest-quality response. |
+| `vote` | Each upstream stage votes; the majority answer wins. |
+| `summarize` | An LLM summarizes all outputs into one response. |
+| `custom` | Runs a user-defined function or skill over the outputs. |
+
+<Callout type="warning">
+  `best_of`, `vote`, and `summarize` invoke an additional LLM call at the Merge node. Factor this into cost estimates for high-volume workflows.
+</Callout>
+
+## Conditional Branching
+
+A Conditional node routes the payload to one of several downstream branches. Conditions can be keyword-based or LLM-classified:
+
+- **Keyword** — Branches when the input contains a specific term.
+- **Classification** — An SLM classifies the input into one of the defined branches.
+
+```json
+{
+  "id": "route",
+  "type": "conditional",
+  "mode": "classification",
+  "branches": [
+    { "label": "technical", "to": "tech-stage"  },
+    { "label": "billing",   "to": "billing-stage" },
+    { "label": "general",   "to": "general-stage" }
+  ]
+}
+```
+
+## Visual Workflow Builder
+
+The Workflow Builder is a ReactFlow canvas in the Xilos dashboard. Drag, connect, and configure nodes without writing JSON.
+
+### Node Palette
+
+Drag any of the following node types onto the canvas:
+
+- **Input** — Define input variables and default values.
+- **LLM Stage** — Pick a model, attach a skill, set temperature and max tokens.
+- **Conditional** — Define branches and the classification mode.
+- **Merge** — Choose a merge strategy.
+- **Output** — Mark the terminal node and configure the response format.
+
+### Building a Workflow
+
+<Steps>
+  <Steps.Step title="Add nodes">
+    Drag nodes from the left palette onto the canvas.
+  </Steps.Step>
+  <Steps.Step title="Connect nodes">
+    Click and drag from a node's output handle to the next node's input handle to create an edge.
+  </Steps.Step>
+  <Steps.Step title="Configure each node">
+    Click a node to open its settings panel. Select models, attach skills, and set parameters.
+  </Steps.Step>
+  <Steps.Step title="Test run">
+    Click **Test Run** and enter sample input. The canvas highlights the execution path and displays each stage's output.
+  </Steps.Step>
+  <Steps.Step title="Save">
+    Click **Save** to persist the workflow. Xilos stores the underlying JSON and creates a new version.
+  </Steps.Step>
+</Steps>
+
+### Save and Load Workflow JSON
+
+Every workflow is stored as JSON. You can export, version-control, and import workflow definitions:
+
+- **Export** — Click **Export JSON** to download the workflow definition.
+- **Import** — Click **Import JSON** and upload a `.json` file to create or overwrite a workflow.
+- **Version history** — The version dropdown lists every saved version. Restore a previous version to roll back changes.
+
+<Callout type="info">
+  Workflow JSON is portable across environments. Export from a staging workspace and import into production to promote a tested workflow.
+</Callout>
+
+### Test Run
+
+The **Test Run** panel executes a workflow with sample input without deploying it. The canvas animates the execution path, and each node displays its output, latency, and token usage. Use Test Run to validate logic and catch errors before activating a workflow in a routing rule.
+
+## Using Skills and Tools in Workflows
+
+Each LLM Stage node can attach a **skill** (reusable prompt template) and a set of **tools** (external actions or MCP servers). See [Skills](/platform/orchestrate/skills) and [Tools & MCP](/platform/orchestrate/tools) for details.
+
+## API: Creating Workflows
+
+Create and manage workflows programmatically.
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+
+```bash
+curl -X POST https://api.xilos.ai/v1/workflows \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "draft-then-refine",
+    "nodes": [
+      { "id": "input",  "type": "input" },
+      { "id": "draft",  "type": "llm", "model": "claude-haiku-3.5", "skill": "draft-answer" },
+      { "id": "refine", "type": "llm", "model": "claude-opus-4",   "skill": "refine-answer" },
+      { "id": "output", "type": "output" }
+    ],
+    "edges": [
+      { "from": "input",  "to": "draft"  },
+      { "from": "draft",  "to": "refine" },
+      { "from": "refine", "to": "output" }
+    ]
+  }'
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+
+```python
+import xilos
+
+client = xilos.Client(api_key="...")
+
+workflow = client.workflows.create(
+    name="draft-then-refine",
+    nodes=[
+        {"id": "input",  "type": "input"},
+        {"id": "draft",  "type": "llm", "model": "claude-haiku-3.5", "skill": "draft-answer"},
+        {"id": "refine", "type": "llm", "model": "claude-opus-4",   "skill": "refine-answer"},
+        {"id": "output", "type": "output"},
+    ],
+    edges=[
+        {"from": "input",  "to": "draft"},
+        {"from": "draft",  "to": "refine"},
+        {"from": "refine", "to": "output"},
+    ],
+)
+
+print(workflow.id)
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+### Execute a Workflow
+
+Pass a query to a deployed workflow:
+
+```bash
+curl -X POST https://api.xilos.ai/v1/workflows/$WORKFLOW_ID/execute \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "input": "Summarize the Q3 financial report." }'
+```
+
+The response includes the final output, per-stage metadata, token usage, and latency for each node.
+
+## Best Practices
+
+- **Start simple** — Begin with a two-stage sequential chain before adding parallel branches.
+- **Use cheap models early** — Draft with Haiku or Flash; refine with Opus or GPT-4.1.
+- **Test before deploying** — Use Test Run to validate logic with edge-case inputs.
+- **Version control your JSON** — Export workflow JSON and commit it to your repository.
+- **Monitor merge costs** — `best_of` and `summarize` add LLM calls; track their impact in Cost Controls.
+- **Attach skills** — Reuse prompt templates across stages instead of inlining long prompts.

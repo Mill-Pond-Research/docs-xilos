@@ -2,18 +2,84 @@
 title: Enable Context Compression
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Enable Context Compression
 
 Reduce token costs by 50-90% by compressing prompts before they reach the LLM.
 
-## Sections
+## Prerequisites
 
-- Enabling Compression
-- Configuring Ratio
-- Setting Token Threshold
-- Per-Rule Overrides
-- Monitoring Savings
+- A Xilos account with admin (SuperAdmin) access
+- At least one routing rule configured
 
----
+## Step 1: Enable Compression at the Organization Level
 
-*This page is a stub. Content will be added soon.*
+1. Navigate to **SuperAdmin** > **Model Config**.
+2. Scroll to the **Compression** section.
+3. Toggle **Compression Enabled** on.
+4. Set the **Compression Target Ratio** (default: 0.5 — compress to 50% of original).
+5. Set the **Compression Token Threshold** (default: 2000 — compression activates only when the prompt exceeds 2000 tokens).
+6. Click **Save**.
+
+<Callout type="info">
+  The token threshold prevents compression from activating on short queries. Only prompts exceeding the threshold are compressed.
+</Callout>
+
+## Step 2: Enable Per-Rule Compression (Optional)
+
+Each routing rule can override the organization setting:
+
+1. Navigate to **Routing Rules**.
+2. Edit the rule (create a new one if rules cannot be edited — see [Create a Routing Rule](/guides/create-routing-rule)).
+3. Toggle compression on or off for this rule.
+4. Save the rule.
+
+**When to enable per-rule:**
+- Enable for rules with long conversation histories
+- Enable for rules with high token costs
+- Disable for rules where full-fidelity context is critical
+
+## Step 3: Monitor Savings
+
+After enabling compression, monitor the results:
+
+1. Navigate to **Dashboard** > **Cost Controls**.
+2. Look for the **Compression Savings** section.
+3. Track:
+   - Total tokens saved
+   - Dollar value of saved tokens
+   - Average compression ratio
+   - Compression rate (percentage of queries compressed)
+
+4. Check the **Query Log** to see per-query compression stats:
+   - Original token count
+   - Compressed token count
+   - Compression ratio applied
+
+## How the Three Strategies Work
+
+Xilos applies three compression strategies in sequence:
+
+### Prefix Stabilizer
+Stabilizes the system prompt prefix so semantic cache lookups are more likely to match. This improves cache hit rates by 15-30%.
+
+### Conversation Summarizer
+Summarizes long conversation histories into a compact summary. A 20-message conversation can be reduced to a single summary paragraph.
+
+### Content Extractor (BM25)
+Uses BM25 ranking to extract the most relevant sentences from the prompt. Irrelevant content is removed while preserving query intent.
+
+## Performance Impact
+
+- **Latency:** Compression adds <50ms (local, CPU-based, zero external calls)
+- **Quality:** The summarizer and BM25 extractor preserve query intent
+- **Cache improvement:** Prefix stabilization improves cache hit rates
+
+## Best Practices
+
+- Start with the default threshold (2000 tokens)
+- Monitor quality — if responses degrade, increase the target ratio
+- Enable per-rule for high-volume rules with long contexts
+- Disable for rules where exact context is critical (e.g., code review, legal analysis)
+- Check the Suggestions page for compression optimization recommendations

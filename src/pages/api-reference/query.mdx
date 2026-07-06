@@ -2,18 +2,91 @@
 title: Query Endpoint
 ---
 
+import { Callout } from 'nextra/components'
+
 # Query Endpoint
 
-POST /api/v1/query/ — Send a query and receive a response with full governance metadata.
+```
+POST /api/v1/query/
+```
 
-## Sections
+Send a query and receive a response with full governance metadata, conversation threading, and quality scoring.
 
-- Request Body
-- Response Format
-- Conversation Threads
-- Parameters
-- Examples
+## Request Body
 
----
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | The user's query text |
+| `conversation_id` | string | No | UUID for conversation threading. Creates new if omitted. |
+| `temperature` | number | No | Override the routing rule's temperature |
+| `max_tokens` | number | No | Override the routing rule's max tokens |
 
-*This page is a stub. Content will be added soon.*
+## Example
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/query/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+  -d '{
+    "query": "What is the capital of France?",
+    "conversation_id": "uuid-of-conversation"
+  }'
+```
+
+## Response
+
+```json
+{
+  "query_id": "uuid",
+  "conversation_id": "uuid",
+  "response": "The capital of France is Paris.",
+  "model_used": "claude-sonnet-4-20250514",
+  "routing_rule_id": "uuid-or-null",
+  "governance": {
+    "is_blocked": false,
+    "is_flagged": false,
+    "is_masked": false,
+    "actions": []
+  },
+  "quality": {
+    "faithfulness": 0.95,
+    "answer_relevance": 0.92,
+    "context_relevance": 0.88
+  },
+  "compression": {
+    "applied": true,
+    "original_tokens": 2100,
+    "compressed_tokens": 950,
+    "ratio": 0.45
+  },
+  "cache": {
+    "hit": false,
+    "cache_reference": null
+  },
+  "cost": {
+    "prompt_tokens": 150,
+    "completion_tokens": 80,
+    "total_tokens": 230,
+    "cost_usd": 0.0024
+  },
+  "latency_ms": 1200
+}
+```
+
+<Callout type="info">
+  The Query endpoint returns richer metadata than the Chat Completions endpoint — including governance actions, quality scores, compression stats, and cache information. Use this endpoint when you need full observability.
+</Callout>
+
+## Conversation Threading
+
+Pass a `conversation_id` to maintain conversation context across multiple queries. Xilos stores the conversation history and includes it in subsequent queries automatically. Context compression will summarize long conversations to reduce token costs.
+
+## Test Mode
+
+Use the test endpoint to preview routing without executing:
+
+```
+POST /api/v1/query/test
+```
+
+This returns the routing decision, model selection, and governance actions without making an LLM call — useful for debugging and rule validation.

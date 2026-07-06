@@ -2,19 +2,129 @@
 title: Build a Multi-Model Workflow
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Build a Multi-Model Workflow
 
-Create multi-stage LLM pipelines using the visual workflow builder or API.
+Create multi-stage LLM pipelines using the Visual Workflow Builder or API. Chain models sequentially, run them in parallel, and merge outputs.
 
-## Sections
+## Prerequisites
 
-- Planning the Pipeline
-- Visual Builder
-- Sequential Chains
-- Parallel Execution
-- Merge Strategies
-- Testing
+- A Xilos account with admin access
+- Multiple LLMs configured in Model Config
+- An understanding of your pipeline goals
 
----
+## Workflow Concepts
 
-*This page is a stub. Content will be added soon.*
+A workflow consists of:
+
+- **Stages** — Each stage uses one LLM to process input and produce output
+- **Execution Mode** — `sequential` (chain) or `parallel` (run simultaneously and merge)
+- **Merge LLM** — For parallel mode, an LLM that combines outputs from all stages
+- **Merge Prompt** — Instructions for how the merge LLM should combine results
+
+## Step 1: Plan Your Pipeline
+
+Decide what you want the workflow to accomplish:
+
+- **Sequential example:** Model A summarizes → Model B translates → Model C formats
+- **Parallel example:** Model A analyzes code, Model B checks security → Merge LLM combines both analyses
+
+## Step 2: Open the Visual Workflow Builder
+
+1. Navigate to **Workflow Builder** in the sidebar.
+2. You'll see a canvas with a left sidebar of draggable node types:
+   - **LLM Stage** — A model processing step
+   - **Merge** — Combines multiple outputs
+   - **Conditional** — Branch based on output
+   - **Input** — Starting point
+   - **Output** — Ending point
+
+## Step 3: Build Your Workflow
+
+1. Drag an **Input** node onto the canvas.
+2. Drag an **LLM Stage** node and connect it to the Input.
+3. Double-click the LLM Stage to edit properties:
+   - Select the model from the dropdown
+   - Write a system prompt for this stage
+   - Set the temperature slider
+4. For sequential chains, drag another LLM Stage and connect it.
+5. For parallel execution, drag multiple LLM Stages from the same source.
+6. For parallel, drag a **Merge** node and connect all parallel outputs to it.
+7. Drag an **Output** node and connect it as the final step.
+
+## Step 4: Configure Merge Settings (Parallel Only)
+
+If using parallel execution:
+
+1. Double-click the Merge node.
+2. Select the merge LLM (the model that will combine outputs).
+3. Write a merge prompt — instructions for how to combine the parallel outputs.
+
+**Example merge prompt:**
+> "Combine the following analyses into a single comprehensive report. Maintain all key findings from each analysis and organize by theme."
+
+## Step 5: Test the Workflow
+
+1. Click the **Test Run** button.
+2. Enter a test query.
+3. Review the output from each stage.
+4. Adjust system prompts and connections as needed.
+
+## Step 6: Save the Workflow
+
+1. Click **Save**.
+2. Enter a name and description.
+3. The workflow is serialized into JSON format and stored.
+
+## Workflow JSON Format
+
+The workflow is stored as:
+
+```json
+{
+  "stages": [
+    {
+      "name": "stage1",
+      "stage_type": "llm",
+      "llm_id": "uuid",
+      "system_prompt_override": "You are a code analyzer.",
+      "temperature": 0.7,
+      "input_source": "previous_output"
+    }
+  ],
+  "execution_mode": "sequential",
+  "merge_llm_id": null,
+  "merge_prompt": null
+}
+```
+
+## Using Workflows via API
+
+Workflows can also be created and managed via the API:
+
+```bash
+# Create a workflow
+curl https://api.xilos.ai/api/v1/workflows \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+  -d '{
+    "name": "Code Analysis Pipeline",
+    "description": "Analyze code and check security",
+    "execution_mode": "parallel",
+    "merge_llm_id": "uuid-of-merge-model",
+    "merge_prompt": "Combine both analyses into a report.",
+    "stages": [...]
+  }'
+```
+
+See the [Workflows API](/api-reference/workflows) for the full reference.
+
+## Best Practices
+
+- Start simple — test with a 2-stage sequential workflow first
+- Write clear, specific system prompts for each stage
+- Use parallel execution when stages are independent
+- Use the Merge LLM to synthesize, not just concatenate
+- Test with real queries before saving
+- Monitor workflow execution in the Query Log

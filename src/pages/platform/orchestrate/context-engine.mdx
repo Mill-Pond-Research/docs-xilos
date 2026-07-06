@@ -2,18 +2,171 @@
 title: Context Engine
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Context Engine
 
-Every answered query becomes a searchable knowledge asset. The context engine extracts atomic facts from responses and uses them to enrich future queries.
+Every answered query becomes a searchable knowledge asset. The Context Engine extracts atomic facts from LLM responses, embeds them, stores them in a vector database, and retrieves them to enrich future queries. The more queries flow through Xilos, the richer the knowledge base becomes.
 
-## Sections
+## How It Works
 
-- Atomic Facts
-- Fact Extraction
-- Semantic Retrieval
-- Document Ingestion
-- Configuration
+The Context Engine operates in three phases:
 
----
+1. **Extract** — After a query completes, Xilos parses the response and decomposes it into atomic facts: self-contained, verifiable statements.
+2. **Embed** — Each fact is embedded with the local `all-MiniLM-L6-v2` model and stored in the vector database alongside metadata (source query, model, timestamp, quality score).
+3. **Retrieve** — When a new query arrives, Xilos embeds the query, searches the fact store for semantically similar facts, and injects them into the prompt as context before the LLM is called.
 
-*This page is a stub. Content will be added soon.*
+<Callout type="info">
+  The Context Engine is what makes Xilos compound knowledge over time. A query answered today enriches the response to a related query asked weeks later — even if phrased entirely differently.
+</Callout>
+
+## Atomic Facts
+
+An **atomic fact** is a single, self-contained statement extracted from a response. Decomposing responses into atomic facts (rather than storing whole responses) improves retrieval precision and reduces noise.
+
+### Example
+
+Given the response:
+
+> "Xilos was founded in 2024 and is headquartered in San Francisco. The platform supports Claude, GPT, and Gemini model families, with semantic caching that reduces costs by up to 90%."
+
+The Context Engine extracts four atomic facts:
+
+1. `Xilos was founded in 2024.`
+2. `Xilos is headquartered in San Francisco.`
+3. `The Xilos platform supports Claude, GPT, and Gemini model families.`
+4. `Xilos semantic caching reduces costs by up to 90%.`
+
+Each fact is embedded and stored independently. A future query about "where is Xilos based" retrieves fact #2, while a query about "supported AI models" retrieves fact #3 — without pulling in unrelated information.
+
+## Fact Extraction
+
+Extraction runs automatically after every completed query. The pipeline:
+
+<Steps>
+  <Steps.Step title="Parse response">
+    The response text is split into sentences and clauses.
+  </Steps.Step>
+  <Steps.Step title="Decompose">
+    An extraction model breaks compound statements into atomic facts.
+  </Steps.Step>
+  <Steps.Step title="Deduplicate">
+    New facts are compared against existing facts. Duplicates and near-duplicates are skipped.
+  </Steps.Step>
+  <Steps.Step title="Score">
+    Each fact receives a faithfulness score based on the source response's quality metrics. Low-scoring facts are flagged.
+  </Steps.Step>
+  <Steps.Step title="Store">
+    The fact is embedded and written to the vector database with full provenance metadata.
+  </Steps.Step>
+</Steps>
+
+<Callout type="warning">
+  Facts are only extracted from responses that pass quality thresholds. If a response has a low faithfulness score, its facts are quarantined and excluded from retrieval until reviewed.
+</Callout>
+
+## Semantic Retrieval
+
+When a new query arrives, the Context Engine retrieves relevant facts before the LLM is called:
+
+1. The query is embedded with `all-MiniLM-L6-v2`.
+2. Xilos performs a cosine similarity search against the fact store.
+3. The top-N facts above the similarity threshold are selected.
+4. Selected facts are injected into the prompt as a context block.
+
+Retrieved facts appear in the Query Log alongside the response, so you can inspect exactly which facts informed each answer.
+
+### Retrieval Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `similarity_threshold` | 0.75 | Minimum cosine similarity for a fact to be included. |
+| `max_facts` | 5 | Maximum number of facts injected per query. |
+| `min_faithfulness` | 0.7 | Minimum faithfulness score for a fact to be eligible. |
+| `context_block_label` | `Retrieved Context` | Header label for the injected context block. |
+
+## Document Ingestion
+
+Beyond query responses, you can ingest external documents directly into the Context Engine. Uploaded documents are processed through the same extraction pipeline: parsed, decomposed into atomic facts, embedded, and stored.
+
+### Supported Formats
+
+- Plain text (`.txt`, `.md`)
+- PDF (`.pdf`)
+- Word documents (`.docx`)
+- HTML (`.html`)
+
+### Ingesting a Document
+
+<Tabs>
+  <Tabs.Tab title="Dashboard">
+
+1. Navigate to **Context Engine** → **Documents**.
+2. Click **Upload Document**.
+3. Select a file or paste text.
+4. Optionally tag the document with metadata (source, category, expiry).
+5. Click **Ingest**. Xilos processes the document and reports the number of facts extracted.
+
+  </Tabs.Tab>
+  <Tabs.Tab title="API">
+
+```bash
+curl -X POST https://api.xilos.ai/v1/context/documents \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@report.pdf" \
+  -F "category=financial" \
+  -F "source=Q3-2024-Report"
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+  Large documents are chunked before extraction. Each chunk is processed independently, and the resulting facts are deduplicated across chunks before storage.
+</Callout>
+
+## Configuration
+
+Configure the Context Engine at the organization level in **Settings** → **Context Engine**.
+
+### Extraction Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `extraction_enabled` | `true` | Master toggle for fact extraction. |
+| `extraction_model` | Internal SLM | Model used to decompose responses into facts. |
+| `min_response_quality` | 0.7 | Minimum faithfulness score for a response to be eligible for extraction. |
+
+### Embedding Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `embedding_model` | `all-MiniLM-L6-v2` | The local embedding model. Runs on CPU; no external API calls. |
+| `embedding_dim` | 384 | Output dimensionality of the embedding model. |
+
+### Storage Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `vector_db` | Internal pgvector | The vector database backend. |
+| `fact_ttl_days` | 365 | Days before a fact expires and is excluded from retrieval. Set to `0` for no expiry. |
+| `auto_prune` | `true` | Automatically delete low-quality or expired facts. |
+
+## Privacy and Data Isolation
+
+- Facts are scoped to the organization. They are never shared across tenants.
+- Per-rule overrides can disable fact extraction for sensitive queries (e.g., PII handling).
+- Ingested documents can be tagged with an expiry, after which their facts are automatically purged.
+
+<Callout type="warning">
+  If a routing rule handles sensitive or regulated data, disable Context Engine extraction for that rule to prevent storing facts derived from confidential information.
+</Callout>
+
+## Best Practices
+
+- **Ingest foundational documents** — Upload policies, product specs, and FAQs so the Context Engine has a strong knowledge base from day one.
+- **Tune the similarity threshold** — Lower it for broader recall; raise it for stricter precision.
+- **Monitor fact quality** — Review low-faithfulness facts in the Context Engine dashboard before they pollute retrieval.
+- **Set expiries on time-sensitive documents** — Use `fact_ttl_days` or document-level expiry tags to auto-purge stale facts.
+- **Disable extraction for sensitive rules** — Protect PII and confidential data by disabling extraction per-rule.

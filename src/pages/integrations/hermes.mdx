@@ -2,18 +2,95 @@
 title: Hermes Agent
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Hermes Agent
 
-Connect Hermes Agent to Xilos by setting the model provider base URL and API key in your profile configuration.
+[Hermes Agent](https://hermes-agent.nousresearch.com) is an open-source AI agent runtime by Nous Research. Connect Hermes to Xilos by setting the provider base URL and API key in your Hermes profile configuration. Once connected, every LLM call flows through the Xilos gateway for routing, guardrails, caching, and cost control.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Configuration
-- Verify Connection
-- Available Models
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- Hermes Agent installed and configured (run `hermes setup` if you have not already).
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Configuration
 
-*This page is a stub. Content will be added soon.*
+Hermes reads provider settings from `~/.hermes/config.yaml` (or the profile-specific YAML under `~/.hermes/profiles/<name>/`). You set the base URL, API key, and model, then export the key as an environment variable so Hermes doctor and tool checks recognize it.
+
+<Steps>
+  <Steps.Step title="Set the model provider and base URL">
+    ```bash
+    hermes config set model.default xilos
+    hermes config set model.provider auto
+    hermes config set model.base_url https://api.xilos.ai/api/v1
+    hermes config set model.api_key $XILOS_API_KEY
+    ```
+  </Steps.Step>
+
+  <Steps.Step title="Export your Xilos API key as an environment variable">
+    ```bash
+    export XILOS_API_KEY="your-xilos-api-key"
+    ```
+    Add this line to your shell profile (`~/.bashrc` or `~/.zshrc`) so it persists across sessions.
+
+    <Callout type="warning">
+      You must also write the key to the Hermes `.env` file. Some tool checks read from `.env`, not `config.yaml`. Run the command below to copy the key into the active profile's environment file:
+      ```bash
+      echo "XILOS_API_KEY=$XILOS_API_KEY" >> $(hermes config env-path)
+      ```
+    </Callout>
+  </Steps.Step>
+
+  <Steps.Step title="Verify the configuration">
+    ```bash
+    hermes doctor
+    ```
+    `hermes doctor` checks that the model, provider, and API key are valid and that required dependencies are present.
+  </Steps.Step>
+
+  <Steps.Step title="Start a session">
+    ```bash
+    hermes
+    ```
+    Any command that triggers an LLM call now routes through Xilos.
+  </Steps.Step>
+</Steps>
+
+<Callout type="info">
+  When `model.default` is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query. To bypass routing and target a specific model, set `model.default` to a concrete model name (for example, `claude-sonnet-4`).
+</Callout>
+
+## Verify the Connection
+
+Send a test message and confirm it appears in the Xilos dashboard:
+
+```bash
+hermes chat -q "Hello, Xilos!"
+```
+
+1. Open your Xilos dashboard.
+2. Navigate to **Query Log**.
+3. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| `Unknown provider 'openai'` | You set `model.provider: openai` for a custom endpoint. | Use `model.provider: auto` instead. Xilos is OpenAI-compatible, but Hermes resolves the provider through `auto`. |
+| `hermes doctor` reports a missing API key | The key is in `config.yaml` but not in `.env`. | Write the key to the profile `.env` file with the command in step 2 above. |
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update both `config.yaml` and `.env`. |
+| Requests ignore routing rules | `model.default` is set to a concrete model name. | Set `model.default` to `xilos` so the Xilos routing engine selects the model. |
+| Auxiliary tasks (vision, compression) fail | Hermes cannot find a backend for auxiliary models. | Set `OPENROUTER_API_KEY` or configure each auxiliary task's provider explicitly with `hermes config set auxiliary.<task>.provider`. |
+
+<Callout type="warning">
+  `security.redact_secrets` (enabled by default) redacts strings that look like API keys from tool output. If Hermes is working with your own tokens and the redaction interferes, disable it with `hermes config set security.redact_secrets false`, then start a new session. The setting is read once at startup and cannot be toggled mid-session.
+</Callout>
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.

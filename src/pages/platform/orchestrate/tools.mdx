@@ -2,18 +2,209 @@
 title: Tools & MCP
 ---
 
+import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
+
 # Tools & MCP
 
-Connect external tools and MCP (Model Context Protocol) servers to execute real actions in workflow stages.
+Connect external tools and MCP (Model Context Protocol) servers to Xilos so that LLMs can execute real actions — query databases, call APIs, search the web, read files — as part of a response. Attach tools to routing rules or workflow stages, or let Xilos auto-select tools based on query intent.
 
-## Sections
+## Overview
 
-- Tool Marketplace
-- Creating Custom Tools
-- MCP Server Integration
-- Auto-Tool Selection
-- Attaching Tools to Rules
+<Cards>
+  <Card title="Tool Marketplace" href="#tool-marketplace">
+    Browse and install pre-built tools for common integrations.
+  </Card>
+  <Card title="Custom Tools" href="#creating-custom-tools">
+    Build your own tools with a simple schema and endpoint.
+  </Card>
+  <Card title="MCP Servers" href="#mcp-server-integration">
+    Connect any MCP-compatible server for instant tool discovery.
+  </Card>
+  <Card title="Auto-Tool Selection" href="#auto-tool-selection">
+    Let Xilos pick the right tool based on query intent.
+  </Card>
+</Cards>
 
----
+## Tool Marketplace
 
-*This page is a stub. Content will be added soon.*
+The marketplace contains pre-built tools for common integrations:
+
+- **Web Search** — Query the web and return results.
+- **Database Query** — Run SQL against a connected database.
+- **HTTP Request** — Call any REST endpoint.
+- **File Reader** — Read files from a connected storage bucket.
+- **Calculator** — Evaluate mathematical expressions.
+- **Code Interpreter** — Execute Python in a sandbox.
+
+### Installing a Marketplace Tool
+
+1. Navigate to **Orchestrate** → **Tools** → **Marketplace**.
+2. Browse or search for a tool.
+3. Click **Install**.
+4. Configure any required credentials (API keys, connection strings).
+5. The tool is now available to attach to routing rules and workflow stages.
+
+## Creating Custom Tools
+
+Define a custom tool with a JSON schema and an HTTP endpoint. Xilos calls the endpoint when the LLM invokes the tool and passes the result back to the model.
+
+### Tool Schema
+
+```json
+{
+  "name": "lookup_order",
+  "description": "Look up an order by its order ID and return the status, items, and total.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "order_id": {
+        "type": "string",
+        "description": "The order identifier, e.g., ORD-12345."
+      }
+    },
+    "required": ["order_id"]
+  },
+  "endpoint": "https://api.yourcompany.com/orders/{{order_id}}",
+  "method": "GET",
+  "headers": {
+    "Authorization": "Bearer {{tool_secret}}"
+  },
+  "response_path": "$.data"
+}
+```
+
+### Creating via API
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+
+```bash
+curl -X POST https://api.xilos.ai/v1/tools \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "lookup_order",
+    "description": "Look up an order by its order ID and return the status, items, and total.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_id": { "type": "string", "description": "The order identifier." }
+      },
+      "required": ["order_id"]
+    },
+    "endpoint": "https://api.yourcompany.com/orders/{{order_id}}",
+    "method": "GET",
+    "headers": { "Authorization": "Bearer {{tool_secret}}" },
+    "response_path": "$.data"
+  }'
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+
+```python
+import xilos
+
+client = xilos.Client(api_key="...")
+
+tool = client.tools.create(
+    name="lookup_order",
+    description="Look up an order by its order ID and return the status, items, and total.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "order_id": {"type": "string", "description": "The order identifier."}
+        },
+        "required": ["order_id"],
+    },
+    endpoint="https://api.yourcompany.com/orders/{{order_id}}",
+    method="GET",
+    headers={"Authorization": "Bearer {{tool_secret}}"},
+    response_path="$.data",
+)
+
+print(tool.id)
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="warning">
+  Store secrets in Xilos's encrypted secret store and reference them with `{{secret_name}}`. Never paste raw credentials into tool schemas that are exported or shared.
+</Callout>
+
+## MCP Server Integration
+
+Xilos supports the **Model Context Protocol (MCP)**, an open standard for exposing tools to LLMs. Connect any MCP-compatible server and Xilos automatically discovers its tools — no manual schema required.
+
+### Connecting an MCP Server
+
+1. Navigate to **Orchestrate** → **Tools** → **MCP Servers**.
+2. Click **Add Server**.
+3. Provide the server URL or command (for stdio-based servers).
+4. Enter authentication credentials if required.
+5. Click **Connect**. Xilos queries the server's `tools/list` endpoint and imports all available tools.
+
+```json
+{
+  "name": "company-mcp",
+  "transport": "sse",
+  "url": "https://mcp.yourcompany.com/sse",
+  "auth": {
+    "type": "bearer",
+    "token": "{{mcp_secret}}"
+  }
+}
+```
+
+<Callout type="info">
+  MCP tools appear alongside custom and marketplace tools. They can be attached to routing rules, workflow stages, and auto-tool selection just like any other tool.
+</Callout>
+
+### Supported Transports
+
+| Transport | Description |
+|-----------|-------------|
+| `sse` | Server-Sent Events over HTTP. Best for remote servers. |
+| `stdio` | Spawned local process communicating over stdin/stdout. Best for local tools. |
+| `websocket` | Persistent WebSocket connection. Best for real-time tools. |
+
+## Auto-Tool Selection
+
+Instead of manually attaching tools to every rule or stage, enable **auto-tool selection** and let Xilos decide which tools are relevant based on query intent.
+
+### How It Works
+
+1. Xilos embeds each tool's `name` and `description` using the local embedding model.
+2. When a query arrives, Xilos embeds the query and computes similarity against the tool index.
+3. The top-N tools above the similarity threshold are made available to the LLM.
+4. The LLM decides whether to invoke a tool based on its judgment and the tool descriptions.
+
+### Enabling Auto-Tool Selection
+
+1. Navigate to **Orchestrate** → **Tools** → **Settings**.
+2. Toggle **Auto-Tool Selection** on.
+3. Set the similarity threshold (default: 0.65).
+4. Set the maximum number of tools per query (default: 5).
+
+<Callout type="info">
+  Auto-tool selection uses the same embedding model as semantic caching (`all-MiniLM-L6-v2`), so it adds negligible latency.
+</Callout>
+
+## Attaching Tools to Rules
+
+Attach specific tools to a routing rule to override auto-selection:
+
+1. Open the routing rule in **Routing Rules**.
+2. In the **Tools** section, select one or more tools.
+3. Save the rule. Queries matching this rule will only have access to the selected tools.
+
+You can also attach tools to individual LLM Stage nodes in the Workflow Builder.
+
+## Best Practices
+
+- **Prefer MCP for existing integrations** — If a tool already exists as an MCP server, connect it rather than rebuilding the schema.
+- **Write clear descriptions** — Auto-tool selection relies on tool descriptions. Be specific about what each tool does and when to use it.
+- **Scope tools per rule** — Attach only the tools a rule needs. Overloading the LLM with irrelevant tools degrades selection accuracy.
+- **Use the secret store** — Never inline credentials. Reference secrets with `{{secret_name}}`.
+- **Monitor tool invocations** — Review the Query Log to see which tools were invoked and whether the LLM used them correctly.

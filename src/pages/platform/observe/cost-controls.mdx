@@ -2,20 +2,94 @@
 title: Cost Controls
 ---
 
+import { Callout } from 'nextra/components'
+
 # Cost Controls
 
-Track AI spend by model, user, department, and routing rule. See savings from caching, routing, and compression.
+Track AI spend by model, user, department, and routing rule. See savings from caching, routing, and compression in real time.
 
-## Sections
+## Cost Overview
 
-- Cost Overview
-- Savings Breakdown
-- By-Model Breakdown
-- By-Rule Breakdown
-- By-User Breakdown
-- Forecasting
-- Compression Savings
+The Cost Controls tab in the dashboard provides a comprehensive view of your AI spending:
 
----
+- **Total spend** for the selected time period
+- **Period-over-period comparison** showing spend trends
+- **Savings breakdown** from caching, routing, and compression
+- **Per-model breakdown** showing which models cost the most
+- **Per-rule breakdown** showing which routing rules drive spend
+- **Per-user breakdown** showing individual user costs
 
-*This page is a stub. Content will be added soon.*
+## Savings Breakdown
+
+Xilos saves you money through three mechanisms:
+
+| Mechanism | How It Saves | Typical Savings |
+|-----------|-------------|-----------------|
+| **Semantic Caching** | Reuses responses for similar queries — no LLM call | 30-70% of repeat queries |
+| **Smart Routing** | Routes to cheaper models when possible | 20-40% vs. always using premium models |
+| **Context Compression** | Reduces token count before LLM call | 50-90% token reduction |
+
+The savings breakdown shows the dollar value of each mechanism for the selected period.
+
+## Per-Model Breakdown
+
+See which models are consuming the most budget:
+
+- Total cost per model
+- Token count (input + output)
+- Number of queries routed to each model
+- Average cost per query
+- Cost trend over time
+
+Use this to identify opportunities to switch to cheaper models for certain query types.
+
+## Per-Rule Breakdown
+
+See which routing rules are driving spend:
+
+- Total cost per rule
+- Number of queries matching each rule
+- Average cost per query for each rule
+- Cache hit rate per rule
+- Compression savings per rule
+
+Use this to identify rules where compression or caching could be enabled to reduce costs.
+
+## Per-User Breakdown
+
+Track individual user spending:
+
+- Total cost per user
+- Query count per user
+- Average cost per query
+- Top users by spend
+
+<Callout type="info">
+  Use [Virtual Keys](/guides/virtual-keys) to set per-user or per-team budget limits. When a budget is exceeded, the key is automatically deactivated.
+</Callout>
+
+## Forecasting
+
+The Cost Controls page includes a simple forecast based on current spending trends:
+
+- Projected monthly spend
+- Projected savings from caching and compression
+- Budget alerts (when configured)
+
+## Compression Savings
+
+Compression savings are tracked separately and show:
+
+- Total tokens saved
+- Dollar value of saved tokens
+- Average compression ratio
+- Compression rate (percentage of queries that were compressed)
+
+## Cost Optimization Tips
+
+1. **Enable caching** on high-volume routing rules with stable answers
+2. **Enable compression** for rules with long conversation histories
+3. **Use Smart Routing** to automatically select cost-efficient models
+4. **Review the Model Risk Leaderboard** to find cheaper models with acceptable quality
+5. **Set Virtual Key budgets** to prevent overspending by individual users or teams
+6. **Monitor the Suggestions page** for AI-powered cost optimization recommendations

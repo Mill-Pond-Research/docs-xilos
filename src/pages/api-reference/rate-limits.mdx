@@ -2,17 +2,73 @@
 title: Rate Limits
 ---
 
+import { Callout } from 'nextra/components'
+
 # Rate Limits
 
 Rate limiting policies and headers for the Xilos API.
 
-## Sections
+## Rate Limit Headers
 
-- Rate Limit Headers
-- Plan Limits
-- Virtual Key Limits
-- Handling 429s
+Every API response includes rate limit headers:
 
----
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests per minute for this key |
+| `X-RateLimit-Remaining` | Remaining requests in the current window |
+| `X-RateLimit-Reset` | Unix timestamp when the window resets |
 
-*This page is a stub. Content will be added soon.*
+## Plan Limits
+
+| Plan | Requests/Minute | Requests/Day |
+|------|----------------|-------------|
+| Starter | 60 | 10,000 |
+| Professional | 200 | 100,000 |
+| Enterprise | 1,000 | Unlimited |
+| On-Premise | Unlimited | Unlimited |
+
+## Virtual Key Limits
+
+Virtual Keys can have custom rate limits set by the organization admin. When a Virtual Key exceeds its rate limit:
+
+1. The response returns `429 Too Many Requests`.
+2. The `Retry-After` header indicates when to retry.
+3. The key is not deactivated — it simply waits for the window to reset.
+
+<Callout type="info">
+  Rate limits and budget limits are independent. A key can hit its rate limit without exceeding its budget, and vice versa.
+</Callout>
+
+## Handling 429 Responses
+
+```python
+import time
+from openai import OpenAI, RateLimitError
+
+client = OpenAI(
+    api_key="YOUR_XILOS_API_KEY",
+    base_url="https://api.xilos.ai/api/v1"
+)
+
+def query_with_retry(messages, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return client.chat.completions.create(
+                model="xilos",
+                messages=messages
+            )
+        except RateLimitError:
+            if attempt == max_retries - 1:
+                raise
+            wait = 2 ** attempt  # 1s, 2s, 4s
+            time.sleep(wait)
+```
+
+## Best Practices
+
+- Use Virtual Keys with appropriate rate limits for each service
+- Implement exponential backoff in your client code
+- Cache responses locally to reduce API calls
+- Batch queries where possible
+- Monitor your rate limit usage in the dashboard
+- Contact support if you need higher limits

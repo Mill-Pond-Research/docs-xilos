@@ -2,16 +2,78 @@
 title: Kilo Code
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Kilo Code
 
-Connect Kilo Code to Xilos for routing, caching, and guardrails.
+[Kilo Code](https://kilocode.ai) is an AI coding assistant. Connect it to Xilos to route all coding queries through the Xilos gateway for governance, caching, and cost control. Xilos is OpenAI-compatible, so Kilo Code connects by setting the base URL and API key.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Configuration
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- Kilo Code installed and configured in your editor (VS Code or JetBrains).
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Configuration
 
-*This page is a stub. Content will be added soon.*
+Kilo Code supports custom OpenAI-compatible providers. Add Xilos as a provider in the Kilo Code settings and select it as the active model.
+
+<Steps>
+  <Steps.Step title="Open the Kilo Code settings">
+    In your editor, open the Kilo Code extension settings. Navigate to **Providers** or **API Configuration** (the exact label varies by version).
+  </Steps.Step>
+
+  <Steps.Step title="Add Xilos as a custom OpenAI-compatible provider">
+    - **Provider Name:** `Xilos`
+    - **Base URL:** `https://api.xilos.ai/api/v1`
+    - **API Key:** `your-xilos-api-key`
+    - **Model:** `xilos`
+
+    Save the provider configuration.
+  </Steps.Step>
+
+  <Steps.Step title="Set environment variables (alternative)">
+    If your version of Kilo Code reads the base URL and API key from environment variables, set them instead:
+
+    ```bash
+    export KILOCODE_API_KEY="your-xilos-api-key"
+    export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
+    ```
+
+    Add these lines to your shell profile (`~/.bashrc` or `~/.zshrc`) so they persist across sessions.
+  </Steps.Step>
+
+  <Steps.Step title="Select the Xilos provider">
+    In the Kilo Code chat panel, select the `Xilos` provider and the `xilos` model. All subsequent queries route through Xilos.
+  </Steps.Step>
+</Steps>
+
+<Callout type="info">
+  When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
+</Callout>
+
+## Verify the Connection
+
+1. Trigger a Kilo Code action that requires an LLM call (for example, a code completion or chat question).
+2. Open your Xilos dashboard.
+3. Navigate to **Query Log**.
+4. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update the Kilo Code provider configuration. |
+| Requests go to the default provider | The Xilos provider was not selected in the chat panel. | Open the Kilo Code chat panel and select the `Xilos` provider and `xilos` model. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| 429 Rate limit exceeded | You exceeded your organization or Virtual Key rate limit. | Reduce request frequency or create a Virtual Key with a higher limit. |
+| Routing rules do not apply | The model name is set to a concrete model instead of `xilos`. | Set the model to `xilos` so the Xilos routing engine processes each query. |
+| Tool calls not returned | The model selected by routing does not support function calling. | Verify the target model supports tools, or set the model to a model known to support function calling. |
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.

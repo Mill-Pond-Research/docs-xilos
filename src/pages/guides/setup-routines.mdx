@@ -2,18 +2,113 @@
 title: Set Up Routines
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Set Up Routines
 
 Schedule agent queries on a recurring basis for automated analysis and reporting.
 
-## Sections
+## Prerequisites
 
-- Creating a Routine
-- Cron Expressions
-- Presets
-- Manual Triggers
-- Monitoring
+- A Xilos account with admin access
+- A query or prompt you want to run on a schedule
+- (Optional) A routing rule to direct the routine's queries
 
----
+## What Are Routines?
 
-*This page is a stub. Content will be added soon.*
+Routines are scheduled queries that run automatically on a cron schedule. Each routine sends a query through the full Xilos pipeline — routing, guardrails, caching, compression — and stores the result.
+
+Common use cases:
+- Daily summary of AI activity
+- Weekly cost analysis
+- Periodic context engine enrichment
+- Automated compliance checks
+- Scheduled report generation
+
+## Step 1: Create a Routine
+
+1. Navigate to **Integrations** in the sidebar.
+2. Click the **Routines** tab.
+3. Click **Create Routine**.
+4. Fill in the form:
+   - **Name** — Descriptive name (e.g., "Daily AI Activity Summary")
+   - **Query** — The prompt to send on each run
+   - **Schedule** — Choose a preset or enter a custom cron expression
+   - **Routing Rule** (optional) — Which routing rule to use
+5. Click **Save**.
+
+## Cron Schedule Presets
+
+| Preset | Cron Expression | Description |
+|--------|----------------|-------------|
+| Hourly | `0 * * * *` | Every hour on the hour |
+| Daily | `0 9 * * *` | Every day at 9:00 AM |
+| Weekly | `0 9 * * 1` | Every Monday at 9:00 AM |
+| Monthly | `0 9 1 * *` | First day of each month at 9:00 AM |
+
+For custom schedules, use standard cron syntax:
+
+```
+┌───────── minute (0-59)
+│ ┌───────── hour (0-23)
+│ │ ┌───────── day of month (1-31)
+│ │ │ ┌───────── month (1-12)
+│ │ │ │ ┌───────── day of week (0-6, 0=Sunday)
+│ │ │ │ │
+* * * * *
+```
+
+## Step 2: Monitor Routine Runs
+
+Each routine tracks:
+
+- **Last Run At** — When the routine last executed
+- **Last Result** — The response from the last run
+- **Status** — Active or inactive
+
+1. Navigate to **Integrations** > **Routines**.
+2. Click on a routine to view its history.
+3. Review the last result and any errors.
+
+## Step 3: Manual Triggers
+
+You can manually trigger a routine without waiting for its scheduled time:
+
+1. Navigate to **Integrations** > **Routines**.
+2. Find the routine.
+3. Click **Run Now**.
+4. The query is sent through the pipeline immediately.
+5. Results appear in the routine's history and the Query Log.
+
+<Callout type="info">
+  Manual runs do not affect the cron schedule — the routine will still run at its next scheduled time.
+</Callout>
+
+## Step 4: Activate/Deactivate
+
+Toggle routines on and off without deleting them:
+
+1. Navigate to **Integrations** > **Routines**.
+2. Toggle the active switch.
+3. Inactive routines do not execute on their schedule.
+
+## Use Cases
+
+### Daily AI Activity Summary
+
+- **Name:** Daily AI Activity Summary
+- **Query:** "Summarize yesterday's AI query activity, including total queries, blocked queries, top topics, and cost."
+- **Schedule:** Daily at 9:00 AM
+- **Routing Rule:** Default
+
+### Weekly Cost Analysis
+
+- **Name:** Weekly Cost Report
+- **Query:** "Analyze this week's AI spending by model and department. Identify cost optimization opportunities."
+- **Schedule:** Weekly on Monday at 9:00 AM
+
+### Periodic Context Enrichment
+
+- **Name:** Knowledge Base Update
+- **Query:** "Review recent queries and identify new facts to add to the context engine."
+- **Schedule:** Daily at midnight

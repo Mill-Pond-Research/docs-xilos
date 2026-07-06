@@ -2,18 +2,96 @@
 title: Manage Virtual Keys
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Manage Virtual Keys
 
 Create per-user or per-team API keys with budget limits and rate limits.
 
-## Sections
+## Prerequisites
 
-- Creating a Virtual Key
-- Budget Limits
-- Rate Limits
-- Monitoring Usage
-- Deactivating
+- A Xilos account with admin access
+- Your master API key (from Settings)
 
----
+## Why Virtual Keys?
 
-*This page is a stub. Content will be added soon.*
+Virtual keys give you granular control over who can access Xilos and how much they can spend:
+
+- **Budget limits** — Set a monthly USD spend cap per key
+- **Rate limits** — Set requests per minute per key
+- **Per-user tracking** — Each key's usage is tracked separately in Cost Controls
+- **Easy deactivation** — Disable a key without affecting others
+- **No key sharing** — Each user or service gets their own key
+
+## Step 1: Create a Virtual Key
+
+1. Navigate to **SuperAdmin** > **Keys** in the sidebar.
+2. Click **Create Virtual Key**.
+3. Fill in the form:
+   - **Name** — Descriptive name (e.g., "Engineering Team", "CI/CD Pipeline")
+   - **Budget (USD/month)** — Monthly spend limit (e.g., 500.00)
+   - **Rate Limit (requests/minute)** — Maximum requests per minute (e.g., 100)
+4. Click **Save**.
+5. Copy the generated key — it will only be shown once.
+
+<Callout type="warning">
+  Virtual keys are only shown once at creation time. Store the key securely. If lost, you must create a new key.
+</Callout>
+
+## Step 2: Distribute Keys
+
+Give each user or service their own virtual key:
+
+- **Per-user:** Create a key for each developer or team member
+- **Per-team:** Create a key per department (Engineering, Marketing, etc.)
+- **Per-service:** Create a key for each integration (CI/CD, chatbot, etc.)
+
+Users set the virtual key as their API key:
+
+```bash
+export OPENAI_API_KEY="xilos-vk-..."
+export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
+```
+
+## Step 3: Monitor Usage
+
+Track each key's usage in Cost Controls:
+
+1. Navigate to **Dashboard** > **Cost Controls**.
+2. View the **Per-User Breakdown** section.
+3. See spend, query count, and average cost per key.
+
+## Step 4: Manage Budgets
+
+When a key exceeds its monthly budget:
+
+1. The key is automatically deactivated.
+2. Requests using that key return a 429 (rate limited) or 403 (forbidden).
+3. The key status changes to "Budget Exceeded" in the dashboard.
+4. The key reactivates at the start of the next billing cycle.
+
+To manually adjust:
+
+1. Navigate to **SuperAdmin** > **Keys**.
+2. Find the key.
+3. Increase the budget or deactivate the key.
+
+## Step 5: Deactivate or Delete Keys
+
+1. Navigate to **SuperAdmin** > **Keys**.
+2. Find the key.
+3. Toggle **Active** to deactivate (preserves the key for future use).
+4. Or click **Delete** to permanently remove the key.
+
+<Callout type="info">
+  Deactivated keys immediately reject all requests. Use deactivation for temporary access revocation.
+</Callout>
+
+## Best Practices
+
+- Use virtual keys for all non-administrative access — never share your master key
+- Start with conservative budgets and adjust based on actual usage
+- Set rate limits to prevent runaway scripts
+- Review the Per-User Breakdown weekly to spot anomalies
+- Create separate keys for each service to track costs independently
+- Rotate keys periodically by creating new keys and deactivating old ones

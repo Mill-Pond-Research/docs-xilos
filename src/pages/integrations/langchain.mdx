@@ -2,17 +2,168 @@
 title: LangChain
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # LangChain
 
-Route LangChain agent traffic through Xilos using the OpenAI-compatible adapter.
+[LangChain](https://www.langchain.com/) supports custom base URLs through the `ChatOpenAI` class. Point it at Xilos to route all chain and agent calls through the Xilos gateway for routing, guardrails, caching, and cost control.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Configuration
-- Streaming
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- LangChain and the OpenAI integration package installed.
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Install LangChain
 
-*This page is a stub. Content will be added soon.*
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```bash
+    pip install langchain langchain-openai
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```bash
+    npm install @langchain/core @langchain/openai
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Configuration
+
+Create a `ChatOpenAI` instance with the Xilos base URL and your Xilos API key.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    from langchain_openai import ChatOpenAI
+
+    llm = ChatOpenAI(
+        model="xilos",
+        api_key="your-xilos-api-key",
+        base_url="https://api.xilos.ai/api/v1",
+    )
+
+    response = llm.invoke("Hello, Xilos!")
+    print(response.content)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import { ChatOpenAI } from "@langchain/openai";
+
+    const llm = new ChatOpenAI({
+      model: "xilos",
+      apiKey: "your-xilos-api-key",
+      configuration: {
+        baseURL: "https://api.xilos.ai/api/v1",
+      },
+    });
+
+    const response = await llm.invoke("Hello, Xilos!");
+    console.log(response.content);
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+  When using LangChain agents or chains, the `model` value `xilos` lets your routing rules decide which underlying LLM handles the request. You can also pass a specific model name (for example, `claude-sonnet-4`) if you want to bypass routing.
+</Callout>
+
+## Streaming
+
+LangChain supports streaming through the `.stream()` method. Xilos returns server-sent events (SSE) that LangChain consumes token by token.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    for chunk in llm.stream("Tell me a story."):
+        print(chunk.content, end="", flush=True)
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    const stream = await llm.stream("Tell me a story.");
+    for await (const chunk of stream) {
+      process.stdout.write(chunk.content);
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Using with Agents and Chains
+
+You can pass the Xilos-backed `ChatOpenAI` instance to any LangChain agent, chain, or tool. The LLM calls are transparent — LangChain sends requests to Xilos, which applies routing and governance.
+
+<Tabs>
+  <Tabs.Tab title="Python">
+    ```python
+    from langchain_openai import ChatOpenAI
+    from langchain.agents import create_tool_calling_agent, AgentExecutor
+    from langchain_core.prompts import ChatPromptTemplate
+
+    llm = ChatOpenAI(
+        model="xilos",
+        api_key="your-xilos-api-key",
+        base_url="https://api.xilos.ai/api/v1",
+    )
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a helpful assistant."),
+        ("human", "{input}"),
+        ("placeholder", "{agent_scratchpad}"),
+    ])
+
+    agent = create_tool_calling_agent(llm, tools=[], prompt=prompt)
+    executor = AgentExecutor(agent=agent, tools=[], verbose=True)
+
+    result = executor.invoke({"input": "What is 2 + 2?"})
+    print(result["output"])
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab title="JavaScript">
+    ```javascript
+    import { ChatOpenAI } from "@langchain/openai";
+    import { createReactAgent } from "@langchain/langgraph/prebuilt";
+
+    const llm = new ChatOpenAI({
+      model: "xilos",
+      apiKey: "your-xilos-api-key",
+      configuration: { baseURL: "https://api.xilos.ai/api/v1" },
+    });
+
+    const agent = createReactAgent({ llm, tools: [] });
+    const result = await agent.invoke({
+      messages: [{ role: "user", content: "What is 2 + 2?" }],
+    });
+    console.log(result.messages[result.messages.length - 1].content);
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Verify the Connection
+
+After running your first LangChain query:
+
+1. Open your Xilos dashboard.
+2. Navigate to **Query Log**.
+3. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update the `ChatOpenAI` configuration. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| Routing rules do not apply | The `model` parameter is set to a concrete model name. | Set `model` to `xilos` so the Xilos routing engine selects the model. |
+| `base_url` not respected (JS) | The `baseURL` was passed at the top level instead of inside `configuration`. | In LangChain.js, pass `baseURL` inside the `configuration` object, not at the top level of the `ChatOpenAI` constructor. |
+| Streaming not working | The chain or agent does not call `.stream()` or `.astream()`. | Use `.stream()` (Python) or `.stream()` / `.astream()` (JavaScript) instead of `.invoke()`. |
+| Tool calls not returned | The model selected by routing does not support function calling. | Verify the target model supports tools, or set `model` to a model known to support function calling. |
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Set Up Webhooks](/guides/setup-webhooks) — Receive real-time event notifications.

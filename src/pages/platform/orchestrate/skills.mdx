@@ -2,17 +2,193 @@
 title: Skills
 ---
 
+import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
+
 # Skills
 
-Reusable prompt templates for workflow stages. Create from scratch or import from the skills marketplace.
+Skills are reusable prompt templates for workflow stages. Define a system prompt once, attach it to any LLM Stage node, and share it across workflows. Skills keep prompts versioned, consistent, and easy to update.
 
-## Sections
+## What Is a Skill?
 
-- Creating Skills
-- System Prompts
-- Importing Skills
-- Using in Workflows
+A skill encapsulates:
 
----
+- **System prompt** — The instructions sent to the LLM.
+- **Variables** — Placeholders (e.g., `{{user_query}}`, `{{context}}`) that are filled at runtime.
+- **Default parameters** — Optional temperature, max tokens, and stop sequences.
+- **Tags** — Labels for organizing and searching skills.
 
-*This page is a stub. Content will be added soon.*
+<Callout type="info">
+  Skills are the prompt-engineering equivalent of functions. Write once, reuse everywhere.
+</Callout>
+
+## Creating a Skill
+
+### From the Dashboard
+
+<Steps>
+  <Steps.Step title="Open Skills">
+    Navigate to **Orchestrate** → **Skills**.
+  </Steps.Step>
+  <Steps.Step title="Create new">
+    Click **New Skill**.
+  </Steps.Step>
+  <Steps.Step title="Write the system prompt">
+    Enter the system prompt. Use `{{variable}}` syntax for runtime placeholders.
+  </Steps.Step>
+  <Steps.Step title="Set default parameters">
+    Optionally set temperature, max tokens, and stop sequences.
+  </Steps.Step>
+  <Steps.Step title="Tag and save">
+    Add tags for discoverability and click **Save**. The skill is now available in the Workflow Builder.
+  </Steps.Step>
+</Steps>
+
+### From the API
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+
+```bash
+curl -X POST https://api.xilos.ai/v1/skills \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "refine-answer",
+    "system_prompt": "You are an editor. Rewrite the following draft to improve clarity, accuracy, and tone. Preserve all factual content.\n\nDraft:\n{{draft}}",
+    "variables": ["draft"],
+    "default_params": { "temperature": 0.3, "max_tokens": 2048 },
+    "tags": ["editing", "refinement"]
+  }'
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+
+```python
+import xilos
+
+client = xilos.Client(api_key="...")
+
+skill = client.skills.create(
+    name="refine-answer",
+    system_prompt=(
+        "You are an editor. Rewrite the following draft to improve clarity, "
+        "accuracy, and tone. Preserve all factual content.\n\nDraft:\n{{draft}}"
+    ),
+    variables=["draft"],
+    default_params={"temperature": 0.3, "max_tokens": 2048},
+    tags=["editing", "refinement"],
+)
+
+print(skill.id)
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+## System Prompts
+
+The system prompt is the core of a skill. It defines the LLM's role, behavior, and output format. Use variables to inject runtime data:
+
+| Variable | Source |
+|----------|--------|
+| `{{user_query}}` | The original user query. |
+| `{{draft}}` | Output from the previous stage in a chain. |
+| `{{context}}` | Facts retrieved by the Context Engine. |
+| `{{tool_output}}` | Results from an attached tool. |
+| `{{custom}}` | Any variable defined in the workflow node configuration. |
+
+### Example: Drafting Skill
+
+```text
+You are a technical writer. Produce a clear, concise draft answering the user's question.
+Use the retrieved context when available. Do not speculate beyond the provided information.
+
+User question:
+{{user_query}}
+
+Retrieved context:
+{{context}}
+```
+
+### Example: Refinement Skill
+
+```text
+You are an editor. Rewrite the following draft to improve clarity, accuracy, and tone.
+Preserve all factual content. Do not introduce new claims.
+
+Draft:
+{{draft}}
+```
+
+<Callout type="warning">
+  Variable names are case-sensitive. `{{User_Query}}` and `{{user_query}}` are different placeholders.
+</Callout>
+
+## Importing Skills
+
+Import skills from the marketplace or from an exported JSON file.
+
+### From the Marketplace
+
+The skills marketplace contains pre-built skills for common use cases: summarization, code review, translation, sentiment analysis, and more.
+
+1. Navigate to **Orchestrate** → **Skills** → **Marketplace**.
+2. Browse or search by tag.
+3. Click a skill to preview its system prompt and default parameters.
+4. Click **Import**. The skill is copied into your workspace and can be customized.
+
+### From JSON
+
+Export a skill from one workspace and import it into another:
+
+```bash
+curl -X POST https://api.xilos.ai/v1/skills/import \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d @refine-answer.json
+```
+
+<Callout type="info">
+  Imported skills are independent copies. Updates to the marketplace original do not propagate to imported skills. Re-import to pick up changes.
+</Callout>
+
+## Using Skills in Workflows
+
+Attach a skill to any LLM Stage node in a workflow:
+
+1. Open the Workflow Builder.
+2. Click an LLM Stage node.
+3. In the settings panel, select a skill from the **Skill** dropdown.
+4. Map workflow variables to the skill's placeholders.
+5. Optionally override the skill's default temperature and max tokens.
+
+When the workflow executes, Xilos fills the skill's variables with runtime values and sends the assembled system prompt to the LLM.
+
+### Example Workflow
+
+A draft-then-refine workflow uses two skills:
+
+| Stage | Model | Skill | Variables |
+|-------|-------|-------|-----------|
+| Draft | Claude Haiku 3.5 | `draft-answer` | `user_query`, `context` |
+| Refine | Claude Opus 4 | `refine-answer` | `draft` (from previous stage) |
+
+The Refine stage automatically receives the Draft stage's output in the `{{draft}}` variable.
+
+## Versioning
+
+Skills are versioned. Every save creates a new version. Existing workflows reference the skill by ID and automatically use the latest version unless pinned. Pin a version in the workflow node settings to lock a specific version for reproducibility.
+
+<Callout type="warning">
+  Editing a skill that is used in active workflows will change the behavior of those workflows on the next execution. Pin a version if you need stability.
+</Callout>
+
+## Best Practices
+
+- **Keep prompts focused** — One skill, one purpose. Compose multiple skills across workflow stages rather than cramming multiple behaviors into one prompt.
+- **Use variables** — Never hardcode values that should be runtime-injected.
+- **Tag for discoverability** — Use consistent tags so team members can find skills.
+- **Pin critical versions** — For production workflows, pin skill versions to prevent unexpected behavior changes.
+- **Test before deploying** — Use the Workflow Builder's Test Run to validate a skill with sample input.
+- **Reuse over rewrite** — Check the marketplace before creating a new skill from scratch.

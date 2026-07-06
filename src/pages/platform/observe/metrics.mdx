@@ -2,18 +2,90 @@
 title: Metrics & Analytics
 ---
 
+import { Callout } from 'nextra/components'
+
 # Metrics & Analytics
 
 Comprehensive metrics including context hit rate, tool call counts, workflow executions, and compression token savings.
 
-## Sections
+## Available Metrics
 
-- Available Metrics
-- Time-Series Data
-- Period Comparison
-- Trending Topics
-- Custom Dashboards
+Xilos tracks the following metrics across all queries:
 
----
+### Query Metrics
 
-*This page is a stub. Content will be added soon.*
+| Metric | Description |
+|--------|-------------|
+| Query Volume | Total queries processed per time period |
+| Query Treatments | Breakdown: unrestricted, blocked, flagged, masked |
+| Average Latency | Time from request to response |
+| Time to First Token | Latency for streaming responses |
+| Error Rate | Percentage of queries returning errors |
+
+### Cost Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Total Spend | Dollar amount for all LLM calls |
+| Cost per Query | Average cost across all queries |
+| Cache Hit Rate | Percentage of queries served from cache |
+| Compression Savings | Tokens saved and dollar value |
+| Savings Rate | Total savings as percentage of gross spend |
+
+### Orchestration Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Context Hit Rate | Percentage of queries enriched by the Context Engine |
+| Tool Call Count | Number of tool/MCP executions |
+| Workflow Executions | Number of multi-model workflow runs |
+| Routing Rule Coverage | Percentage of queries matching a routing rule |
+| Smart Routing Decisions | Number of SLM-based routing decisions |
+
+### Quality Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Faithfulness Score | How well the response matches the source |
+| Answer Relevance | How relevant the response is to the query |
+| Context Relevance | How relevant the retrieved context is |
+| Hallucination Risk | Estimated risk of hallucination per model |
+
+## Time-Series Data
+
+All metrics are available as time-series data. Use the time range selector to view:
+
+- **Day** — Hourly granularity
+- **Week** — Daily granularity
+- **Month** — Daily granularity
+- **Custom** — Select any date range
+
+## Period Comparison
+
+Compare metrics between two periods to identify trends:
+
+- Current period vs. previous period
+- Percentage change for each metric
+- Visual indicators (up/down arrows) for significant changes
+
+## Trending Topics
+
+Xilos automatically identifies trending topics in your query traffic:
+
+- **Top Unrestricted Topics** — Most common subjects in queries that passed through
+- **Top Blocked Topics** — Most frequent categories that triggered blocks
+- **Top Masked Topics** — Most common subjects where PII was detected and masked
+
+<Callout type="info">
+  Trending topics help you understand what your users are asking about and where your security rules are most active.
+</Callout>
+
+## Exporting Data
+
+Query log data can be exported for custom analysis:
+
+1. Navigate to **Query Log**.
+2. Apply filters as needed.
+3. Click **Export** to download as CSV.
+
+For programmatic access, use the [Query endpoint](/api-reference/query) to retrieve historical data.

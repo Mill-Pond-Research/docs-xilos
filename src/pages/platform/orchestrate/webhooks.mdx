@@ -2,18 +2,294 @@
 title: Webhooks
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Webhooks
 
-Receive event-driven notifications when queries complete, are blocked, cached, or compressed. HMAC-signed payloads for secure integration.
+Receive event-driven notifications when queries complete, are blocked, cached, or compressed. Xilos sends HMAC-SHA256-signed HTTP POST requests to your endpoint so you can integrate query events into Slack, Microsoft Teams, custom dashboards, or any HTTP-compatible system.
 
-## Sections
+## Event Types
 
-- Event Types
-- Creating Webhooks
-- HMAC Signatures
-- Payload Format
-- Retry Logic
+Xilos emits webhooks for the following events:
 
----
+| Event | Triggered When |
+|-------|----------------|
+| `query.completed` | A query finishes processing and a response is returned. |
+| `query.blocked` | A query is blocked by a restriction rule or guardrail. |
+| `query.cached` | A query is served from the semantic cache without an LLM call. |
+| `query.compressed` | A query's prompt is compressed before being sent to the LLM. |
+| `cost.threshold` | A cost threshold (daily, monthly, or per-query) is exceeded. |
+| `user.created` | A new user is created in the organization. |
 
-*This page is a stub. Content will be added soon.*
+<Callout type="info">
+  Subscribe to specific event types per webhook. A single endpoint can receive multiple event types, or you can create dedicated webhooks per event.
+</Callout>
+
+## Creating a Webhook
+
+### From the Dashboard
+
+<Steps>
+  <Steps.Step title="Open Webhooks">
+    Navigate to **Orchestrate** → **Webhooks**.
+  </Steps.Step>
+  <Steps.Step title="Create new">
+    Click **New Webhook**.
+  </Steps.Step>
+  <Steps.Step title="Enter endpoint URL">
+    Provide the HTTPS URL that will receive webhook payloads.
+  </Steps.Step>
+  <Steps.Step title="Select events">
+    Choose which event types this webhook should receive.
+  </Steps.Step>
+  <Steps.Step title="Save">
+    Click **Save**. Xilos generates a signing secret. Copy and store it securely — you will need it to verify payloads.
+  </Steps.Step>
+</Steps>
+
+### From the API
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+
+```bash
+curl -X POST https://api.xilos.ai/v1/webhooks \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://hooks.yourcompany.com/xilos",
+    "events": ["query.completed", "query.blocked", "cost.threshold"]
+  }'
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+
+```python
+import xilos
+
+client = xilos.Client(api_key="...")
+
+webhook = client.webhooks.create(
+    url="https://hooks.yourcompany.com/xilos",
+    events=["query.completed", "query.blocked", "cost.threshold"],
+)
+
+print(webhook.id)
+print(webhook.signing_secret)
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="warning">
+  The signing secret is only shown once at creation time. Store it immediately in a secrets manager. If lost, regenerate it from the webhook settings page (this invalidates the previous secret).
+</Callout>
+
+## HMAC-SHA256 Signatures
+
+Every webhook delivery includes an `X-Xilos-Signature` header containing an HMAC-SHA256 signature of the request body. Verify this signature on your server to confirm the payload originated from Xilos.
+
+### Verifying the Signature
+
+<Tabs>
+  <Tabs.Tab title="Node.js">
+
+```javascript
+import crypto from 'crypto';
+
+function verifySignature(rawBody, signature, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(rawBody, 'utf8')
+    .digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
+}
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+
+```python
+import hmac
+import hashlib
+
+def verify_signature(raw_body: bytes, signature: str, secret: str) -> bool:
+    expected = hmac.new(
+        secret.encode('utf-8'),
+        raw_body,
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="warning">
+  Always use a constant-time comparison function (e.g., `hmac.compare_digest` or `crypto.timingSafeEqual`) when verifying signatures. Naive string comparison is vulnerable to timing attacks.
+</Callout>
+
+## Payload Format
+
+All webhook payloads share a common envelope:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event` | string | The event type (e.g., `query.completed`). |
+| `timestamp` | string | ISO 8601 timestamp of when the event was generated. |
+| `webhook_id` | string | The ID of the webhook that triggered this delivery. |
+| `data` | object | The event-specific payload. |
+
+### Payload Example
+
+The following is an example of a `query.completed` webhook payload:
+
+```json
+{
+  "event": "query.completed",
+  "timestamp": "2026-07-06T14:32:07.482Z",
+  "webhook_id": "wh_8f3a2b1c",
+  "data": {
+    "query_id": "q_4a9c7e2d",
+    "user_id": "usr_2b8f1a03",
+    "model": "claude-sonnet-4",
+    "routing_rule": "Technical_Support_Tier1",
+    "input_tokens": 1240,
+    "output_tokens": 856,
+    "cost_usd": 0.0123,
+    "latency_ms": 1843,
+    "cache_hit": false,
+    "compressed": true,
+    "compression_ratio": 0.52,
+    "faithfulness_score": 0.91,
+    "answer_relevance_score": 0.88,
+    "context_relevance_score": 0.85,
+    "query": "How do I reset my API key?",
+    "response_preview": "To reset your API key, navigate to Settings → API Keys..."
+  }
+}
+```
+
+### Event-Specific Data Fields
+
+#### `query.blocked`
+
+```json
+{
+  "data": {
+    "query_id": "q_4a9c7e2d",
+    "user_id": "usr_2b8f1a03",
+    "rule": "PII_Restriction",
+    "reason": "Query contains personally identifiable information.",
+    "category": "pii",
+    "severity": "high",
+    "query": "What is John Smith's social security number?"
+  }
+}
+```
+
+#### `query.cached`
+
+```json
+{
+  "data": {
+    "query_id": "q_4a9c7e2d",
+    "user_id": "usr_2b8f1a03",
+    "original_query": "What is the capital of France?",
+    "matched_query": "What's the capital city of France?",
+    "similarity_score": 0.94,
+    "cost_saved_usd": 0.0089,
+    "latency_saved_ms": 1620
+  }
+}
+```
+
+#### `query.compressed`
+
+```json
+{
+  "data": {
+    "query_id": "q_4a9c7e2d",
+    "user_id": "usr_2b8f1a03",
+    "original_tokens": 4200,
+    "compressed_tokens": 2016,
+    "compression_ratio": 0.48,
+    "strategies": ["prefix_stabilizer", "conversation_summarizer", "bm25_extractor"],
+    "cost_saved_usd": 0.0312
+  }
+}
+```
+
+#### `cost.threshold`
+
+```json
+{
+  "data": {
+    "scope": "daily",
+    "period": "2026-07-06",
+    "threshold_usd": 500.00,
+    "actual_usd": 512.47,
+    "top_model": "claude-opus-4",
+    "top_model_spend_usd": 287.13
+  }
+}
+```
+
+#### `user.created`
+
+```json
+{
+  "data": {
+    "user_id": "usr_2b8f1a03",
+    "email": "jane.doe@company.com",
+    "role": "member",
+    "organization_id": "org_1a2b3c"
+  }
+}
+```
+
+## Retry Logic
+
+If your endpoint returns a non-`2xx` response or does not respond within 10 seconds, Xilos retries the delivery with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1 | Immediate |
+| 2 | 1 minute |
+| 3 | 5 minutes |
+| 4 | 30 minutes |
+| 5 | 2 hours |
+| 6 (final) | 6 hours |
+
+After 6 failed attempts, the delivery is marked as failed and recorded in the webhook's delivery log. The webhook itself remains active for future events.
+
+<Callout type="info">
+  Your endpoint should respond with a `200` or `201` status code as soon as the payload is received. Process the payload asynchronously if your logic is slow — timeouts count as failures and trigger retries.
+</Callout>
+
+### Delivery Log
+
+Each webhook maintains a delivery log accessible from the dashboard:
+
+- **Timestamp** — When the delivery was attempted.
+- **Event** — The event type.
+- **Status** — `delivered`, `failed`, or `retrying`.
+- **HTTP status code** — The response code from your endpoint.
+- **Response body** — The first 500 characters of your endpoint's response.
+- **Retry count** — How many retry attempts have been made.
+
+You can manually redeliver any event from the delivery log.
+
+## Best Practices
+
+- **Verify signatures** — Always validate the `X-Xilos-Signature` header. Reject payloads that fail verification.
+- **Respond quickly** — Return `200` immediately and process asynchronously. Timeouts trigger retries.
+- **Make endpoints idempotent** — Xilos may deliver the same event more than once during retries. Use the `query_id` or event `timestamp` to deduplicate.
+- **Use HTTPS** — Xilos only delivers to HTTPS endpoints. Never use plain HTTP.
+- **Subscribe selectively** — Only subscribe to events you act on. Receiving unnecessary events wastes bandwidth and processing.
+- **Monitor the delivery log** — Check for failed deliveries and redeliver important events manually if needed.
+- **Rotate secrets** — Regenerate the signing secret periodically from the webhook settings page. Update your verification code before regenerating.

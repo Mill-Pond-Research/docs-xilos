@@ -2,17 +2,89 @@
 title: OpenClaw
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # OpenClaw
 
-Route OpenClaw agent traffic through Xilos for governance, caching, and cost control.
+[OpenClaw](https://github.com/NousResearch/openclaw) is an open-source agent framework. Route OpenClaw traffic through Xilos to apply routing rules, restriction rules, guardrails, and caching to every agent call.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Configuration
-- Verify Connection
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- OpenClaw installed and initialized in your project.
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Configuration
 
-*This page is a stub. Content will be added soon.*
+OpenClaw uses the OpenAI-compatible provider as its default backend. Set two environment variables and update the model name in your OpenClaw configuration file.
+
+<Steps>
+  <Steps.Step title="Set environment variables">
+    OpenClaw respects the standard `OPENAI_API_KEY` and `OPENAI_BASE_URL` variables. Set them to your Xilos API key and the Xilos base URL.
+
+    ```bash
+    export OPENAI_API_KEY="your-xilos-api-key"
+    export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
+    ```
+
+    Add these lines to your shell profile (`~/.bashrc` or `~/.zshrc`) so they persist across sessions.
+  </Steps.Step>
+
+  <Steps.Step title="Configure the model in your OpenClaw config">
+    In your OpenClaw configuration file (typically `openclaw.yaml` or `.openclaw/config.yaml`), set the model name to `xilos` so the Xilos routing engine selects the underlying LLM:
+
+    ```yaml
+    model:
+      name: xilos
+      provider: openai
+    ```
+  </Steps.Step>
+
+  <Steps.Step title="Run your agent">
+    ```bash
+    openclaw run
+    ```
+    All LLM calls now route through Xilos.
+  </Steps.Step>
+</Steps>
+
+<Callout type="info">
+  When the model name is `xilos`, Xilos applies your routing rules to select the best LLM for each query. To target a specific model, set `model.name` to a concrete model identifier (for example, `claude-sonnet-4`).
+</Callout>
+
+## Verify the Connection
+
+Send a test query from OpenClaw and confirm it appears in the Xilos dashboard:
+
+1. Trigger any agent action that requires an LLM call.
+2. Open your Xilos dashboard.
+3. Navigate to **Query Log**.
+4. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+```bash
+curl https://api.xilos.ai/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "xilos",
+    "messages": [{"role": "user", "content": "Hello, Xilos!"}]
+  }'
+```
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update `OPENAI_API_KEY`. |
+| Requests go to OpenAI directly | `OPENAI_BASE_URL` is not set or is overridden in the config file. | Ensure `OPENAI_BASE_URL` is exported and that the OpenClaw config does not hardcode a different endpoint. |
+| Routing rules do not apply | The model name is set to a concrete model instead of `xilos`. | Set `model.name` to `xilos` so the Xilos routing engine processes each query. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| Connection refused | Network proxy or firewall blocks outbound HTTPS to `api.xilos.ai`. | Allow outbound traffic to `https://api.xilos.ai` on port 443. |
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.
+- [Set Up Webhooks](/guides/setup-webhooks) — Receive real-time event notifications.

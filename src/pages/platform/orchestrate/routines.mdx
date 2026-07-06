@@ -2,18 +2,216 @@
 title: Routines
 ---
 
+import { Callout, Tabs, Steps, Card, Cards } from 'nextra/components'
+
 # Routines
 
-Schedule agent queries on a recurring basis using cron expressions. Run analysis, generate reports, or trigger workflows automatically.
+Schedule agent queries on a recurring basis using cron expressions. Routines run analysis, generate reports, trigger workflows, and surface insights automatically — without manual intervention.
 
-## Sections
+## What Is a Routine?
 
-- Creating Routines
-- Cron Schedules
-- Manual Triggers
-- Routine Runner
-- Use Cases
+A routine is a scheduled query that runs on a cron schedule. Each routine specifies:
 
----
+- **Schedule** — A cron expression or a preset (hourly, daily, weekly, monthly).
+- **Query** — The prompt sent to the routing pipeline.
+- **Target** — A routing rule, workflow, or specific model.
+- **Output** — Where the result goes (dashboard, webhook, email, or stored report).
 
-*This page is a stub. Content will be added soon.*
+<Callout type="info">
+  Routines are the automation layer of Xilos. Combine them with workflows, tools, and webhooks to build fully autonomous pipelines.
+</Callout>
+
+## Creating a Routine
+
+### From the Dashboard
+
+<Steps>
+  <Steps.Step title="Open Routines">
+    Navigate to **Orchestrate** → **Routines**.
+  </Steps.Step>
+  <Steps.Step title="Create new">
+    Click **New Routine**.
+  </Steps.Step>
+  <Steps.Step title="Set the schedule">
+    Choose a preset or enter a custom cron expression.
+  </Steps.Step>
+  <Steps.Step title="Define the query">
+    Enter the prompt that the routine will execute.
+  </Steps.Step>
+  <Steps.Step title="Select a target">
+    Choose a routing rule, workflow, or specific model.
+  </Steps.Step>
+  <Steps.Step title="Configure output">
+    Choose where results are delivered: dashboard only, webhook, email, or saved report.
+  </Steps.Step>
+  <Steps.Step title="Save and enable">
+    Click **Save**. The routine is active and will run on its next scheduled time.
+  </Steps.Step>
+</Steps>
+
+### From the API
+
+<Tabs>
+  <Tabs.Tab title="cURL">
+
+```bash
+curl -X POST https://api.xilos.ai/v1/routines \
+  -H "Authorization: Bearer $XILOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "daily-cost-summary",
+    "schedule": "0 9 * * *",
+    "query": "Summarize yesterday'\''s LLM cost breakdown by model and identify the top 3 cost drivers.",
+    "target": { "type": "workflow", "id": "wf_cost_analysis" },
+    "output": { "type": "email", "recipients": ["finops@company.com"] }
+  }'
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab title="Python">
+
+```python
+import xilos
+
+client = xilos.Client(api_key="...")
+
+routine = client.routines.create(
+    name="daily-cost-summary",
+    schedule="0 9 * * *",
+    query="Summarize yesterday's LLM cost breakdown by model and identify the top 3 cost drivers.",
+    target={"type": "workflow", "id": "wf_cost_analysis"},
+    output={"type": "email", "recipients": ["finops@company.com"]},
+)
+
+print(routine.id)
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Cron Schedules
+
+Xilos uses standard 5-field cron expressions: `minute hour day-of-month month day-of-week`.
+
+### Presets
+
+| Preset | Cron Expression | Description |
+|--------|-----------------|-------------|
+| Hourly | `0 * * * *` | Runs at the top of every hour. |
+| Daily | `0 9 * * *` | Runs at 09:00 every day. |
+| Weekly | `0 9 * * 1` | Runs at 09:00 every Monday. |
+| Monthly | `0 9 1 * *` | Runs at 09:00 on the first day of each month. |
+
+### Custom Expressions
+
+| Expression | Meaning |
+|------------|---------|
+| `*/15 * * * *` | Every 15 minutes. |
+| `0 9,17 * * *` | At 09:00 and 17:00 every day. |
+| `0 0 * * 6` | At midnight every Saturday. |
+| `30 8 1 * *` | At 08:30 on the first day of each month. |
+
+<Callout type="warning">
+  All times are in the timezone configured in your organization settings. Verify the timezone before relying on time-sensitive routines.
+</Callout>
+
+## Manual Triggers
+
+Run a routine on demand without waiting for its next scheduled execution:
+
+- **Dashboard** — Open the routine and click **Run Now**.
+- **API** — `POST /v1/routines/{id}/trigger`
+
+```bash
+curl -X POST https://api.xilos.ai/v1/routines/$ROUTINE_ID/trigger \
+  -H "Authorization: Bearer $XILOS_API_KEY"
+```
+
+Manual triggers do not affect the routine's schedule. The next scheduled run proceeds as normal.
+
+## Routine Runner
+
+The Routine Runner is the background process that executes scheduled routines. It:
+
+1. Polls for routines whose next run time has passed.
+2. Submits the routine's query to the specified target (routing rule or workflow).
+3. Collects the response and routes it to the configured output.
+4. Records the run in the routine's execution history.
+
+### Execution History
+
+Each routine maintains a log of past runs:
+
+- **Timestamp** — When the routine executed.
+- **Status** — `success`, `failed`, or `timeout`.
+- **Duration** — Wall-clock time for the run.
+- **Token usage** — Input and output tokens consumed.
+- **Output preview** — The first 500 characters of the response.
+
+Failed runs are retried up to 3 times with exponential backoff before being marked as failed.
+
+## Output Options
+
+| Output Type | Description |
+|-------------|-------------|
+| `dashboard` | Result appears in the routine's execution history only. |
+| `webhook` | Result is POSTed to a configured webhook endpoint. |
+| `email` | Result is emailed to specified recipients. |
+| `report` | Result is saved as a report in the Reports section for later retrieval. |
+
+<Callout type="info">
+  Combine the `webhook` output with [Webhooks](/platform/orchestrate/webhooks) to pipe routine results into Slack, Microsoft Teams, or any HTTP-compatible system.
+</Callout>
+
+## Use Cases
+
+### Daily Cost Analysis
+
+Run a workflow every morning that summarizes the previous day's LLM spending, identifies cost drivers, and emails the report to the FinOps team.
+
+```json
+{
+  "name": "daily-cost-analysis",
+  "schedule": "0 9 * * *",
+  "query": "Summarize yesterday's LLM costs by model. Flag any model whose spend exceeded the 7-day average by more than 20%.",
+  "target": { "type": "workflow", "id": "wf_cost_analysis" },
+  "output": { "type": "email", "recipients": ["finops@company.com"] }
+}
+```
+
+### Weekly Security Review
+
+Every Monday, run a query that reviews blocked queries from the past week and summarizes policy violations, attempted prompt injections, and restricted-topic access.
+
+```json
+{
+  "name": "weekly-security-review",
+  "schedule": "0 9 * * 1",
+  "query": "Review all blocked queries from the past 7 days. Categorize violations by type and severity. List any repeated offenders.",
+  "target": { "type": "rule", "id": "security_analysis" },
+  "output": { "type": "report" }
+}
+```
+
+### Automated Reports
+
+Generate a monthly report combining query volume, cache hit rate, cost savings, and quality scores into a single summary delivered via webhook to a reporting system.
+
+```json
+{
+  "name": "monthly-platform-report",
+  "schedule": "0 9 1 * *",
+  "query": "Generate a monthly platform report: total queries, cache hit rate, total cost savings from caching and compression, average quality scores, and top 5 models by volume.",
+  "target": { "type": "workflow", "id": "wf_monthly_report" },
+  "output": { "type": "webhook", "url": "https://hooks.company.com/xilos-reports" }
+}
+```
+
+## Best Practices
+
+- **Start with presets** — Use hourly, daily, weekly, or monthly presets before writing custom cron.
+- **Stagger schedules** — Avoid running many routines at the same minute. Spread them out to balance load.
+- **Use workflows for complex analysis** — Point routines at workflows when the analysis requires multiple stages.
+- **Monitor failures** — Check execution history regularly. A silently failing routine can go unnoticed.
+- **Set timeouts** — Configure a timeout per routine to prevent runaway queries from blocking the runner.
+- **Tag routines** — Use tags to group routines by team or purpose for easier management.

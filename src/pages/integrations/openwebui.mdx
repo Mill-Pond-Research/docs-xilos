@@ -2,17 +2,80 @@
 title: OpenWebUI
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # OpenWebUI
 
-Add Xilos as an OpenAI-compatible API connection in OpenWebUI for full chat interface with governance.
+[OpenWebUI](https://docs.openwebui.com/) is a self-hosted chat interface for LLMs. Add Xilos as a custom OpenAI-compatible connection to get a full chat interface with Xilos governance, routing, caching, and cost control.
 
-## Sections
+## Prerequisites
 
-- Prerequisites
-- Configuration
-- Verify Connection
-- Troubleshooting
+- A Xilos account with an active organization.
+- An API key from **Settings** in the Xilos dashboard, or a [Virtual Key](/guides/virtual-keys) with scoped limits.
+- OpenWebUI installed and running (see the [OpenWebUI docs](https://docs.openwebui.com/) for installation).
+- The base URL: `https://api.xilos.ai/api/v1`.
 
----
+## Configuration
 
-*This page is a stub. Content will be added soon.*
+OpenWebUI discovers models from the OpenAI-compatible `/models` endpoint. Add Xilos as a connection and OpenWebUI fetches the available models automatically.
+
+<Steps>
+  <Steps.Step title="Open OpenWebUI settings">
+    Log in to your OpenWebUI instance as an administrator. Navigate to **Settings → Connections** in the admin panel.
+  </Steps.Step>
+
+  <Steps.Step title="Add a new OpenAI API connection">
+    Click **Add Connection** (or **Add OpenAI API** depending on your version) and enter the following:
+
+    - **URL:** `https://api.xilos.ai/api/v1`
+    - **API Key:** `your-xilos-api-key`
+
+    Set the connection name to `Xilos` for easy identification.
+  </Steps.Step>
+
+  <Steps.Step title="Save and enable the connection">
+    Click **Save** and toggle the connection to enabled. OpenWebUI fetches the model list from the Xilos `/models` endpoint. The `xilos` model (and any other models surfaced by your routing configuration) appears in the model picker.
+  </Steps.Step>
+
+  <Steps.Step title="Select the Xilos model">
+    In the chat interface, open the model picker and select `xilos`. Messages now flow through the Xilos gateway.
+
+    <Callout type="info">
+      When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, select it from the model picker if it appears, or configure a routing rule that routes to it.
+    </Callout>
+  </Steps.Step>
+</Steps>
+
+<Callout type="warning">
+  Ensure the URL ends with `/api/v1` and not `/api/v1/`. A trailing slash can cause OpenWebUI to construct invalid endpoint paths (for example, `//chat/completions`), which results in 404 errors.
+</Callout>
+
+## Verify the Connection
+
+1. In the OpenWebUI chat interface, select the `xilos` model.
+2. Send a test message (for example, "Hello, Xilos!").
+3. Open your Xilos dashboard.
+4. Navigate to **Query Log**.
+5. Confirm the query appears with the routing decision, governance actions, and cost breakdown.
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| No models appear in the picker | OpenWebUI could not fetch the model list from Xilos. | Verify the URL is `https://api.xilos.ai/api/v1` (no trailing slash) and the API key is valid. Check the OpenWebUI logs for connection errors. |
+| 401 Unauthorized | The API key is invalid or expired. | Regenerate the key in the Xilos dashboard under **Settings** and update the OpenWebUI connection. |
+| 403 Forbidden | A Xilos restriction rule blocked the query. | Check the **Query Log** for the triggered rule and adjust the rule or the query content. |
+| 404 on chat completions | The connection URL has a trailing slash or is missing `/api/v1`. | Set the URL to `https://api.xilos.ai/api/v1` with no trailing slash. |
+| 429 Rate limit exceeded | You exceeded your organization or Virtual Key rate limit. | Reduce request frequency or create a Virtual Key with a higher limit. |
+| Routing rules do not apply | The selected model is a concrete model instead of `xilos`. | Select the `xilos` model in the chat interface so the Xilos routing engine processes each query. |
+
+<Callout type="info">
+  If you manage multiple OpenWebUI instances, create a separate [Virtual Key](/guides/virtual-keys) for each instance. This lets you track usage and enforce independent budget limits per instance.
+</Callout>
+
+## Next Steps
+
+- [Create a Routing Rule](/guides/create-routing-rule) — Direct specific query types to the best model.
+- [Create a Restriction Rule](/guides/create-restriction-rule) — Block, mask, or flag sensitive content.
+- [Enable Context Compression](/guides/enable-compression) — Reduce token costs by 50–90%.
+- [Manage Virtual Keys](/guides/virtual-keys) — Scope API keys with budget and rate limits.

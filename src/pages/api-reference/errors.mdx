@@ -2,17 +2,112 @@
 title: Error Codes
 ---
 
+import { Callout } from 'nextra/components'
+
 # Error Codes
 
 Standard HTTP status codes and Xilos-specific error responses.
 
-## Sections
+## Error Response Format
 
-- Error Response Format
-- HTTP Status Codes
-- Xilos Error Codes
-- Error Handling Best Practices
+All errors return a JSON response with the following structure:
 
----
+```json
+{
+  "detail": "Human-readable error message",
+  "code": "XILOS_ERROR_CODE",
+  "status": 400
+}
+```
 
-*This page is a stub. Content will be added soon.*
+## HTTP Status Codes
+
+| Status | Meaning | Description |
+|--------|---------|-------------|
+| 200 | OK | Request succeeded |
+| 201 | Created | Resource created successfully |
+| 400 | Bad Request | Invalid request body or parameters |
+| 401 | Unauthorized | Missing or invalid API key |
+| 403 | Forbidden | Query blocked by restriction rule, or insufficient permissions |
+| 404 | Not Found | Resource not found |
+| 429 | Rate Limited | Rate limit or budget limit exceeded |
+| 500 | Internal Server Error | Unexpected server error |
+| 502 | Bad Gateway | Upstream LLM provider error |
+| 503 | Service Unavailable | Service temporarily unavailable |
+
+## Xilos-Specific Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `QUERY_BLOCKED` | 403 | Query was blocked by a restriction rule |
+| `QUERY_FLAGGED` | 200 | Query was processed but flagged for review |
+| `BUDGET_EXCEEDED` | 429 | Virtual key budget has been exceeded |
+| `RATE_LIMIT_EXCEEDED` | 429 | Rate limit for this key has been exceeded |
+| `MODEL_UNAVAILABLE` | 502 | The selected LLM provider is unavailable |
+| `COMPRESSION_FAILED` | 200 | Compression failed, query processed without compression |
+| `CACHE_MISS` | 200 | No cache hit, query processed normally |
+| `ROUTING_FALLBACK` | 200 | No routing rule matched, default model used |
+
+## Handling Errors
+
+### Python
+
+```python
+from openai import OpenAI, APIError, RateLimitError, APIStatusError
+
+client = OpenAI(
+    api_key="YOUR_XILOS_API_KEY",
+    base_url="https://api.xilos.ai/api/v1"
+)
+
+try:
+    response = client.chat.completions.create(
+        model="xilos",
+        messages=[{"role": "user", "content": "Hello"}]
+    )
+except RateLimitError:
+    # Budget or rate limit exceeded — back off
+    time.sleep(60)
+except APIStatusError as e:
+    if e.status_code == 403:
+        # Query blocked by restriction rule
+        print(f"Query blocked: {e}")
+    else:
+        print(f"API error: {e}")
+```
+
+### JavaScript
+
+```javascript
+try {
+  const response = await client.chat.completions.create({
+    model: "xilos",
+    messages: [{ role: "user", content: "Hello" }],
+  });
+} catch (error) {
+  if (error.status === 429) {
+    // Rate limited — wait and retry
+    await new Promise(resolve => setTimeout(resolve, 60000));
+  } else if (error.status === 403) {
+    // Query blocked
+    console.error("Query blocked:", error.message);
+  } else {
+    console.error("API error:", error);
+  }
+}
+```
+
+<Callout type="info">
+  A 403 response means the query was blocked by a restriction rule — this is expected behavior, not a bug. Check your restriction rules if this happens unexpectedly.
+</Callout>
+
+## Retry Strategy
+
+For transient errors (429, 500, 502, 503), use exponential backoff:
+
+1. Wait 1 second, retry
+2. Wait 2 seconds, retry
+3. Wait 4 seconds, retry
+4. After 3 failed attempts, give up
+
+Do not retry on 400, 401, or 403 errors — these are permanent failures.

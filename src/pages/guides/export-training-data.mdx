@@ -2,18 +2,115 @@
 title: Export Training Data
 ---
 
+import { Steps, Callout } from 'nextra/components'
+
 # Export Training Data
 
 Export the query log as a filtered training dataset for fine-tuning open-source models.
 
-## Sections
+## Prerequisites
 
-- Accessing the Export
-- Quality Filters
-- Output Formats
-- Cost Estimation
-- Previewing
+- A Xilos account with admin access
+- Query history (at least 100 queries recommended)
+- An understanding of which routing rules or models you want to fine-tune
 
----
+## Why Export Training Data?
 
-*This page is a stub. Content will be added soon.*
+Every query that passes through Xilos is logged with full context — the query, the response, the routing rule, the model used, and quality scores. This data is already a training dataset. By filtering for high-quality interactions, you can create a training set that captures your organization's specific query patterns and desired responses.
+
+## Step 1: Review Suggestions
+
+Before exporting, check the Suggestions page for fine-tune recommendations:
+
+1. Navigate to **SuperAdmin** > **Suggestions** (if available) or use the API.
+2. Review the suggested fine-tune targets — these are routing rules where fine-tuning would save the most money.
+3. Note the estimated savings and recommended base model.
+
+## Step 2: Preview the Training Data
+
+1. Use the API to preview the training data before exporting:
+
+```bash
+curl "https://api.xilos.ai/api/v1/training-data/preview?limit=5" \
+  -H "Authorization: Bearer YOUR_XILOS_API_KEY"
+```
+
+2. Review the preview to ensure the data quality meets your standards.
+3. Adjust filters as needed.
+
+## Step 3: Export the Dataset
+
+Export the training data with quality filters:
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/training-data/export \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+  -d '{
+    "format": "openai",
+    "min_faithfulness": 0.7,
+    "min_relevance": 0.7,
+    "limit": 10000
+  }'
+```
+
+### Filter Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `format` | Output format: `openai`, `alpaca`, `chatml`, `csv` | `openai` |
+| `min_faithfulness` | Minimum faithfulness score (0-1) | 0.7 |
+| `min_relevance` | Minimum answer relevance score (0-1) | 0.7 |
+| `routing_rule_id` | Filter by specific routing rule | None |
+| `llm_id` | Filter by specific model | None |
+| `start_date` | Filter from date | None |
+| `end_date` | Filter to date | None |
+| `limit` | Maximum number of examples | 10000 |
+
+## Step 4: Review the Output
+
+The export returns a JSON response with:
+
+- `examples` — Array of training examples in the selected format
+- `total_count` — Number of examples exported
+- `estimated_tokens` — Total token count in the dataset
+- `estimated_cost` — Estimated fine-tune cost
+- `format` — The output format used
+
+### OpenAI JSONL Format
+
+Each line is a JSON object:
+
+```json
+{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What is the capital of France?"}, {"role": "assistant", "content": "The capital of France is Paris."}]}
+```
+
+## Step 5: Create a Fine-Tune Job
+
+Use the exported data to create a fine-tune job:
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/fine-tune/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_XILOS_API_KEY" \
+  -d '{
+    "base_model": "meta-llama/Llama-3.3-70B-Instruct",
+    "provider": "together",
+    "training_data_export_id": "uuid-from-step-3"
+  }'
+```
+
+See [Fine-Tune a Model](/guides/fine-tune-model) for the full workflow.
+
+<Callout type="info">
+  The estimated fine-tune cost is typically a fraction of what you would spend on premium API calls. A dataset of 10,000 examples might cost $5-20 to fine-tune, but save hundreds per month in API costs.
+</Callout>
+
+## Best Practices
+
+- Filter by quality scores (faithfulness ≥ 0.7, relevance ≥ 0.7)
+- Filter by specific routing rules to create targeted fine-tune datasets
+- Export at least 1,000 examples for meaningful fine-tuning
+- Review the preview before exporting to catch quality issues
+- Use the OpenAI JSONL format for broadest compatibility
+- Re-export periodically as your query log grows
