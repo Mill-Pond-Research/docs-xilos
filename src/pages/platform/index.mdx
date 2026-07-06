@@ -29,21 +29,26 @@ The platform is built on three pillars — **Observe**, **Secure**, and **Orches
 Every query that enters Xilos follows the same path. The pillars apply sequentially, and each stage can act on or transform the request before it reaches the model.
 
 <Steps>
-  <Step title="Ingest">
+  ### Ingest
+
     A user submits a query through a connected application, API, or agent. Xilos receives the request and attaches a trace identifier that follows it end to end.
-  </Step>
-  <Step title="Secure">
+  
+  ### Secure
+
     Restriction rules evaluate the query for blocked, masked, or flagged content. PII detection redacts sensitive fields. Prompt injection defense runs before any model is invoked. Queries that violate policy are terminated here.
-  </Step>
-  <Step title="Orchestrate">
+  
+  ### Orchestrate
+
     The internal Small Language Model (SLM) classifies query intent, selects the optimal target LLM, and applies context compression, semantic caching, and enrichment from the Context Engine. Multi-model workflows, tools, and routines are applied as configured.
-  </Step>
-  <Step title="Execute">
+  
+  ### Execute
+
     The AI Kernel dispatches the prepared request to the selected model — public or private — and retrieves the response.
-  </Step>
-  <Step title="Observe">
+  
+  ### Observe
+
     The response, governance actions, compression statistics, and cost breakdown are written to the Query Log and rendered on the Dashboard in real time.
-  </Step>
+  
 </Steps>
 
 <Callout type="info">

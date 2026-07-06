@@ -48,15 +48,18 @@ A sequential chain runs stages one after another. Each stage receives the output
 ```
 
 <Steps>
-  <Steps.Step title="Draft">
+  ### Draft
+
     Claude Haiku 3.5 produces a first-pass answer quickly and cheaply.
-  </Steps.Step>
-  <Steps.Step title="Refine">
+  
+  ### Refine
+
     Claude Opus 4 receives the draft and rewrites it for accuracy, tone, and completeness.
-  </Steps.Step>
-  <Steps.Step title="Return">
+  
+  ### Return
+
     The Output node returns the refined response to the caller.
-  </Steps.Step>
+  
 </Steps>
 
 ## Parallel Execution
@@ -141,21 +144,26 @@ Drag any of the following node types onto the canvas:
 ### Building a Workflow
 
 <Steps>
-  <Steps.Step title="Add nodes">
+  ### Add nodes
+
     Drag nodes from the left palette onto the canvas.
-  </Steps.Step>
-  <Steps.Step title="Connect nodes">
+  
+  ### Connect nodes
+
     Click and drag from a node's output handle to the next node's input handle to create an edge.
-  </Steps.Step>
-  <Steps.Step title="Configure each node">
+  
+  ### Configure each node
+
     Click a node to open its settings panel. Select models, attach skills, and set parameters.
-  </Steps.Step>
-  <Steps.Step title="Test run">
+  
+  ### Test run
+
     Click **Test Run** and enter sample input. The canvas highlights the execution path and displays each stage's output.
-  </Steps.Step>
-  <Steps.Step title="Save">
+  
+  ### Save
+
     Click **Save** to persist the workflow. Xilos stores the underlying JSON and creates a new version.
-  </Steps.Step>
+  
 </Steps>
 
 ### Save and Load Workflow JSON

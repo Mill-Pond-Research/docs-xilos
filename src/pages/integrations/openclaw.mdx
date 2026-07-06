@@ -20,7 +20,8 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 OpenClaw uses the OpenAI-compatible provider as its default backend. Set two environment variables and update the model name in your OpenClaw configuration file.
 
 <Steps>
-  <Steps.Step title="Set environment variables">
+  ### Set environment variables
+
     OpenClaw respects the standard `OPENAI_API_KEY` and `OPENAI_BASE_URL` variables. Set them to your Xilos API key and the Xilos base URL.
 
     ```bash
@@ -29,9 +30,10 @@ OpenClaw uses the OpenAI-compatible provider as its default backend. Set two env
     ```
 
     Add these lines to your shell profile (`~/.bashrc` or `~/.zshrc`) so they persist across sessions.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Configure the model in your OpenClaw config">
+  ### Configure the model in your OpenClaw config
+
     In your OpenClaw configuration file (typically `openclaw.yaml` or `.openclaw/config.yaml`), set the model name to `xilos` so the Xilos routing engine selects the underlying LLM:
 
     ```yaml
@@ -39,14 +41,15 @@ OpenClaw uses the OpenAI-compatible provider as its default backend. Set two env
       name: xilos
       provider: openai
     ```
-  </Steps.Step>
+  
 
-  <Steps.Step title="Run your agent">
+  ### Run your agent
+
     ```bash
     openclaw run
     ```
     All LLM calls now route through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="info">

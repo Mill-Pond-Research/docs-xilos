@@ -26,14 +26,16 @@ Configure GitHub Copilot to route through Xilos for governance, caching, and cos
 If your Copilot client supports a custom OpenAI-compatible endpoint, set the base URL and API key directly. This is the simplest approach — no proxy required.
 
 <Steps>
-  <Steps.Step title="Set environment variables">
+  ### Set environment variables
+
     ```bash
     export OPENAI_API_KEY="your-xilos-api-key"
     export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
     ```
-  </Steps.Step>
+  
 
-  <Steps.Step title="Configure the Copilot model">
+  ### Configure the Copilot model
+
     Set the model name to `xilos` so the Xilos routing engine selects the underlying LLM. If your client requires a specific model identifier, use `xilos`.
 
     ```json
@@ -49,11 +51,12 @@ If your Copilot client supports a custom OpenAI-compatible endpoint, set the bas
     <Callout type="info">
       The exact setting keys differ between Copilot versions. The principle is the same: set the API URL to `https://api.xilos.ai/api/v1`, the API key to your Xilos key, and the model to `xilos`.
     </Callout>
-  </Steps.Step>
+  
 
-  <Steps.Step title="Restart your editor">
+  ### Restart your editor
+
     Reload VS Code or your JetBrains IDE so the new settings take effect.
-  </Steps.Step>
+  
 </Steps>
 
 ### Option 2: Local Proxy
@@ -61,7 +64,8 @@ If your Copilot client supports a custom OpenAI-compatible endpoint, set the bas
 If your Copilot client does not expose a custom endpoint setting, run a lightweight local proxy that forwards requests to Xilos. Point Copilot at the proxy and the proxy rewrites the target to the Xilos base URL.
 
 <Steps>
-  <Steps.Step title="Start a local proxy">
+  ### Start a local proxy
+
     Use any HTTP reverse proxy (for example, `socat`, `nginx`, or a small Node.js script). The proxy listens on a local port and forwards to `https://api.xilos.ai/api/v1`.
 
     ```bash
@@ -69,15 +73,17 @@ If your Copilot client does not expose a custom endpoint setting, run a lightwei
     ```
 
     For TLS termination, use `nginx` or `caddy` with a self-signed certificate for `localhost`.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Point Copilot at the local proxy">
+  ### Point Copilot at the local proxy
+
     Set the Copilot endpoint to `http://localhost:8080` (or your proxy address) and provide your Xilos API key in the `Authorization` header. The proxy injects the header and forwards the request to Xilos.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Set the model name">
+  ### Set the model name
+
     Use `xilos` as the model name in your Copilot configuration so the Xilos routing engine selects the underlying LLM.
-  </Steps.Step>
+  
 </Steps>
 
 ## Verify the Connection

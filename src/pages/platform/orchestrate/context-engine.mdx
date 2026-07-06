@@ -44,21 +44,26 @@ Each fact is embedded and stored independently. A future query about "where is X
 Extraction runs automatically after every completed query. The pipeline:
 
 <Steps>
-  <Steps.Step title="Parse response">
+  ### Parse response
+
     The response text is split into sentences and clauses.
-  </Steps.Step>
-  <Steps.Step title="Decompose">
+  
+  ### Decompose
+
     An extraction model breaks compound statements into atomic facts.
-  </Steps.Step>
-  <Steps.Step title="Deduplicate">
+  
+  ### Deduplicate
+
     New facts are compared against existing facts. Duplicates and near-duplicates are skipped.
-  </Steps.Step>
-  <Steps.Step title="Score">
+  
+  ### Score
+
     Each fact receives a faithfulness score based on the source response's quality metrics. Low-scoring facts are flagged.
-  </Steps.Step>
-  <Steps.Step title="Store">
+  
+  ### Store
+
     The fact is embedded and written to the vector database with full provenance metadata.
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="warning">

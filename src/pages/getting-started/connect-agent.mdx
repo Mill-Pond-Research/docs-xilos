@@ -42,10 +42,12 @@ Before you connect an agent, make sure you have:
 [Hermes Agent](https://hermes-agent.nousresearch.com) is an AI agent runtime by Nous Research. To route Hermes traffic through Xilos, set the provider base URL and API key in your Hermes configuration.
 
 <Steps>
-  <Steps.Step title="Open your Hermes config">
+  ### Open your Hermes config
+
     Edit the provider configuration in your Hermes profile (typically `~/.hermes/config.yaml` or the profile-specific YAML).
-  </Steps.Step>
-  <Steps.Step title="Set the base URL and API key">
+  
+  ### Set the base URL and API key
+
     ```yaml
     providers:
       xilos:
@@ -54,22 +56,25 @@ Before you connect an agent, make sure you have:
         # Model name sent to Xilos; Xilos routes to the actual LLM
         model: xilos
     ```
-  </Steps.Step>
-  <Steps.Step title="Export your API key as an environment variable">
+  
+  ### Export your API key as an environment variable
+
     ```bash
     export XILOS_API_KEY="your-xilos-api-key"
     ```
-  </Steps.Step>
-  <Steps.Step title="Set Xilos as the active provider">
+  
+  ### Set Xilos as the active provider
+
     ```yaml
     model:
       provider: xilos
       name: xilos
     ```
-  </Steps.Step>
-  <Steps.Step title="Verify the connection">
+  
+  ### Verify the connection
+
     Run any Hermes command that triggers an LLM call. Open the Xilos dashboard **Query Log** to confirm the request was processed through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 ---
@@ -79,25 +84,28 @@ Before you connect an agent, make sure you have:
 [OpenClaw](https://github.com/NousResearch/openclaw) is an open-source agent framework. Configure it to use Xilos as the OpenAI-compatible backend.
 
 <Steps>
-  <Steps.Step title="Set environment variables">
+  ### Set environment variables
+
     ```bash
     export OPENAI_API_KEY="your-xilos-api-key"
     export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
     ```
-  </Steps.Step>
-  <Steps.Step title="Configure the model in your OpenClaw config">
+  
+  ### Configure the model in your OpenClaw config
+
     ```yaml
     model:
       name: xilos
       provider: openai
     ```
-  </Steps.Step>
-  <Steps.Step title="Run your agent">
+  
+  ### Run your agent
+
     ```bash
     openclaw run
     ```
     All LLM calls are now routed through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 ---
@@ -107,22 +115,25 @@ Before you connect an agent, make sure you have:
 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's CLI coding agent. Connect it to Xilos by overriding the API base URL.
 
 <Steps>
-  <Steps.Step title="Set environment variables">
+  ### Set environment variables
+
     Claude Code respects the standard `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` variables. Because Xilos is OpenAI-compatible, use the OpenAI-compatible override instead:
 
     ```bash
     export OPENAI_API_KEY="your-xilos-api-key"
     export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
     ```
-  </Steps.Step>
-  <Steps.Step title="Launch Claude Code with the OpenAI provider">
+  
+  ### Launch Claude Code with the OpenAI provider
+
     ```bash
     claude-code --provider openai --model xilos
     ```
-  </Steps.Step>
-  <Steps.Step title="Verify in the dashboard">
+  
+  ### Verify in the dashboard
+
     Check the **Query Log** in your Xilos dashboard to confirm Claude Code traffic is flowing through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="warning">
@@ -241,19 +252,23 @@ The official OpenAI SDKs for Python and JavaScript work with Xilos out of the bo
 [OpenWebUI](https://docs.openwebui.com/) is a self-hosted chat interface. Add Xilos as a custom OpenAI-compatible connection.
 
 <Steps>
-  <Steps.Step title="Open OpenWebUI settings">
+  ### Open OpenWebUI settings
+
     Navigate to **Settings → Connections** in the OpenWebUI admin panel.
-  </Steps.Step>
-  <Steps.Step title="Add a new OpenAI API connection">
+  
+  ### Add a new OpenAI API connection
+
     - **URL:** `https://api.xilos.ai/api/v1`
     - **API Key:** `your-xilos-api-key`
-  </Steps.Step>
-  <Steps.Step title="Save and enable the connection">
+  
+  ### Save and enable the connection
+
     Click **Save** and toggle the connection to enabled. OpenWebUI will fetch the model list from Xilos.
-  </Steps.Step>
-  <Steps.Step title="Select the Xilos model">
+  
+  ### Select the Xilos model
+
     In the chat interface, select the `xilos` model (or any model surfaced by your routing configuration). Messages now flow through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 ---
@@ -263,15 +278,18 @@ The official OpenAI SDKs for Python and JavaScript work with Xilos out of the bo
 Regardless of which framework you connected, verify that traffic is flowing through Xilos:
 
 <Steps>
-  <Steps.Step title="Send a test message">
+  ### Send a test message
+
     Trigger any LLM call from your agent or application.
-  </Steps.Step>
-  <Steps.Step title="Open the Xilos dashboard">
+  
+  ### Open the Xilos dashboard
+
     Navigate to the **Query Log** in the sidebar.
-  </Steps.Step>
-  <Steps.Step title="Confirm the query appears">
+  
+  ### Confirm the query appears
+
     You should see the query, the routing decision, any governance actions applied, and the cost breakdown.
-  </Steps.Step>
+  
 </Steps>
 
 ## Next Steps

@@ -20,20 +20,23 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 Kilo Code supports custom OpenAI-compatible providers. Add Xilos as a provider in the Kilo Code settings and select it as the active model.
 
 <Steps>
-  <Steps.Step title="Open the Kilo Code settings">
-    In your editor, open the Kilo Code extension settings. Navigate to **Providers** or **API Configuration** (the exact label varies by version).
-  </Steps.Step>
+  ### Open the Kilo Code settings
 
-  <Steps.Step title="Add Xilos as a custom OpenAI-compatible provider">
+    In your editor, open the Kilo Code extension settings. Navigate to **Providers** or **API Configuration** (the exact label varies by version).
+  
+
+  ### Add Xilos as a custom OpenAI-compatible provider
+
     - **Provider Name:** `Xilos`
     - **Base URL:** `https://api.xilos.ai/api/v1`
     - **API Key:** `your-xilos-api-key`
     - **Model:** `xilos`
 
     Save the provider configuration.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Set environment variables (alternative)">
+  ### Set environment variables (alternative)
+
     If your version of Kilo Code reads the base URL and API key from environment variables, set them instead:
 
     ```bash
@@ -42,11 +45,12 @@ Kilo Code supports custom OpenAI-compatible providers. Add Xilos as a provider i
     ```
 
     Add these lines to your shell profile (`~/.bashrc` or `~/.zshrc`) so they persist across sessions.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Select the Xilos provider">
+  ### Select the Xilos provider
+
     In the Kilo Code chat panel, select the `Xilos` provider and the `xilos` model. All subsequent queries route through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="info">

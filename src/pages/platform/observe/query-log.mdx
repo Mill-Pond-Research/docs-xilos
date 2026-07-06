@@ -2,7 +2,7 @@
 title: Query Log
 ---
 
-import { Callout, Steps, Tabs } from 'nextra/components'
+import { Callout, Tabs } from 'nextra/components'
 
 # Query Log
 
@@ -64,21 +64,21 @@ Costs are calculated against the pricing of the selected model and are isolated 
 The Query Log supports filtering to narrow the list to relevant rows.
 
 <Tabs>
-  <Tab title="By Treatment">
+  <Tabs.Tab title="By Treatment">
     Filter by governance action — show only Blocked, Flagged, Masked, or Unrestricted queries.
-  </Tab>
-  <Tab title="By Model">
+  </Tabs.Tab>
+  <Tabs.Tab title="By Model">
     Filter by the LLM that processed the query. Useful for comparing cost or quality across models.
-  </Tab>
-  <Tab title="By Tenant">
+  </Tabs.Tab>
+  <Tabs.Tab title="By Tenant">
     In multi-tenant deployments, filter to a specific tenant. Users with access to a single tenant see only that tenant's queries.
-  </Tab>
-  <Tab title="By Time">
+  </Tabs.Tab>
+  <Tabs.Tab title="By Time">
     Filter by date or time range to focus on a specific window of activity.
-  </Tab>
-  <Tab title="By Text">
+  </Tabs.Tab>
+  <Tabs.Tab title="By Text">
     Full-text search across the Query and Improved Query fields to find prompts that mention a specific term or phrase.
-  </Tab>
+  </Tabs.Tab>
 </Tabs>
 
 Filters can be combined. For example, filter to Blocked queries on a specific model within a date range to audit a restriction rule's behavior.

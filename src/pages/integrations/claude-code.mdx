@@ -20,7 +20,8 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 Claude Code respects the standard `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` environment variables. Because Xilos is OpenAI-compatible, use the OpenAI-compatible override to route traffic through Xilos.
 
 <Steps>
-  <Steps.Step title="Set environment variables">
+  ### Set environment variables
+
     ```bash
     export OPENAI_API_KEY="your-xilos-api-key"
     export OPENAI_BASE_URL="https://api.xilos.ai/api/v1"
@@ -35,19 +36,21 @@ Claude Code respects the standard `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` e
       export ANTHROPIC_BASE_URL="https://api.xilos.ai/api/v1"
       ```
     </Callout>
-  </Steps.Step>
+  
 
-  <Steps.Step title="Launch Claude Code with the OpenAI provider">
+  ### Launch Claude Code with the OpenAI provider
+
     ```bash
     claude-code --provider openai --model xilos
     ```
 
     The `--model xilos` flag tells Xilos to apply your routing rules. To target a specific model, pass a concrete model name (for example, `claude-sonnet-4`).
-  </Steps.Step>
+  
 
-  <Steps.Step title="Verify in the dashboard">
+  ### Verify in the dashboard
+
     Check the **Query Log** in your Xilos dashboard to confirm Claude Code traffic is flowing through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="warning">

@@ -20,16 +20,18 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 Hermes reads provider settings from `~/.hermes/config.yaml` (or the profile-specific YAML under `~/.hermes/profiles/<name>/`). You set the base URL, API key, and model, then export the key as an environment variable so Hermes doctor and tool checks recognize it.
 
 <Steps>
-  <Steps.Step title="Set the model provider and base URL">
+  ### Set the model provider and base URL
+
     ```bash
     hermes config set model.default xilos
     hermes config set model.provider auto
     hermes config set model.base_url https://api.xilos.ai/api/v1
     hermes config set model.api_key $XILOS_API_KEY
     ```
-  </Steps.Step>
+  
 
-  <Steps.Step title="Export your Xilos API key as an environment variable">
+  ### Export your Xilos API key as an environment variable
+
     ```bash
     export XILOS_API_KEY="your-xilos-api-key"
     ```
@@ -41,21 +43,23 @@ Hermes reads provider settings from `~/.hermes/config.yaml` (or the profile-spec
       echo "XILOS_API_KEY=$XILOS_API_KEY" >> $(hermes config env-path)
       ```
     </Callout>
-  </Steps.Step>
+  
 
-  <Steps.Step title="Verify the configuration">
+  ### Verify the configuration
+
     ```bash
     hermes doctor
     ```
     `hermes doctor` checks that the model, provider, and API key are valid and that required dependencies are present.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Start a session">
+  ### Start a session
+
     ```bash
     hermes
     ```
     Any command that triggers an LLM call now routes through Xilos.
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="info">

@@ -20,30 +20,34 @@ import { Callout, Tabs, Steps } from 'nextra/components'
 OpenWebUI discovers models from the OpenAI-compatible `/models` endpoint. Add Xilos as a connection and OpenWebUI fetches the available models automatically.
 
 <Steps>
-  <Steps.Step title="Open OpenWebUI settings">
-    Log in to your OpenWebUI instance as an administrator. Navigate to **Settings → Connections** in the admin panel.
-  </Steps.Step>
+  ### Open OpenWebUI settings
 
-  <Steps.Step title="Add a new OpenAI API connection">
+    Log in to your OpenWebUI instance as an administrator. Navigate to **Settings → Connections** in the admin panel.
+  
+
+  ### Add a new OpenAI API connection
+
     Click **Add Connection** (or **Add OpenAI API** depending on your version) and enter the following:
 
     - **URL:** `https://api.xilos.ai/api/v1`
     - **API Key:** `your-xilos-api-key`
 
     Set the connection name to `Xilos` for easy identification.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Save and enable the connection">
+  ### Save and enable the connection
+
     Click **Save** and toggle the connection to enabled. OpenWebUI fetches the model list from the Xilos `/models` endpoint. The `xilos` model (and any other models surfaced by your routing configuration) appears in the model picker.
-  </Steps.Step>
+  
 
-  <Steps.Step title="Select the Xilos model">
+  ### Select the Xilos model
+
     In the chat interface, open the model picker and select `xilos`. Messages now flow through the Xilos gateway.
 
     <Callout type="info">
       When the model is set to `xilos`, the Xilos routing engine selects the underlying LLM for each query based on your routing rules. To target a specific model, select it from the model picker if it appears, or configure a routing rule that routes to it.
     </Callout>
-  </Steps.Step>
+  
 </Steps>
 
 <Callout type="warning">
