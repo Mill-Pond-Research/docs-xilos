@@ -2,18 +2,176 @@
 title: Eval Datasets API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Eval Datasets API
 
-Create evaluation datasets, add test cases, and run regression tests against routing rules.
+Eval datasets are collections of test cases used to evaluate routing accuracy, response quality, and model performance. Create a dataset, add test cases, then run it against your routing rules to measure accuracy.
 
-## Sections
+## Dataset Object
 
-- List Datasets
-- Create Dataset
-- Add Test Cases
-- Run Dataset
-- Results
+```json
+{
+  "id": "eval_01HXYZ",
+  "name": "Routing accuracy Q1",
+  "test_cases": [
+    {
+      "query": "Write a Python function to reverse a string",
+      "expected_rule_id": "rule_01HXYZ"
+    },
+    {
+      "query": "Translate this to French",
+      "expected_rule_id": "rule_01ABC"
+    }
+  ],
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/eval-datasets` | List all eval datasets |
+| `POST` | `/eval-datasets` | Create a new eval dataset |
+| `POST` | `/eval-datasets/{id}/run` | Run an eval dataset |
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Eval Datasets
+
+```
+GET /api/v1/eval-datasets
+```
+
+Returns all eval datasets for your organization.
+
+### Response
+
+```json
+[
+  {
+    "id": "eval_01HXYZ",
+    "name": "Routing accuracy Q1",
+    "test_cases": [...],
+    "created_at": "2025-01-15T10:30:00Z"
+  }
+]
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/eval-datasets \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+---
+
+## Create Eval Dataset
+
+```
+POST /api/v1/eval-datasets
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the dataset. |
+| `test_cases` | array | Yes | Array of test case objects. |
+
+### Test Case Object
+
+| Field | Type | Description |
+|-------|------|------|
+| `query` | string | The test query string. |
+| `expected_rule_id` | string | The routing rule ID that should match this query. |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/eval-datasets \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Routing accuracy Q1",
+    "test_cases": [
+      {
+        "query": "Write a Python function to reverse a string",
+        "expected_rule_id": "rule_01HXYZ"
+      },
+      {
+        "query": "Translate this to French",
+        "expected_rule_id": "rule_01ABC"
+      }
+    ]
+  }'
+```
+
+### Response
+
+Returns the created [Dataset Object](#dataset-object).
+
+---
+
+## Run Eval Dataset
+
+```
+POST /api/v1/eval-datasets/{id}/run
+```
+
+Runs all test cases in the dataset against your current routing rules and returns accuracy metrics.
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/eval-datasets/eval_01HXYZ/run \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+### Response
+
+```json
+{
+  "id": "eval_01HXYZ",
+  "status": "completed",
+  "total_cases": 2,
+  "correct_matches": 2,
+  "accuracy": 1.0,
+  "results": [
+    {
+      "query": "Write a Python function to reverse a string",
+      "expected_rule_id": "rule_01HXYZ",
+      "matched_rule_id": "rule_01HXYZ",
+      "correct": true
+    },
+    {
+      "query": "Translate this to French",
+      "expected_rule_id": "rule_01ABC",
+      "matched_rule_id": "rule_01ABC",
+      "correct": true
+    }
+  ]
+}
+```
+
+<Callout type="info">
+  Eval runs are synchronous for small datasets. For datasets with more than 100 test cases, the response returns a `pending` status — poll the dataset endpoint to check for results.
+</Callout>
+
+## Using Eval Datasets
+
+<Steps>
+  ### Create Test Cases
+  Write queries that represent your real traffic. Assign the expected routing rule for each.
+
+  ### Run the Dataset
+  Execute the dataset to measure how accurately your routing rules match queries to the intended model.
+
+  ### Review Results
+  Identify mismatches where queries routed to the wrong rule. Update trigger phrases or sample queries to improve accuracy.
+
+  ### Re-run After Changes
+  After updating routing rules, re-run the dataset to verify improvements. Track accuracy over time as your rules evolve.
+</Steps>

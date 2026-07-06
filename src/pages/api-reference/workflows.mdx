@@ -2,17 +2,185 @@
 title: Workflows API
 ---
 
+import { Callout, Tabs, Steps } from 'nextra/components'
+
 # Workflows API
 
-Create, update, and manage multi-model workflows.
+Workflows chain multiple LLM stages together, with an optional merge step that combines outputs into a single response. Use these endpoints to create and manage multi-model workflows.
 
-## Sections
+## Workflow Object
 
-- List Workflows
-- Create Workflow
-- Update Workflow
-- Workflow Object
+```json
+{
+  "id": "wf_01HXYZ",
+  "name": "Research and summarize",
+  "description": "Generate a detailed analysis, then summarize for executives.",
+  "stages": [
+    {
+      "name": "Deep analysis",
+      "llm_id": "gpt-4o",
+      "prompt": "Provide a detailed analysis of the following topic: {{input}}"
+    },
+    {
+      "name": "Executive summary",
+      "llm_id": "claude-3-5-sonnet",
+      "prompt": "Summarize the following analysis in 3 bullet points: {{previous}}"
+    }
+  ],
+  "execution_mode": "sequential",
+  "merge_llm_id": null,
+  "merge_prompt": null,
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}
+```
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/workflows` | List all workflows |
+| `POST` | `/workflows` | Create a new workflow |
+| `PUT` | `/workflows/{id}` | Update an existing workflow |
+
+<Callout type="info">
+  Workflows do not have a DELETE endpoint. To remove a workflow, contact your account admin or use the dashboard.
+</Callout>
 
 ---
 
-*This page is a stub. Content will be added soon.*
+## List Workflows
+
+```
+GET /api/v1/workflows
+```
+
+Returns all workflows for your organization.
+
+### Response
+
+```json
+[
+  {
+    "id": "wf_01HXYZ",
+    "name": "Research and summarize",
+    "description": "Generate a detailed analysis, then summarize for executives.",
+    "stages": [...],
+    "execution_mode": "sequential",
+    "merge_llm_id": null,
+    "merge_prompt": null,
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z"
+  }
+]
+```
+
+### cURL
+
+```bash
+curl https://api.xilos.ai/api/v1/workflows \
+  -H "Authorization: Bearer YOUR_X..._KEY"
+```
+
+---
+
+## Create Workflow
+
+```
+POST /api/v1/workflows
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name for the workflow. |
+| `description` | string | No | Description of what the workflow does. |
+| `stages` | array | Yes | Ordered array of stage objects. |
+| `execution_mode` | string | No | `sequential` or `parallel`. Default: `sequential`. |
+| `merge_llm_id` | string | No | Model ID used to merge parallel stage outputs. Required for `parallel` mode. |
+| `merge_prompt` | string | No | Prompt template for the merge step. Use `{{stages}}` to reference stage outputs. |
+
+### Stage Object
+
+| Field | Type | Description |
+|-------|------|------|
+| `name` | string | Stage name. |
+| `llm_id` | string | Model ID for this stage. |
+| `prompt` | string | Prompt template. Use `{{input}}` for the original input, `{{previous}}` for the prior stage output (sequential mode). |
+
+### cURL
+
+```bash
+curl -X POST https://api.xilos.ai/api/v1/workflows \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "name": "Research and summarize",
+    "description": "Generate a detailed analysis, then summarize for executives.",
+    "stages": [
+      {
+        "name": "Deep analysis",
+        "llm_id": "gpt-4o",
+        "prompt": "Provide a detailed analysis of the following topic: {{input}}"
+      },
+      {
+        "name": "Executive summary",
+        "llm_id": "claude-3-5-sonnet",
+        "prompt": "Summarize the following analysis in 3 bullet points: {{previous}}"
+      }
+    ],
+    "execution_mode": "sequential"
+  }'
+```
+
+### Response
+
+Returns the created [Workflow Object](#workflow-object).
+
+---
+
+## Update Workflow
+
+```
+PUT /api/v1/workflows/{id}
+```
+
+Updates an existing workflow. All fields are optional — only provided fields are updated.
+
+### Request Body
+
+Same fields as [Create Workflow](#create-workflow). All fields are optional.
+
+### cURL
+
+```bash
+curl -X PUT https://api.xilos.ai/api/v1/workflows/wf_01HXYZ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_X..._KEY" \
+  -d '{
+    "execution_mode": "parallel",
+    "merge_llm_id": "gpt-4o",
+    "merge_prompt": "Combine the following analyses into a single report: {{stages}}"
+  }'
+```
+
+### Response
+
+Returns the updated workflow object.
+
+## Designing Workflows
+
+<Steps>
+  ### Define Your Stages
+  Identify the distinct steps your workflow needs. Each stage runs on a single model with its own prompt.
+
+  ### Choose Execution Mode
+  Use `sequential` when each stage depends on the previous output. Use `parallel` when stages are independent and you want to merge results.
+
+  ### Configure Merge (Parallel Only)
+  For parallel workflows, set `merge_llm_id` and `merge_prompt` to combine stage outputs into a single response.
+
+  ### Test and Iterate
+  Run sample queries through the workflow and review outputs in the dashboard. Adjust prompts and model selections as needed.
+</Steps>
