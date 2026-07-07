@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xilos Sidebar — Design Exploration</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px}
+h1{font-size:1.5rem;font-weight:700;color:#0066FF;margin-bottom:4px}
+.sub{color:#64748b;margin-bottom:32px;font-size:.85rem}
+h2{font-size:1rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin:40px 0 16px}
+.cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+@media(max-width:1100px){.cards{grid-template-columns:1fr}}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;overflow:hidden}
+.card-label{padding:16px 20px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0066FF;border-bottom:1px solid #334155}
+.card-desc{padding:12px 20px;font-size:.78rem;color:#94a3b8;line-height:1.5}
+.demo{height:420px;position:relative;overflow:hidden}
+
+/* === SHARED SIDEBAR STYLES === */
+:root{--rail:56px;--full:220px;--accent:#0066FF;--bg:#1e293b;--hover:#334155;--active:rgba(0,102,255,.12);--text:#e2e8f0;--muted:#64748b}
+
+/* === OPTION A: Icon Rail + Flyout === */
+.opt-a-rail{width:var(--rail);height:100%;background:#0f172a;border-right:1px solid #334155;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px}
+.opt-a-logo{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem;color:#fff;margin-bottom:8px}
+.opt-a-item{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.15s}
+.opt-a-item:hover{background:var(--hover);color:var(--text)}
+.opt-a-item.active{background:var(--active);color:var(--accent)}
+.opt-a-item.active::before{content:'';position:absolute;left:-8px;top:8px;bottom:8px;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.opt-a-flyout{position:absolute;left:var(--rail);top:0;width:200px;height:100%;background:#1e293b;border-right:1px solid #334155;padding:16px;opacity:0;transform:translateX(-8px);transition:.2s;pointer-events:none}
+.opt-a-rail .opt-a-item:hover ~ .opt-a-flyout{opacity:1;transform:translateX(0);pointer-events:auto}
+.opt-a-flyout-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+.opt-a-flyout-item{padding:8px 12px;border-radius:8px;font-size:.82rem;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;transition:.1s}
+.opt-a-flyout-item:hover{background:var(--hover)}
+.opt-a-flyout-item.active{background:var(--active);color:var(--accent);font-weight:600}
+.opt-a-content{position:absolute;left:var(--rail);top:0;right:0;bottom:0;background:#111827;padding:24px}
+.opt-a-content .hint{color:var(--muted);font-size:.75rem;margin-top:8px}
+
+/* === OPTION B: Auto-collapsing === */
+.opt-b-sidebar{width:var(--full);height:100%;background:#0f172a;border-right:1px solid #334155;display:flex;flex-direction:column;transition:width .2s}
+.opt-b-sidebar:hover{width:var(--full)}
+.opt-b-collapsed{width:var(--rail)}
+.opt-b-header{padding:12px 16px;display:flex;align-items:center;gap:10px}
+.opt-b-logo{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.65rem;color:#fff;flex-shrink:0}
+.opt-b-title{font-weight:700;font-size:.95rem;white-space:nowrap}
+.opt-b-collapsed .opt-b-title{opacity:0}
+.opt-b-section-label{padding:20px 16px 6px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.opt-b-collapsed .opt-b-section-label{opacity:0}
+.opt-b-item{padding:8px 16px;display:flex;align-items:center;gap:12px;border-radius:10px;margin:2px 8px;font-size:.83rem;color:var(--text);cursor:pointer;transition:.1s;position:relative}
+.opt-b-item:hover{background:var(--hover)}
+.opt-b-item.active{background:var(--active);color:var(--accent);font-weight:600}
+.opt-b-collapsed .opt-b-item{justify-content:center;margin:2px 8px}
+.opt-b-collapsed .opt-b-label{opacity:0;width:0}
+.opt-b-tooltip{display:none;position:absolute;left:48px;background:#1e293b;border:1px solid #475569;padding:6px 10px;border-radius:6px;font-size:.75rem;white-space:nowrap;z-index:10}
+.opt-b-collapsed .opt-b-item:hover .opt-b-tooltip{display:block}
+.opt-b-content{position:absolute;left:var(--full);top:0;right:0;bottom:0;background:#111827;padding:24px}
+.opt-b-content .hint{color:var(--muted);font-size:.75rem;margin-top:8px}
+
+/* === OPTION C: Hybrid rail + panel === */
+.opt-c-wrap{display:flex;height:100%}
+.opt-c-rail{width:var(--rail);background:#0f172a;border-right:1px solid #334155;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px}
+.opt-c-logo{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem;color:#fff;margin-bottom:8px}
+.opt-c-section-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:.15s;position:relative}
+.opt-c-section-icon:hover{background:var(--hover);color:var(--text)}
+.opt-c-section-icon.active{background:var(--active);color:var(--accent)}
+.opt-c-section-icon.active::after{content:'';position:absolute;right:-6px;top:10px;bottom:10px;width:3px;background:var(--accent);border-radius:3px 0 0 3px}
+.opt-c-panel{width:180px;background:#1e293b;border-right:1px solid #334155;padding:16px;display:flex;flex-direction:column}
+.opt-c-panel-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+.opt-c-panel-item{padding:8px 12px;border-radius:8px;font-size:.82rem;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;transition:.1s}
+.opt-c-panel-item:hover{background:var(--hover)}
+.opt-c-panel-item.active{background:var(--active);color:var(--accent);font-weight:600}
+.opt-c-content{flex:1;background:#111827;padding:24px}
+.opt-c-content .hint{color:var(--muted);font-size:.75rem;margin-top:8px}
+
+/* Icons via emoji for prototype */
+.ic{font-size:1rem}
+</style>
+</head>
+<body>
+<h1>Xilos Sidebar — Design Exploration</h1>
+<p class="sub">Three approaches. All eliminate the slider. All work on mobile. Pick one to implement.</p>
+
+<div class="cards">
+
+<!-- OPTION A -->
+<div class="card">
+<div class="card-label">A — Icon Rail + Flyout (Linear)</div>
+<div class="card-desc">Fixed 56px rail. Hover a section icon → flyout panel shows that section's items. Active item has left accent bar. Zero layout shift ever. Best for power users with many items.</div>
+<div class="demo" style="display:flex">
+  <div class="opt-a-rail">
+    <div class="opt-a-logo">X</div>
+    <div class="opt-a-item active"><span class="ic">🏠</span></div>
+    <div class="opt-a-item"><span class="ic">📊</span></div>
+    <div class="opt-a-item"><span class="ic">⚡</span></div>
+    <div class="opt-a-item"><span class="ic">🛡️</span></div>
+    <div class="opt-a-item"><span class="ic">🔌</span></div>
+    <div style="flex:1"></div>
+    <div class="opt-a-item"><span class="ic">⚙️</span></div>
+    <div class="opt-a-item"><span class="ic">📖</span></div>
+    <div class="opt-a-flyout">
+      <div class="opt-a-flyout-title">Overview</div>
+      <div class="opt-a-flyout-item active">Dashboard</div>
+      <div class="opt-a-flyout-item">Query Log</div>
+      <div class="opt-a-flyout-item">Cost Controls</div>
+    </div>
+  </div>
+  <div class="opt-a-content">
+    <div style="font-weight:600;font-size:.9rem">Dashboard</div>
+    <div class="hint">Rail is always 56px. Flyout appears on hover.<br>On mobile: same rail, flyout becomes full overlay.</div>
+  </div>
+</div>
+</div>
+
+<!-- OPTION B -->
+<div class="card">
+<div class="card-label">B — Auto-collapsing + Tooltips (Slack)</div>
+<div class="card-desc">Full 220px sidebar on desktop. Auto-collapses to 56px below 1024px. Collapsed icons show tooltips on hover. No manual toggle. Mobile: hamburger opens overlay drawer.</div>
+<div class="demo" style="position:relative">
+  <div class="opt-b-sidebar">
+    <div class="opt-b-header">
+      <div class="opt-b-logo">X</div>
+      <div class="opt-b-title">Xilos</div>
+    </div>
+    <div class="opt-b-section-label">Overview</div>
+    <div class="opt-b-item active">
+      <span class="ic">🏠</span>
+      <span class="opt-b-label">Dashboard</span>
+      <span class="opt-b-tooltip">Dashboard</span>
+    </div>
+    <div class="opt-b-item">
+      <span class="ic">📋</span>
+      <span class="opt-b-label">Query Log</span>
+      <span class="opt-b-tooltip">Query Log</span>
+    </div>
+    <div class="opt-b-item">
+      <span class="ic">💳</span>
+      <span class="opt-b-label">Cost Controls</span>
+      <span class="opt-b-tooltip">Cost Controls</span>
+    </div>
+    <div class="opt-b-section-label">Orchestration</div>
+    <div class="opt-b-item">
+      <span class="ic">⚡</span>
+      <span class="opt-b-label">Workflows</span>
+      <span class="opt-b-tooltip">Workflows</span>
+    </div>
+    <div class="opt-b-item">
+      <span class="ic">🔧</span>
+      <span class="opt-b-label">Routing Rules</span>
+      <span class="opt-b-tooltip">Routing Rules</span>
+    </div>
+  </div>
+  <div class="opt-b-content">
+    <div style="font-weight:600;font-size:.9rem">Dashboard</div>
+    <div class="hint">Full sidebar → auto-collapses on smaller screens.<br>Tooltips appear on hover when collapsed.</div>
+  </div>
+</div>
+</div>
+
+<!-- OPTION C -->
+<div class="card">
+<div class="card-label">C — Hybrid Rail + Panel (Notion)</div>
+<div class="card-desc">56px rail with section icons. Click a section → panel expands showing that section's items. Only one section open at a time. Progressive disclosure — shows what you need when you need it.</div>
+<div class="demo">
+  <div class="opt-c-wrap">
+    <div class="opt-c-rail">
+      <div class="opt-c-logo">X</div>
+      <div class="opt-c-section-icon active"><span class="ic">🏠</span></div>
+      <div class="opt-c-section-icon"><span class="ic">📊</span></div>
+      <div class="opt-c-section-icon"><span class="ic">⚡</span></div>
+      <div class="opt-c-section-icon"><span class="ic">🛡️</span></div>
+      <div class="opt-c-section-icon"><span class="ic">🔌</span></div>
+      <div style="flex:1"></div>
+      <div class="opt-c-section-icon"><span class="ic">⚙️</span></div>
+    </div>
+    <div class="opt-c-panel">
+      <div class="opt-c-panel-title">Overview</div>
+      <div class="opt-c-panel-item active">Dashboard</div>
+      <div class="opt-c-panel-item">Query Log</div>
+      <div class="opt-c-panel-item">Cost Controls</div>
+    </div>
+    <div class="opt-c-content">
+      <div style="font-weight:600;font-size:.9rem">Dashboard</div>
+      <div class="hint">Rail always visible. Panel shows active section.<br>Mobile: rail stays, panel becomes bottom sheet.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<h2>Performance Comparison</h2>
+<div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;font-size:.8rem;color:#cbd5e1;line-height:1.8">
+<table style="width:100%;border-collapse:collapse">
+<tr style="border-bottom:1px solid #334155">
+  <th style="text-align:left;padding:8px;color:#94a3b8"></th>
+  <th style="text-align:center;padding:8px;color:#0066FF">A — Flyout</th>
+  <th style="text-align:center;padding:8px;color:#0066FF">B — Auto-collapse</th>
+  <th style="text-align:center;padding:8px;color:#0066FF">C — Hybrid</th>
+</tr>
+<tr style="border-bottom:1px solid #334155">
+  <td style="padding:8px">Layout shift on toggle</td>
+  <td style="text-align:center;padding:8px">None</td>
+  <td style="text-align:center;padding:8px">None (auto)</td>
+  <td style="text-align:center;padding:8px">Panel only</td>
+</tr>
+<tr style="border-bottom:1px solid #334155">
+  <td style="padding:8px">Mobile strategy</td>
+  <td style="text-align:center;padding:8px">Rail + overlay</td>
+  <td style="text-align:center;padding:8px">Hamburger drawer</td>
+  <td style="text-align:center;padding:8px">Rail + sheet</td>
+</tr>
+<tr style="border-bottom:1px solid #334155">
+  <td style="padding:8px">Labels visible when collapsed</td>
+  <td style="text-align:center;padding:8px">On hover</td>
+  <td style="text-align:center;padding:8px">Tooltips</td>
+  <td style="text-align:center;padding:8px">In panel</td>
+</tr>
+<tr style="border-bottom:1px solid #334155">
+  <td style="padding:8px">Max content width</td>
+  <td style="text-align:center;padding:8px">Best (56px)</td>
+  <td style="text-align:center;padding:8px">Good (220→56px)</td>
+  <td style="text-align:center;padding:8px">Good (56+180px)</td>
+</tr>
+<tr style="border-bottom:1px solid #334155">
+  <td style="padding:8px">JS complexity</td>
+  <td style="text-align:center;padding:8px">Low</td>
+  <td style="text-align:center;padding:8px">Lowest</td>
+  <td style="text-align:center;padding:8px">Medium</td>
+</tr>
+<tr>
+  <td style="padding:8px">Discoverability</td>
+  <td style="text-align:center;padding:8px">Medium</td>
+  <td style="text-align:center;padding:8px">High</td>
+  <td style="text-align:center;padding:8px">High</td>
+</tr>
+</table>
+</div>
+
+<h2>My Recommendation</h2>
+<div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;font-size:.82rem;color:#cbd5e1;line-height:1.7">
+<p><b style="color:#0066FF">Option B (Auto-collapsing)</b> is the safest, most performant choice for Xilos:</p>
+<ul style="margin:12px 0;padding-left:20px;line-height:1.8">
+<li>Zero layout shift — the sidebar width is determined by breakpoint, not a toggle</li>
+<li>Lowest JS complexity — CSS media queries handle the collapse, no state management</li>
+<li>Highest discoverability — labels are visible on desktop, tooltips on mobile/tablet</li>
+<li>Familiar pattern — Slack, Discord, Vercel all use this approach</li>
+<li>Mobile: hamburger button opens a temporary drawer (overlay, not permanent)</li>
+<li>Fewest React re-renders — the sidebar state is implicit (CSS), not explicit (useState)</li>
+</ul>
+<p style="margin-top:12px"><b style="color:#94a3b8">Option A</b> is better if Xilos grows to 30+ menu items (the flyout scales better). <b style="color:#94a3b8">Option C</b> is better if sections have complex sub-navigation (3+ levels).</p>
+</div>
+
+</body>
+</html>

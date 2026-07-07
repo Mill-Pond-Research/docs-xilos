@@ -13,6 +13,7 @@
   ],
   "redirects": [
     { "source": "/docs", "destination": "/", "permanent": false },
-    { "source": "/documentation", "destination": "/", "permanent": false }
+    { "source": "/documentation", "destination": "/", "permanent": false },
+    { "source": "/login", "destination": "/login.html", "permanent": false }
   ]
 }

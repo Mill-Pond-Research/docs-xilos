@@ -62,6 +62,7 @@ const config: DocsThemeConfig = {
       <meta name="twitter:card" content="summary_large_image" />
       <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       <link rel="stylesheet" href="/xilos.css" />
+      <script src="/tracker.js" defer />
     </>
   ),
   darkMode: true,
