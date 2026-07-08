@@ -36,7 +36,11 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all paths except _next/static, _next/image, favicon, and public assets
-    "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image).*)",
+    // Match all paths except:
+    // - _next/static, _next/image (Next.js internals)
+    // - favicon, logos, CSS, OG image (public assets)
+    // - /login, /login.html (local login page)
+    // - /api/* (auth, logout, tracking endpoints)
+    "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image|login\\.html|login$|api).*)",
   ],
 };
