@@ -4,6 +4,13 @@ const LOGIN_URL = "https://www.xilos.ai/login?redirect=docs";
 const VERIFY_URL = "https://api.xilos.ai/api/v1/auth/token/verify/";
 
 export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Serve the local login page at /login (rewrite to the static HTML file)
+  if (pathname === "/login" || pathname === "/login.html") {
+    return NextResponse.rewrite(new URL("/login.html", req.url));
+  }
+
   const token = req.cookies.get("xilos_docs_token")?.value;
 
   // No token cookie — redirect to login
@@ -39,8 +46,7 @@ export const config = {
     // Match all paths except:
     // - _next/static, _next/image (Next.js internals)
     // - favicon, logos, CSS, OG image (public assets)
-    // - /login, /login.html (local login page)
     // - /api/* (auth, logout, tracking endpoints)
-    "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image|login\\.html|login$|api).*)",
+    "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image|api).*)",
   ],
 };
