@@ -46,7 +46,7 @@ export const config = {
     // Match all paths except:
     // - _next/static, _next/image (Next.js internals)
     // - favicon, logos, CSS, OG image (public assets)
-    // - /api/* (auth, logout, tracking endpoints)
-    "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image|api).*)",
+    // - /api/* (auth, logout, tracking endpoints — note: /api/ not /api to avoid excluding /api-reference)
+    "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image|api/).*)",
   ],
 };
