@@ -11,4 +11,14 @@ module.exports = withNextra({
   images: {
     unoptimized: true,
   },
+  async headers() {
+    return [
+      {
+        source: "/((?!_next/static|_next/image|favicon\\.svg|favicon\\.ico|xilos-logo-.*\\.svg|xilos\\.css|og-image|signin\\.html|api).*)",
+        headers: [
+          { key: "Cache-Control", value: "no-store, must-revalidate" },
+        ],
+      },
+    ];
+  },
 });
