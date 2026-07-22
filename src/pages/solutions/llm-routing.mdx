@@ -1,0 +1,78 @@
+---
+title: LLM Routing
+description: Multi-provider LLM routing without vendor lock-in. Route queries to the right model based on cost, capability, and content. Xilos provides an OpenAI-compatible AI gateway with intelligent routing rules.
+og:title: LLM Routing — Multi-Provider Without Lock-In
+og:description: Route every AI query to the right model based on cost, capability, and content. Xilos provides an OpenAI-compatible gateway with intelligent routing rules, fallbacks, and per-org provider management.
+---
+
+# LLM Routing: Multi-Provider Without Lock-In
+
+import { Callout } from 'nextra/components'
+
+<Callout type="info" emoji="💡">
+Output token costs range from $0.14 to $30.00 per million tokens — a **214x differential** between the cheapest and most expensive models. Most organizations send every query to their most expensive model.
+</Callout>
+
+Organations use 3-7 different LLM providers — OpenAI, Anthropic, Google, Groq, Fireworks, open-source models. But without a routing layer, every application hardcodes its provider, and switching models means rewriting code.
+
+## The Problem with Hardcoded LLM Providers
+
+When each application directly calls an LLM provider's API:
+
+- **Switching models requires code changes** in every application
+- **No fallback** when a provider goes down or rate-limits you
+- **No cost optimization** — every query goes to the same expensive model regardless of complexity
+- **No governance** — queries bypass your security and compliance rules
+- **Vendor lock-in** — your infrastructure is captive to one provider's pricing and roadmap
+
+## How Xilos LLM Routing Works
+
+Xilos provides an **OpenAI-compatible API gateway**. Your applications call Xilos once, and Xilos routes each query to the right model based on your rules.
+
+### Intelligent Routing Rules
+
+Define routing rules that match queries to models based on:
+
+- **Keywords and content** — Route legal queries to a private enterprise model, marketing content to a cost-efficient model
+- **User role and department** — Different teams get different models
+- **Cost optimization** — Simple queries go to cheap models, complex queries go to frontier models
+- **Organizational policy** — Free-tier users get one model, paid users get another
+
+### Automatic Fallbacks
+
+When a provider goes down or returns an error, Xilos automatically falls back to your configured secondary model. Your users never see an outage.
+
+### Zero-Code Model Switching
+
+Switching from GPT-5 to Claude Opus to Gemini is a configuration change in the Xilos dashboard — not a code deploy. Your applications don't change at all.
+
+### Per-Organization Provider Management
+
+Each Xilos organization manages its own provider credentials (API keys) in an encrypted credential store. Different orgs can use different providers, different models, and different routing rules — all through the same Xilos gateway.
+
+### OpenAI-Compatible API
+
+Xilos exposes an OpenAI-compatible `/chat/completions` endpoint. Any tool that supports OpenAI (TypingMind, LangChain, custom apps, WorkBench) works with Xilos without modification. Just point the base URL at your Xilos instance.
+
+## Routing vs. Gateway: What's the Difference?
+
+A **gateway** is the secure entry point — authentication, rate limiting, logging, compliance. A **router** sits behind the gateway and makes intelligent model selection. Xilos provides both in one platform.
+
+| Capability | Basic Proxy | AI Gateway | Xilos |
+|-----------|------------|------------|-------|
+| Multi-provider routing | ✗ | ✓ | ✓ |
+| Content-based routing | ✗ | ✗ | ✓ |
+| Automatic fallbacks | ✗ | ✓ | ✓ |
+| Per-org credentials | ✗ | ✓ | ✓ |
+| Governance + restrictions | ✗ | ✗ | ✓ |
+| Audit logs | ✗ | ✓ | ✓ |
+| Budget control | ✗ | ✗ | ✓ |
+| OpenAI-compatible API | Partial | ✓ | ✓ |
+
+## Start Routing in Minutes
+
+Point your application's OpenAI base URL at Xilos, configure your providers and routing rules in the dashboard, and every query is automatically routed, logged, and governed.
+
+[See how it works →](/getting-started)
+
+[Compare LLM costs →](https://spotlight.xilos.ai/models)

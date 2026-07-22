@@ -1,0 +1,87 @@
+---
+title: WorkBench
+description: WorkBench is your organization's AI workspace. Projects, conversations, documents, agents, and RAG — all connected to the Xilos governance platform. The best way to interact with AI for your team.
+og:title: WorkBench — Your Organization's AI Workspace
+og:description: WorkBench is an agentic AI frontend with projects, conversations, documents, agents, routines, and RAG. Connected to Xilos for governance, routing, and visibility.
+---
+
+# WorkBench: Your Organization's AI Workspace
+
+import { Callout } from 'nextra/components'
+
+<Callout type="info" emoji="✨">
+WorkBench is the application layer on top of the Xilos governance platform. While Xilos handles routing, restrictions, and audit logging, WorkBench gives your team a beautiful, fast, governed interface to actually use AI.
+</Callout>
+
+WorkBench is how your organization uses AI. Not personal ChatGPT accounts. Not ungoverned API integrations. A unified workspace where every conversation, document, and agent is governed, logged, and optimized through Xilos.
+
+## What WorkBench Does
+
+### Projects
+
+A project is a collection of conversations, documents, and uploads. All files within a project are used as context for all conversations and documents within that project. Multiple users can have access to the same project.
+
+### Conversations
+
+Chat with any LLM through the Xilos gateway. Every message is:
+- Routed to the right model based on your org's routing rules
+- Logged in the Xilos Query Log with full metadata
+- Subject to your content restrictions and budget caps
+- Enhanced with RAG context from project files and org knowledge base
+
+### Documents
+
+When an AI conversation produces a document, it's automatically extracted and saved as an editable document in the project. Documents can be re-edited, shared, and used as context for future conversations.
+
+### Agents
+
+Create custom AI agents with system instructions and contextual documents. Agents can be private (creator only), shared within a project, or published to the organization's agent library. Agents can also run routines — scheduled or manual automated executions.
+
+### Foundational Knowledge Base (RAG)
+
+WorkBench is built on a foundational vector/RAG knowledge base that flavors the outputs of the entire system. Upload documents to a project or the org library, and every conversation in that project automatically has access to that context via semantic search.
+
+### File Uploads
+
+Drag and drop files into the sidebar or conversation. Files dropped in the sidebar are added to the project. Files dropped in the conversation are added to the project AND attached as context to that specific conversation.
+
+## Why WorkBench vs. ChatGPT or Claude?
+
+| Capability | ChatGPT Team | Claude Team | WorkBench |
+|-----------|-------------|-------------|-----------|
+| Multi-provider access | OpenAI only | Anthropic only | All providers via Xilos |
+| Organizational governance | Limited | Limited | Full (routing, restrictions, audit) |
+| Per-user cost tracking | ✗ | ✗ | ✓ |
+| Content restrictions | ✗ | ✗ | ✓ |
+| Self-hosted knowledge base | ✗ | ✗ | ✓ (pgvector RAG) |
+| Custom agents | Limited | ✗ | ✓ (system prompt + context docs) |
+| Project-scoped context | ✗ | ✗ | ✓ |
+| Document extraction from chat | Manual | Manual | Automatic |
+| OpenAI-compatible API | ✗ | ✗ | ✓ |
+| Budget control per user | ✗ | ✗ | ✓ |
+| Admin user management | ✓ | ✓ | ✓ (via Xilos) |
+
+## How Access Works
+
+1. **Admin** sets up the Xilos organization — configures providers, models, routing rules
+2. **Admin** creates users in WorkBench (via Xilos user management)
+3. **Users** log in at xilos.ai → navigate to workbench.xilos.ai → automatically authenticated
+4. **Users** see only their projects and conversations — no access to governance settings
+5. **Admins** see WorkBench + Admin page + link to Xilos Dashboard
+
+## Connected to Xilos — Not Separate
+
+WorkBench is not a standalone product. Every query, every document, every agent is connected to the Xilos governance platform:
+
+- **Routing rules** determine which model handles each conversation
+- **Content restrictions** block sensitive data from leaving the org
+- **Query logs** capture every interaction for audit and compliance
+- **Budget quotas** prevent cost overruns
+- **Provider credentials** are managed at the org level in Xilos
+- **SuperAdmin** can switch between organizations to manage all tenants
+
+[Explore the platform →](/platform)
+
+[Try WorkBench →](https://workbench.xilos.ai)
+
+[Book a demo →](https://www.xilos.ai)
